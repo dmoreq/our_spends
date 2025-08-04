@@ -16,6 +16,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
+  final List<Map<String, String>> _conversationHistory = [];
 
   @override
   void dispose() {
@@ -31,9 +32,29 @@ class _ChatScreenState extends State<ChatScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     
-    if (authProvider.user == null) return;
+    // Debug logging
+    print('DEBUG: Sending message: $message');
+    print('DEBUG: User authenticated: ${authProvider.user != null}');
+    print('DEBUG: ExpenseProvider loading: ${expenseProvider.isLoading}');
+    
+    // Allow demo mode when Gemini API key is configured
+    if (authProvider.user == null) {
+      print('DEBUG: User not authenticated, checking for demo mode');
+      // Create a demo user ID for testing
+      final demoUserId = 'demo_user_${DateTime.now().millisecondsSinceEpoch}';
+      print('DEBUG: Using demo mode with user ID: $demoUserId');
+      
+      // Continue with demo user ID instead of returning
+      await _processChatMessage(message, demoUserId, expenseProvider);
+      return;
+    }
+    
+    // Normal authenticated flow
+    await _processChatMessage(message, authProvider.user!.uid, expenseProvider);
+  }
 
-    // Add user message to chat
+  Future<void> _processChatMessage(String message, String userId, ExpenseProvider expenseProvider) async {
+    // Add user message to chat and conversation history
     setState(() {
       _messages.add(ChatMessage(
         text: message,
@@ -42,32 +63,129 @@ class _ChatScreenState extends State<ChatScreen> {
       ));
     });
 
+    // Add user message to conversation history
+    _conversationHistory.add({
+      'role': 'user',
+      'content': message,
+    });
+
     _messageController.clear();
     _scrollToBottom();
 
-    // Send message to API
+    // Send message to Gemini AI with conversation history
     try {
-      await expenseProvider.sendMessage(message, authProvider.user!.uid);
+      print('DEBUG: Calling expenseProvider.sendMessage with userId: $userId');
+      print('DEBUG: Conversation history length: ${_conversationHistory.length}');
+      final response = await expenseProvider.sendMessage(message, userId, conversationHistory: _conversationHistory);
+      print('DEBUG: Received response: $response');
       
-      // Add AI response (this would come from the API response)
+      if (response['status'] == 'success') {
+        final aiResponse = response['data'] ?? "I received your message!";
+        
+        // Add AI response to chat
+        setState(() {
+          _messages.add(ChatMessage(
+            text: aiResponse,
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
+        });
+
+        // Add AI response to conversation history
+        _conversationHistory.add({
+          'role': 'assistant',
+          'content': aiResponse,
+        });
+
+        // Check if expense information was extracted
+        if (response['expense_info'] != null && response['expense_info']['hasExpense'] == true) {
+          final expenseMessage = "💡 I detected an expense in your message! Would you like me to help you add it to your expense tracker?";
+          
+          setState(() {
+            _messages.add(ChatMessage(
+              text: expenseMessage,
+              isUser: false,
+              timestamp: DateTime.now(),
+            ));
+          });
+
+          // Add expense detection message to conversation history
+          _conversationHistory.add({
+            'role': 'assistant',
+            'content': expenseMessage,
+          });
+        }
+      } else {
+        final errorMessage = response['data'] ?? "Sorry, I couldn't process your message. Please try again.";
+        
+        setState(() {
+          _messages.add(ChatMessage(
+            text: errorMessage,
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
+        });
+
+        // Add error response to conversation history
+        _conversationHistory.add({
+          'role': 'assistant',
+          'content': errorMessage,
+        });
+      }
+    } catch (e) {
+      print('DEBUG: Error in sendMessage: $e');
+      final errorMessage = "Sorry, I encountered an error. Please try again.";
+      
       setState(() {
         _messages.add(ChatMessage(
-          text: "Message processed successfully!", // This would be the actual API response
+          text: errorMessage,
           isUser: false,
           timestamp: DateTime.now(),
         ));
       });
-    } catch (e) {
-      setState(() {
-        _messages.add(ChatMessage(
-          text: "Sorry, I couldn't process your message. Please try again.",
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
+
+      // Add error message to conversation history
+      _conversationHistory.add({
+        'role': 'assistant',
+        'content': errorMessage,
       });
     }
 
     _scrollToBottom();
+  }
+
+  void _generateInsights() async {
+    final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+    
+    try {
+      final response = await expenseProvider.generateInsights();
+      
+      setState(() {
+        _messages.add(ChatMessage(
+          text: "📊 Here are your spending insights:",
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
+        
+        _messages.add(ChatMessage(
+          text: response['data'] ?? "Unable to generate insights at the moment.",
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
+      });
+      
+      _scrollToBottom();
+    } catch (e) {
+      setState(() {
+        _messages.add(ChatMessage(
+          text: "Sorry, I couldn't generate insights right now. Please try again.",
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
+      });
+      
+      _scrollToBottom();
+    }
   }
 
   void _scrollToBottom() {
@@ -90,6 +208,17 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Text(l10n.chatTitle),
         centerTitle: true,
+        actions: [
+          Consumer<ExpenseProvider>(
+            builder: (context, expenseProvider, child) {
+              return IconButton(
+                onPressed: expenseProvider.isLoading ? null : _generateInsights,
+                icon: const Icon(Icons.insights),
+                tooltip: 'Generate Spending Insights',
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

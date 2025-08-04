@@ -13,30 +13,49 @@ class ExpenseProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> sendMessage(String message, String userId) async {
+  Future<Map<String, dynamic>> sendMessage(String message, String userId, {List<Map<String, String>>? conversationHistory}) async {
     try {
       _setLoading(true);
       _clearError();
 
-      final response = await _apiService.processMessage(message, userId);
+      final response = await _apiService.processMessage(message, userId, _expenses, conversationHistory: conversationHistory);
       
       if (response['status'] == 'success') {
-        // Handle successful response
-        if (response['type'] == 'text') {
-          // Just a text response, no action needed
-        } else if (response['type'] == 'report') {
-          // Handle report data if needed
-        } else if (response['type'] == 'comparison') {
-          // Handle comparison data if needed
-        }
+        _setLoading(false);
+        return response;
       } else {
         _setError(response['data'] ?? 'Unknown error occurred');
+        _setLoading(false);
+        return response;
       }
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to process message: ${e.toString()}');
       _setLoading(false);
+      return {
+        'status': 'error',
+        'data': 'Failed to process message: ${e.toString()}',
+        'error_code': 'provider_error',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> generateInsights() async {
+    try {
+      _setLoading(true);
+      _clearError();
+
+      final response = await _apiService.generateInsights(_expenses);
+      
+      _setLoading(false);
+      return response;
+    } catch (e) {
+      _setError('Failed to generate insights: ${e.toString()}');
+      _setLoading(false);
+      return {
+        'status': 'error',
+        'data': 'Failed to generate insights: ${e.toString()}',
+        'error_code': 'insights_error',
+      };
     }
   }
 

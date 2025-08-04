@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late final GoogleSignIn _googleSignIn;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   User? _user;
   bool _isLoading = false;
@@ -43,7 +41,7 @@ class AuthProvider extends ChangeNotifier {
 
       // Since we're using demo configuration, go directly to demo authentication
       // This prevents popup blocking issues and provides a smooth demo experience
-      print('Demo mode: Skipping Google Sign-In popup to prevent browser blocking');
+      // Demo mode: Skipping Google Sign-In popup to prevent browser blocking
       await _simulateDemoAuthentication();
       _setLoading(false);
       return true;
@@ -56,7 +54,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _simulateDemoAuthentication() async {
     // For demo purposes, we'll create a mock user object
-    print('Demo authentication: Simulating successful sign-in');
+    // Demo authentication: Simulating successful sign-in
     _isDemoAuthenticated = true;
     _demoUser = {
       'uid': 'demo-user-123',
@@ -83,31 +81,6 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       _setError('Failed to sign out: ${e.toString()}');
       _setLoading(false);
-    }
-  }
-
-  Future<void> _createOrUpdateUserDocument(User user) async {
-    try {
-      final userDoc = _firestore.collection('users').doc(user.uid);
-      final docSnapshot = await userDoc.get();
-
-      if (!docSnapshot.exists) {
-        // Create new user document
-        await userDoc.set({
-          'email': user.email,
-          'display_name': user.displayName,
-          'preferred_currency': 'VND',
-          'created_at': FieldValue.serverTimestamp(),
-          'last_login': FieldValue.serverTimestamp(),
-        });
-      } else {
-        // Update last login
-        await userDoc.update({
-          'last_login': FieldValue.serverTimestamp(),
-        });
-      }
-    } catch (e) {
-      print('Error creating/updating user document: $e');
     }
   }
 

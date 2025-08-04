@@ -5,7 +5,7 @@ import '../services/api_service.dart';
 class ExpenseProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   
-  List<Expense> _expenses = [];
+  final List<Expense> _expenses = [];
   bool _isLoading = false;
   String? _errorMessage;
 

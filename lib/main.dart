@@ -25,8 +25,8 @@ void main() async {
       ),
     );
   } catch (e) {
-    print('Firebase initialization error: $e');
     // Continue without Firebase for demo purposes
+    // Firebase initialization error ignored in demo mode
   }
   
   runApp(const FamilyExpenseTrackerApp());

@@ -1,6 +1,6 @@
 # 🤖 AI Integration Setup Guide
 
-This guide will help you set up the AI integration for your Family Expense Tracker app. The app supports multiple AI providers, giving you flexibility in choosing which service to use.
+This guide will help you set up the AI integration for your Our Spends app. The app supports multiple AI providers, giving you flexibility in choosing which service to use.
 
 ## 📋 Supported AI Providers
 
@@ -63,7 +63,7 @@ The app currently supports the following AI providers:
 ### Method 1: Using the Settings UI (Recommended)
 
 1. **Open the App**
-   - Launch the Family Expense Tracker app
+   - Launch the Our Spends app
 
 2. **Navigate to AI Settings**
    - Tap on the Settings icon

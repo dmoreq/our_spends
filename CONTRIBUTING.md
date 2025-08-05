@@ -1,6 +1,6 @@
-# Contributing to Family Expense Tracker
+# Contributing to Our Spends
 
-Thank you for considering contributing to the Family Expense Tracker project! This document provides guidelines and instructions for contributing.
+Thank you for considering contributing to the Our Spends project! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -131,4 +131,4 @@ To add support for a new AI provider:
 
 If you have any questions about contributing, please open an issue or contact the project maintainers.
 
-Thank you for contributing to Family Expense Tracker!
+Thank you for contributing to Our Spends!

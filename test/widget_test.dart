@@ -7,17 +7,17 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:family_expense_tracker/main.dart';
+import 'package:our_spends/main.dart';
 
 void main() {
   testWidgets('App loads correctly', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const FamilyExpenseTrackerApp());
+    await tester.pumpWidget(const OurSpendsApp());
 
     // Verify that the app loads without crashing
     await tester.pumpAndSettle();
     
     // Check if login screen elements are present
-    expect(find.text('Family Expense Tracker'), findsOneWidget);
+    expect(find.text('Our Spends'), findsOneWidget);
   });
 }

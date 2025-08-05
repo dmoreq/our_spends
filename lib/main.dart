@@ -30,11 +30,11 @@ void main() async {
     // Firebase initialization error ignored in demo mode
   }
   
-  runApp(const FamilyExpenseTrackerApp());
+  runApp(const OurSpendsApp());
 }
 
-class FamilyExpenseTrackerApp extends StatelessWidget {
-  const FamilyExpenseTrackerApp({super.key});
+class OurSpendsApp extends StatelessWidget {
+  const OurSpendsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class FamilyExpenseTrackerApp extends StatelessWidget {
       child: Consumer<LanguageProvider>(
         builder: (context, languageProvider, child) {
           return MaterialApp(
-            title: 'Family Expense Tracker',
+            title: 'Our Spends',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,

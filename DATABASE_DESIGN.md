@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the comprehensive database design for the Family Expense Tracker application. The system uses SQLite for local storage with CSV export capabilities and provides a query interface for the AI chatbot.
+This document describes the comprehensive database design for the Our Spends application. The system uses SQLite for local storage with CSV export capabilities and provides a query interface for the AI chatbot.
 
 ## Database Schema
 

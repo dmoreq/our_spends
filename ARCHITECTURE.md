@@ -1,8 +1,8 @@
-# Family Expense Tracker Architecture
+# Our Spends Architecture
 
 ## Overview
 
-The Family Expense Tracker is built using Flutter and follows a clean architecture pattern with a focus on maintainability, testability, and scalability. This document outlines the high-level architecture and key components of the application.
+The Our Spends application is built using Flutter and follows a clean architecture pattern with a focus on maintainability, testability, and scalability. This document outlines the high-level architecture and key components of the application.
 
 ## Architecture Layers
 

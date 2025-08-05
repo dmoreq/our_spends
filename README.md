@@ -1,6 +1,6 @@
-# 🏠 Family Expense Tracker
+# 🏠 Our Spends
 
-An AI-powered family expense tracking application built with Flutter. This app helps families track, analyze, and optimize their spending with intelligent insights.
+An AI-powered expense tracking application built with Flutter. This app helps you track, analyze, and optimize your spending with intelligent insights.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.8.1-blue.svg)

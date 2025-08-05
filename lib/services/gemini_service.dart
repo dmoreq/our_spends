@@ -277,7 +277,7 @@ Vui lòng cung cấp phản hồi hữu ích và ngắn gọn bằng tiếng Vi�
 ''';
     } else {
       return '''
-You are a helpful AI assistant for a family expense tracker app. Your role is to:
+You are a helpful AI assistant for the Our Spends app. Your role is to:
 1. Help users track and categorize their expenses
 2. Provide insights about spending patterns
 3. Answer questions about their financial data

@@ -1,5 +1,5 @@
-name: family_expense_tracker
-description: "AI-powered family expense tracker with minimalist design"
+name: our_spends
+description: "AI-powered expense tracker with minimalist design"
 publish_to: 'none'
 
 version: 1.0.0+1

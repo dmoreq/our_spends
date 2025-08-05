@@ -8,35 +8,19 @@ class GeminiService {
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
   /// Process a chat message and return AI response with conversation memory
-  Future<String> processMessage(String message, List<Expense> userExpenses, {List<Map<String, String>>? conversationHistory}) async {
+  Future<String> processMessage(String message, List<Expense> userExpenses, {List<Map<String, String>>? conversationHistory, String? languageCode}) async {
     try {
       // Create context about user's expenses for better AI responses
-      final expenseContext = _buildExpenseContext(userExpenses);
+      final expenseContext = _buildExpenseContext(userExpenses, languageCode);
       
       // Build conversation history context
-      final conversationContext = _buildConversationContext(conversationHistory ?? []);
+      final conversationContext = _buildConversationContext(conversationHistory ?? [], languageCode);
       
       // Create the prompt with context and conversation history
-      final prompt = '''
-You are a helpful AI assistant for a family expense tracker app. Your role is to:
-1. Help users track and categorize their expenses
-2. Provide insights about spending patterns
-3. Answer questions about their financial data
-4. Suggest ways to save money
-5. Remember and reference previous parts of our conversation
-
-Current user expenses context:
-$expenseContext
-
-$conversationContext
-
-Current user message: $message
-
-Please provide a helpful, concise response. If the user mentions a purchase or expense, acknowledge it and offer to help categorize it. Reference previous conversation when relevant.
-''';
+      final prompt = _buildPrompt(expenseContext, conversationContext, message, languageCode);
 
       final response = await _makeGeminiRequest(prompt);
-      return response ?? 'Sorry, I couldn\'t process your message. Please try again.';
+      return response ?? _getDefaultErrorMessage(languageCode);
     } catch (e) {
       throw Exception('Failed to get AI response: ${e.toString()}');
     }
@@ -165,18 +149,24 @@ Keep the response concise and friendly.
   }
 
   /// Build context string from user's expenses
-  String _buildExpenseContext(List<Expense> expenses) {
+  String _buildExpenseContext(List<Expense> expenses, [String? languageCode]) {
     if (expenses.isEmpty) {
-      return 'No expenses recorded yet.';
+      return languageCode == 'vi' ? 'Chưa có chi tiêu nào được ghi lại.' : 'No expenses recorded yet.';
     }
 
     final recentExpenses = expenses.take(10).toList();
     final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
     
     final context = StringBuffer();
-    context.writeln('Total expenses: \$${totalAmount.toStringAsFixed(2)}');
-    context.writeln('Number of expenses: ${expenses.length}');
-    context.writeln('Recent expenses:');
+    if (languageCode == 'vi') {
+      context.writeln('Tổng chi tiêu: \$${totalAmount.toStringAsFixed(2)}');
+      context.writeln('Số lượng chi tiêu: ${expenses.length}');
+      context.writeln('Chi tiêu gần đây:');
+    } else {
+      context.writeln('Total expenses: \$${totalAmount.toStringAsFixed(2)}');
+      context.writeln('Number of expenses: ${expenses.length}');
+      context.writeln('Recent expenses:');
+    }
     
     for (final expense in recentExpenses) {
       context.writeln('- \$${expense.amount.toStringAsFixed(2)} for ${expense.item} (${expense.category})');
@@ -186,13 +176,13 @@ Keep the response concise and friendly.
   }
 
   /// Build conversation history context
-  String _buildConversationContext(List<Map<String, String>> conversationHistory) {
+  String _buildConversationContext(List<Map<String, String>> conversationHistory, [String? languageCode]) {
     if (conversationHistory.isEmpty) {
-      return 'This is the start of our conversation.';
+      return languageCode == 'vi' ? 'Đây là bắt đầu cuộc trò chuyện của chúng ta.' : 'This is the start of our conversation.';
     }
 
     final context = StringBuffer();
-    context.writeln('Previous conversation:');
+    context.writeln(languageCode == 'vi' ? 'Cuộc trò chuyện trước đó:' : 'Previous conversation:');
     
     // Show last 10 messages to keep context manageable
     final recentHistory = conversationHistory.take(10).toList();
@@ -200,7 +190,9 @@ Keep the response concise and friendly.
     for (final message in recentHistory) {
       final role = message['role'] ?? 'unknown';
       final content = message['content'] ?? '';
-      final prefix = role == 'user' ? 'User:' : 'Assistant:';
+      final prefix = role == 'user' 
+          ? (languageCode == 'vi' ? 'Người dùng:' : 'User:')
+          : (languageCode == 'vi' ? 'Trợ lý:' : 'Assistant:');
       context.writeln('$prefix $content');
     }
     
@@ -261,5 +253,53 @@ Keep the response concise and friendly.
 
 Configure your Gemini API key for more detailed AI insights!
 ''';
+  }
+
+  /// Build language-specific prompt for AI
+  String _buildPrompt(String expenseContext, String conversationContext, String message, String? languageCode) {
+    if (languageCode == 'vi') {
+      return '''
+Bạn là một trợ lý AI hữu ích cho ứng dụng theo dõi chi tiêu gia đình. Vai trò của bạn là:
+1. Giúp người dùng theo dõi và phân loại chi tiêu
+2. Cung cấp thông tin chi tiết về các mô hình chi tiêu
+3. Trả lời câu hỏi về dữ liệu tài chính của họ
+4. Đề xuất cách tiết kiệm tiền
+5. Nhớ và tham khảo các phần trước của cuộc trò chuyện
+
+Bối cảnh chi tiêu hiện tại của người dùng:
+$expenseContext
+
+$conversationContext
+
+Tin nhắn hiện tại của người dùng: $message
+
+Vui lòng cung cấp phản hồi hữu ích và ngắn gọn bằng tiếng Việt. Nếu người dùng đề cập đến việc mua hàng hoặc chi tiêu, hãy xác nhận và đề nghị giúp phân loại. Tham khảo cuộc trò chuyện trước đó khi có liên quan.
+''';
+    } else {
+      return '''
+You are a helpful AI assistant for a family expense tracker app. Your role is to:
+1. Help users track and categorize their expenses
+2. Provide insights about spending patterns
+3. Answer questions about their financial data
+4. Suggest ways to save money
+5. Remember and reference previous parts of our conversation
+
+Current user expenses context:
+$expenseContext
+
+$conversationContext
+
+Current user message: $message
+
+Please provide a helpful, concise response. If the user mentions a purchase or expense, acknowledge it and offer to help categorize it. Reference previous conversation when relevant.
+''';
+    }
+  }
+
+  /// Get default error message based on language
+  String _getDefaultErrorMessage(String? languageCode) {
+    return languageCode == 'vi' 
+        ? 'Xin lỗi, tôi không thể xử lý tin nhắn của bạn. Vui lòng thử lại.'
+        : 'Sorry, I couldn\'t process your message. Please try again.';
   }
 }

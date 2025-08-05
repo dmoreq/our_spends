@@ -1,24 +1,57 @@
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
 import '../services/api_service.dart';
+import '../services/database_service.dart';
+import '../services/expense_query_service.dart';
 
 class ExpenseProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
+  final DatabaseService _databaseService = DatabaseService();
+  late final ExpenseQueryService _queryService;
   
   final List<Expense> _expenses = [];
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isInitialized = false;
 
   List<Expense> get expenses => _expenses;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get isInitialized => _isInitialized;
 
-  Future<Map<String, dynamic>> sendMessage(String message, String userId, {List<Map<String, String>>? conversationHistory}) async {
+  ExpenseProvider() {
+    _queryService = ExpenseQueryService();
+    _initializeDatabase();
+  }
+
+  Future<void> _initializeDatabase() async {
+    try {
+      await _databaseService.init();
+      await _loadExpenses();
+      _isInitialized = true;
+      notifyListeners();
+    } catch (e) {
+      _setError('Failed to initialize database: ${e.toString()}');
+    }
+  }
+
+  Future<void> _loadExpenses() async {
+    try {
+      final expenses = await _databaseService.getExpenses();
+      _expenses.clear();
+      _expenses.addAll(expenses);
+      notifyListeners();
+    } catch (e) {
+      _setError('Failed to load expenses: ${e.toString()}');
+    }
+  }
+
+  Future<Map<String, dynamic>> sendMessage(String message, String userId, {List<Map<String, String>>? conversationHistory, String? languageCode}) async {
     try {
       _setLoading(true);
       _clearError();
 
-      final response = await _apiService.processMessage(message, userId, _expenses, conversationHistory: conversationHistory);
+      final response = await _apiService.processMessage(message, userId, _expenses, conversationHistory: conversationHistory, languageCode: languageCode);
       
       if (response['status'] == 'success') {
         _setLoading(false);
@@ -39,12 +72,12 @@ class ExpenseProvider extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> generateInsights() async {
+  Future<Map<String, dynamic>> generateInsights(String userId) async {
     try {
       _setLoading(true);
       _clearError();
 
-      final response = await _apiService.generateInsights(_expenses);
+      final response = await _apiService.generateInsights(_expenses, userId);
       
       _setLoading(false);
       return response;

@@ -134,6 +134,18 @@ abstract class AppLocalizations {
   /// **'Tell me about your expense...'**
   String get chatHint;
 
+  /// No description provided for @chatEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start tracking your expenses'**
+  String get chatEmptyTitle;
+
+  /// No description provided for @chatEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me about your purchases and I\'ll help you track them'**
+  String get chatEmptySubtitle;
+
   /// No description provided for @send.
   ///
   /// In en, this message translates to:
@@ -163,6 +175,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @vietnamese.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese'**
+  String get vietnamese;
 
   /// No description provided for @reports.
   ///

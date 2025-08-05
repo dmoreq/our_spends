@@ -27,6 +27,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get chatHint => 'Hãy nói cho tôi về khoản chi tiêu của bạn...';
 
   @override
+  String get chatEmptyTitle => 'Bắt đầu theo dõi chi tiêu của bạn';
+
+  @override
+  String get chatEmptySubtitle =>
+      'Hãy nói cho tôi về các giao dịch mua hàng và tôi sẽ giúp bạn theo dõi chúng';
+
+  @override
   String get send => 'Gửi';
 
   @override
@@ -40,6 +47,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get language => 'Ngôn Ngữ';
+
+  @override
+  String get selectLanguage => 'Chọn Ngôn Ngữ';
+
+  @override
+  String get english => 'Tiếng Anh';
+
+  @override
+  String get vietnamese => 'Tiếng Việt';
 
   @override
   String get reports => 'Báo Cáo';

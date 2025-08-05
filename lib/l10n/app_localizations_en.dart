@@ -27,6 +27,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatHint => 'Tell me about your expense...';
 
   @override
+  String get chatEmptyTitle => 'Start tracking your expenses';
+
+  @override
+  String get chatEmptySubtitle =>
+      'Tell me about your purchases and I\'ll help you track them';
+
+  @override
   String get send => 'Send';
 
   @override
@@ -40,6 +47,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get language => 'Language';
+
+  @override
+  String get selectLanguage => 'Select Language';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get vietnamese => 'Vietnamese';
 
   @override
   String get reports => 'Reports';

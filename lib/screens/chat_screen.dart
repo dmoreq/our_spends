@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/expense_provider.dart';
+import '../providers/language_provider.dart';
 import '../models/chat_message.dart';
 import '../l10n/app_localizations.dart';
 
@@ -72,11 +73,16 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.clear();
     _scrollToBottom();
 
-    // Send message to Gemini AI with conversation history
+    // Get current language code
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final languageCode = languageProvider.currentLocale.languageCode;
+
+    // Send message to Gemini AI with conversation history and language
     try {
       print('DEBUG: Calling expenseProvider.sendMessage with userId: $userId');
       print('DEBUG: Conversation history length: ${_conversationHistory.length}');
-      final response = await expenseProvider.sendMessage(message, userId, conversationHistory: _conversationHistory);
+      print('DEBUG: Language code: $languageCode');
+      final response = await expenseProvider.sendMessage(message, userId, conversationHistory: _conversationHistory, languageCode: languageCode);
       print('DEBUG: Received response: $response');
       
       if (response['status'] == 'success') {
@@ -99,7 +105,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
         // Check if expense information was extracted
         if (response['expense_info'] != null && response['expense_info']['hasExpense'] == true) {
-          final expenseMessage = "💡 I detected an expense in your message! Would you like me to help you add it to your expense tracker?";
+          final expenseMessage = languageCode == 'vi' 
+              ? "💡 Tôi phát hiện một khoản chi tiêu trong tin nhắn của bạn! Bạn có muốn tôi giúp thêm nó vào trình theo dõi chi tiêu không?"
+              : "💡 I detected an expense in your message! Would you like me to help you add it to your expense tracker?";
           
           setState(() {
             _messages.add(ChatMessage(
@@ -116,7 +124,9 @@ class _ChatScreenState extends State<ChatScreen> {
           });
         }
       } else {
-        final errorMessage = response['data'] ?? "Sorry, I couldn't process your message. Please try again.";
+        final errorMessage = response['data'] ?? (languageCode == 'vi' 
+            ? "Xin lỗi, tôi không thể xử lý tin nhắn của bạn. Vui lòng thử lại."
+            : "Sorry, I couldn't process your message. Please try again.");
         
         setState(() {
           _messages.add(ChatMessage(
@@ -134,7 +144,9 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       print('DEBUG: Error in sendMessage: $e');
-      final errorMessage = "Sorry, I encountered an error. Please try again.";
+      final errorMessage = languageCode == 'vi' 
+          ? "Xin lỗi, tôi gặp lỗi. Vui lòng thử lại."
+          : "Sorry, I encountered an error. Please try again.";
       
       setState(() {
         _messages.add(ChatMessage(
@@ -156,9 +168,18 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _generateInsights() async {
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    // Get userId (either authenticated user or demo user)
+    String userId;
+    if (authProvider.user != null) {
+      userId = authProvider.user!.uid;
+    } else {
+      userId = 'demo_user_${DateTime.now().millisecondsSinceEpoch}';
+    }
     
     try {
-      final response = await expenseProvider.generateInsights();
+      final response = await expenseProvider.generateInsights(userId);
       
       setState(() {
         _messages.add(ChatMessage(
@@ -236,14 +257,14 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Start tracking your expenses',
+                          l10n.chatEmptyTitle ?? 'Start tracking your expenses',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Tell me about your purchases and I\'ll help you track them',
+                          l10n.chatEmptySubtitle ?? 'Tell me about your purchases and I\'ll help you track them',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                           ),

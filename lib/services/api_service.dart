@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'gemini_service.dart';
+import 'ai_service.dart';
 import '../models/expense.dart';
 
 class ApiService {
-  final GeminiService _geminiService = GeminiService();
+  final AIService _aiService = AIService();
   
-  Future<Map<String, dynamic>> processMessage(String message, String userId, List<Expense> userExpenses, {List<Map<String, String>>? conversationHistory}) async {
+  Future<Map<String, dynamic>> processMessage(String message, String userId, List<Expense> userExpenses, {List<Map<String, String>>? conversationHistory, String? languageCode}) async {
     try {
-      // Use Gemini AI to process the message with conversation history
-      final aiResponse = await _geminiService.processMessage(message, userExpenses, conversationHistory: conversationHistory);
+      // Use AI service to process the message with conversation history
+      final aiResponse = await _aiService.processMessage(message, userExpenses, conversationHistory: conversationHistory, languageCode: languageCode);
       
       // Try to extract expense information from the message
-      final expenseInfo = await _geminiService.extractExpenseInfo(message);
+      final expenseInfo = await _aiService.extractExpenseInfo(message);
       
       return {
         'status': 'success',
@@ -30,9 +30,9 @@ class ApiService {
   }
   
   /// Generate spending insights using Gemini AI
-  Future<Map<String, dynamic>> generateInsights(List<Expense> expenses) async {
+  Future<Map<String, dynamic>> generateInsights(List<Expense> expenses, String userId) async {
     try {
-      final insights = await _geminiService.generateSpendingInsights(expenses);
+      final insights = await _aiService.generateSpendingInsights(expenses);
       
       return {
         'status': 'success',

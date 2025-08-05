@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 import '../providers/auth_provider.dart';
 import '../l10n/app_localizations.dart';
+import 'ai_settings_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -102,6 +104,19 @@ class SettingsScreen extends StatelessWidget {
             children: [
               _buildSettingsTile(
                 context,
+                icon: Icons.smart_toy,
+                title: 'AI Settings',
+                subtitle: 'Configure AI providers and API keys',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AISettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+              _buildSettingsTile(
+                context,
                 icon: Icons.attach_money,
                 title: l10n.currency,
                 subtitle: 'VND',
@@ -109,13 +124,15 @@ class SettingsScreen extends StatelessWidget {
                   // TODO: Implement currency selection
                 },
               ),
-              _buildSettingsTile(
-                context,
-                icon: Icons.language,
-                title: l10n.language,
-                subtitle: 'Vietnamese',
-                onTap: () {
-                  // TODO: Implement language selection
+              Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return ListTile(
+                    leading: const Icon(Icons.language),
+                    title: Text(l10n.language),
+                    subtitle: Text(languageProvider.getLanguageName(languageProvider.currentLocale.languageCode)),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () => _showLanguageSelectionDialog(context),
+                  );
                 },
               ),
             ],
@@ -235,6 +252,50 @@ class SettingsScreen extends StatelessWidget {
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
+    );
+  }
+
+  void _showLanguageSelectionDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer<LanguageProvider>(
+          builder: (context, languageProvider, child) {
+            return AlertDialog(
+              title: Text(l10n.selectLanguage),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile<String>(
+                    title: Text(l10n.english),
+                    value: 'en',
+                    groupValue: languageProvider.currentLocale.languageCode,
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        languageProvider.changeLanguage(value);
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                  RadioListTile<String>(
+                    title: Text(l10n.vietnamese),
+                    value: 'vi',
+                    groupValue: languageProvider.currentLocale.languageCode,
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        languageProvider.changeLanguage(value);
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -44,4 +44,24 @@ class Tag {
       'updated_at': updatedAt?.toIso8601String(),
     };
   }
+
+  Tag copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? color,
+    bool? isActive,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Tag(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      color: color ?? this.color,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

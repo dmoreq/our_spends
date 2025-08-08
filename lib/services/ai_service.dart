@@ -7,24 +7,34 @@ import 'deepseek_service.dart';
 import '../models/expense.dart';
 
 class AIService {
-  late final GeminiService _geminiService;
-  late final OpenAIService _openaiService;
-  late final ClaudeService _claudeService;
-  late final DeepSeekService _deepseekService;
+  late GeminiService _geminiService;
+  late OpenAIService _openaiService;
+  late ClaudeService _claudeService;
+  late DeepSeekService _deepseekService;
   
   String _currentProvider = ApiConfig.defaultProvider;
   bool _initialized = false;
 
   // Constructor
-  AIService() {
-    _initializeServices();
+  AIService({
+    GeminiService? geminiService,
+    OpenAIService? openaiService,
+    ClaudeService? claudeService,
+    DeepSeekService? deepseekService,
+  }) {
+    _initializeServices(geminiService, openaiService, claudeService, deepseekService);
   }
 
-  void _initializeServices() {
-    _geminiService = GeminiService();
-    _openaiService = OpenAIService();
-    _claudeService = ClaudeService();
-    _deepseekService = DeepSeekService();
+  void _initializeServices(
+    GeminiService? geminiService,
+    OpenAIService? openaiService,
+    ClaudeService? claudeService,
+    DeepSeekService? deepseekService,
+  ) {
+    _geminiService = geminiService ?? GeminiService();
+    _openaiService = openaiService ?? OpenAIService();
+    _claudeService = claudeService ?? ClaudeService();
+    _deepseekService = deepseekService ?? DeepSeekService();
   }
 
   // Initialize with settings from shared preferences

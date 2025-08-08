@@ -61,8 +61,15 @@ Analyze this message and extract expense information. Return ONLY a JSON object 
   "category": "food|transport|shopping|entertainment|bills|healthcare|education|travel|family|other",
   "item": "description of what was bought",
   "location": "where it was purchased (if mentioned)",
-  "date": "YYYY-MM-DD format (today if not specified)"
+  "date": "YYYY-MM-DD format"
 }
+
+For the date field:
+- If a specific date is mentioned (like "yesterday", "today", or a date like "2023-05-15"), use that date.
+- If a date is mentioned without a year (like "01/08"), interpret it as DD/MM format (day/month) and use the current year.
+- If "yesterday" is mentioned, use yesterday's date in YYYY-MM-DD format.
+- If "today" is mentioned, use today's date in YYYY-MM-DD format.
+- If no date is mentioned, don't include the date field.
 
 If no expense is mentioned, return null.
 
@@ -97,7 +104,32 @@ Message: "$message"
           }
           
           try {
-            return jsonDecode(text);
+            final result = jsonDecode(text);
+            
+            // If it's a valid expense, ensure time and location have default values if not provided
+            if (result != null) {
+              // Set default date to today if not provided
+              if (result['date'] == null) {
+                final now = DateTime.now();
+                result['date'] = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+                result['needs_date_confirmation'] = true;
+              } else {
+                result['needs_date_confirmation'] = false;
+              }
+              
+              // Remove time field as we're focusing on date only
+              result.remove('time');
+              
+              // Set default location to "Forgotted" if not provided
+              if (result['location'] == null) {
+                result['location'] = 'Forgotted';
+                result['needs_location_confirmation'] = true;
+              } else {
+                result['needs_location_confirmation'] = false;
+              }
+            }
+            
+            return result;
           } catch (e) {
             return null;
           }

@@ -52,4 +52,28 @@ class Category {
       'updated_at': updatedAt?.toIso8601String(),
     };
   }
+
+  Category copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? icon,
+    String? color,
+    String? parentId,
+    bool? isActive,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Category(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      icon: icon ?? this.icon,
+      color: color ?? this.color,
+      parentId: parentId ?? this.parentId,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

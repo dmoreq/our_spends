@@ -92,6 +92,7 @@ class ExpenseProvider extends ChangeNotifier {
     }
   }
 
+  // Private methods for internal use
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -105,5 +106,65 @@ class ExpenseProvider extends ChangeNotifier {
   void _clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+  
+  // Public methods for testing
+  void setLoading(bool loading) {
+    _setLoading(loading);
+  }
+
+  void setError(String error) {
+    _setError(error);
+  }
+
+  void clearError() {
+    _clearError();
+  }
+  
+  // Expose _loadExpenses for testing
+  Future<void> loadExpensesForTesting() async {
+    await _loadExpenses();
+  }
+
+  // Add a new expense to the database and refresh the expenses list
+  Future<String?> addExpense(Expense expense) async {
+    try {
+      _setLoading(true);
+      _clearError();
+      
+      // Insert the expense into the database
+      final expenseId = await _databaseService.insertExpense(expense);
+      
+      // Reload expenses to update the UI
+      await _loadExpenses();
+      
+      _setLoading(false);
+      return expenseId;
+    } catch (e) {
+      _setError('Failed to add expense: ${e.toString()}');
+      _setLoading(false);
+      return null;
+    }
+  }
+  
+  // Delete an expense from the database and refresh the expenses list
+  Future<bool> deleteExpense(String expenseId) async {
+    try {
+      _setLoading(true);
+      _clearError();
+      
+      // Delete the expense from the database
+      await _databaseService.deleteExpense(expenseId);
+      
+      // Reload expenses to update the UI
+      await _loadExpenses();
+      
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError('Failed to delete expense: ${e.toString()}');
+      _setLoading(false);
+      return false;
+    }
   }
 }

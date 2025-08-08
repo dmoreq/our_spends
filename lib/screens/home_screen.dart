@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'chat_screen.dart';
+import 'ai_chat_screen.dart';
 import 'settings_screen.dart';
 import '../l10n/app_localizations.dart';
 
@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _screens = [
-      const ChatScreen(),
+      const AIChatScreen(),
       const SettingsScreen(),
     ];
   }

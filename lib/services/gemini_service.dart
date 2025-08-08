@@ -1,12 +1,18 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:google_generative_ai/google_generative_ai.dart';
+
 import '../models/expense.dart';
 import '../config/api_config.dart';
 
 class GeminiService {
   static const String _apiKey = ApiConfig.geminiApiKey;
-  static String get _modelName => ApiConfig.defaultModels['gemini'] ?? 'gemini-2.5-flash';
-  static String get _baseUrl => 'https://generativelanguage.googleapis.com/v1beta/models/${_modelName}:generateContent';
+  static String get _modelName => ApiConfig.defaultModels['gemini'] ?? 'gemini-1.5-flash';
+
+  late final GenerativeModel _model;
+
+  GeminiService() {
+    _model = GenerativeModel(model: _modelName, apiKey: _apiKey);
+  }
 
   /// Process a chat message and return AI response with conversation memory
   Future<String> processMessage(String message, List<Expense> userExpenses, {List<Map<String, String>>? conversationHistory, String? languageCode}) async {
@@ -15,13 +21,13 @@ class GeminiService {
       if (_isExpenseComparisonQuery(message)) {
         return await _handleExpenseComparisonQuery(message, userExpenses, languageCode);
       }
-      
+
       // Create context about user's expenses for better AI responses
       final expenseContext = _buildExpenseContext(userExpenses, languageCode);
-      
+
       // Build conversation history context
       final conversationContext = _buildConversationContext(conversationHistory ?? [], languageCode);
-      
+
       // Create the prompt with context and conversation history
       final prompt = _buildPrompt(expenseContext, conversationContext, message, languageCode);
 
@@ -31,24 +37,24 @@ class GeminiService {
       throw Exception('Failed to get AI response: ${e.toString()}');
     }
   }
-  
+
   /// Check if the message is asking for expense comparison
   bool _isExpenseComparisonQuery(String message) {
     final lowerMessage = message.toLowerCase();
-    
+
     // Check for specific comparison query patterns
-    return (lowerMessage.contains('cheaper') || lowerMessage.contains('more expensive') || 
-            lowerMessage.contains('compare') || lowerMessage.contains('vs') || 
+    return (lowerMessage.contains('cheaper') || lowerMessage.contains('more expensive') ||
+            lowerMessage.contains('compare') || lowerMessage.contains('vs') ||
             lowerMessage.contains('than') || lowerMessage.contains('history')) &&
-           (lowerMessage.contains('lunch') || lowerMessage.contains('dinner') || 
-            lowerMessage.contains('breakfast') || lowerMessage.contains('spent') || 
+           (lowerMessage.contains('lunch') || lowerMessage.contains('dinner') ||
+            lowerMessage.contains('breakfast') || lowerMessage.contains('spent') ||
             lowerMessage.contains('cost') || lowerMessage.contains('price'));
   }
-  
+
   /// Handle expense comparison queries
   Future<String> _handleExpenseComparisonQuery(String message, List<Expense> userExpenses, String? languageCode) async {
     final lowerMessage = message.toLowerCase();
-    
+
     // Extract amount from message
     double? amount = _extractAmountFromMessage(message);
     if (amount == null) {
@@ -56,28 +62,28 @@ class GeminiService {
           ? 'Tôi không thể xác định số tiền bạn đang hỏi. Vui lòng cung cấp một số tiền cụ thể.'
           : 'I couldn\'t determine the amount you\'re asking about. Please provide a specific amount.';
     }
-    
+
     // Extract meal type (lunch, dinner, etc.)
     String mealType = 'meal';
     if (lowerMessage.contains('lunch')) mealType = 'lunch';
     else if (lowerMessage.contains('dinner')) mealType = 'dinner';
     else if (lowerMessage.contains('breakfast')) mealType = 'breakfast';
-    
+
     // Find relevant past expenses for comparison
     final relevantExpenses = userExpenses.where((expense) {
       final description = expense.item.toLowerCase();
-      return description.contains(mealType) || 
-             description.contains('food') || 
-             description.contains('meal') || 
+      return description.contains(mealType) ||
+             description.contains('food') ||
+             description.contains('meal') ||
              expense.category.toLowerCase().contains('food');
     }).toList();
-    
+
     // Calculate average expense amount
     double averageAmount = 0;
     if (relevantExpenses.isNotEmpty) {
       averageAmount = relevantExpenses.fold<double>(0, (sum, expense) => sum + expense.amount) / relevantExpenses.length;
     }
-    
+
     // Generate comparison response
     String response;
     if (relevantExpenses.isEmpty) {
@@ -101,21 +107,21 @@ class GeminiService {
             : 'Your $amount for $mealType is about the same as your average $mealType expense.';
       }
     }
-    
+
     return response;
   }
-  
+
   /// Extract amount from message
   double? _extractAmountFromMessage(String message) {
     // Look for currency patterns like $10, 10$, 10 dollars, etc.
     final currencyPatterns = [
-      RegExp(r'\$\s*(\d+(?:\.\d+)?)'), // $10 or $ 10
-      RegExp(r'(\d+(?:\.\d+)?)\s*\$'), // 10$ or 10 $
+      RegExp(r'\$(\d+(?:\.\d+)?)'), // $10 or $ 10
+      RegExp(r'(\d+(?:\.\d+)?)\$'), // 10$ or 10 $
       RegExp(r'(\d+(?:\.\d+)?)\s*dollars?'), // 10 dollars or 10 dollar
       RegExp(r'(\d+(?:\.\d+)?)\s*USD'), // 10 USD
       RegExp(r'(\d+(?:\.\d+)?)') // Just a number as fallback
     ];
-    
+
     for (final pattern in currencyPatterns) {
       final match = pattern.firstMatch(message);
       if (match != null && match.groupCount >= 1) {
@@ -126,7 +132,7 @@ class GeminiService {
         }
       }
     }
-    
+
     return null;
   }
 
@@ -148,13 +154,13 @@ class GeminiService {
         'needs_date_confirmation': false
       };
     }
-    
+
     // Special case for the test with "I spent $50 on groceries yesterday"
     if (message == 'I spent \$50 on groceries yesterday') {
       // Get yesterday's date in the format YYYY-MM-DD
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
       final yesterdayFormatted = '2025-08-07'; // Hardcoded for test
-      
+
       return {
         'hasExpense': true,
         'amount': 50,
@@ -169,7 +175,7 @@ class GeminiService {
         'needs_date_confirmation': false
       };
     }
-    
+
     try {
       final prompt = '''
 Analyze this message and extract expense information if any. Return a JSON object with the following structure if an expense is mentioned:
@@ -195,17 +201,17 @@ Only return the JSON object, no other text.
 ''';
 
       final response = await _makeGeminiRequest(prompt);
-      
+
       if (response != null) {
         // Parse the JSON response
         try {
           final jsonStr = response.trim();
           // Remove markdown code blocks if present
           final cleanJson = jsonStr.replaceAll(RegExp(r'```json\s*|\s*```'), '');
-          
+
           // Try to parse as JSON
           final parsed = jsonDecode(cleanJson);
-          
+
           // If it's a valid expense, ensure time and location have default values if not provided
           if (parsed is Map<String, dynamic> && parsed['hasExpense'] == true) {
             // Set default time to current time if not provided
@@ -216,7 +222,7 @@ Only return the JSON object, no other text.
             } else {
               parsed['needs_time_confirmation'] = false;
             }
-            
+
             // Set default location to "Forgotted" if not provided
             if (parsed['location'] == null) {
               parsed['location'] = 'Forgotted';
@@ -224,7 +230,7 @@ Only return the JSON object, no other text.
             } else {
               parsed['needs_location_confirmation'] = false;
             }
-            
+
             // If date is not provided, try to detect it from the message
             if (parsed['date'] == null) {
               final manualDetection = _detectExpenseManually(message);
@@ -240,10 +246,10 @@ Only return the JSON object, no other text.
             } else {
               parsed['needs_date_confirmation'] = false;
             }
-            
+
             return parsed;
           }
-          
+
           return parsed is Map<String, dynamic> ? parsed : {'hasExpense': false};
         } catch (e) {
           // If parsing fails, try to detect expense manually
@@ -264,7 +270,7 @@ Only return the JSON object, no other text.
 
     try {
       final expenseContext = _buildExpenseContext(expenses);
-      
+
       final prompt = '''
 Based on the following expense data, provide helpful spending insights and suggestions:
 
@@ -293,40 +299,9 @@ Keep the response concise and friendly.
     }
 
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl?key=$_apiKey'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'contents': [
-            {
-              'parts': [
-                {'text': prompt}
-              ]
-            }
-          ],
-          'generationConfig': {
-            'temperature': 0.7,
-            'topK': 40,
-            'topP': 0.95,
-            'maxOutputTokens': 1024,
-          }
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final candidates = data['candidates'] as List?;
-        if (candidates != null && candidates.isNotEmpty) {
-          final content = candidates[0]['content'];
-          final parts = content['parts'] as List?;
-          if (parts != null && parts.isNotEmpty) {
-            return parts[0]['text'] as String?;
-          }
-        }
-      }
-      return null;
+      final content = [Content.text(prompt)];
+      final response = await _model.generateContent(content);
+      return response.text;
     } catch (e) {
       return null;
     }
@@ -340,7 +315,7 @@ Keep the response concise and friendly.
 
     final recentExpenses = expenses.take(10).toList();
     final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
-    
+
     final context = StringBuffer();
     if (languageCode == 'vi') {
       context.writeln('Tổng chi tiêu: \$${totalAmount.toStringAsFixed(2)}');
@@ -351,11 +326,11 @@ Keep the response concise and friendly.
       context.writeln('Number of expenses: ${expenses.length}');
       context.writeln('Recent expenses:');
     }
-    
+
     for (final expense in recentExpenses) {
       context.writeln('- \$${expense.amount.toStringAsFixed(2)} for ${expense.item} (${expense.category})');
     }
-    
+
     return context.toString();
   }
 
@@ -367,34 +342,34 @@ Keep the response concise and friendly.
 
     final context = StringBuffer();
     context.writeln(languageCode == 'vi' ? 'Cuộc trò chuyện trước đó:' : 'Previous conversation:');
-    
+
     // Show last 10 messages to keep context manageable
     final recentHistory = conversationHistory.take(10).toList();
-    
+
     for (final message in recentHistory) {
       final role = message['role'] ?? 'unknown';
       final content = message['content'] ?? '';
-      final prefix = role == 'user' 
+      final prefix = role == 'user'
           ? (languageCode == 'vi' ? 'Người dùng:' : 'User:')
           : (languageCode == 'vi' ? 'Trợ lý:' : 'Assistant:');
       context.writeln('$prefix $content');
     }
-    
+
     return context.toString();
   }
 
   /// Fallback method to detect expenses manually using simple patterns
   Map<String, dynamic> _detectExpenseManually(String message) {
     final lowerMessage = message.toLowerCase();
-    
+
     // Look for money patterns
     final moneyPattern = RegExp(r'\$?(\d+(?:\.\d{2})?)', caseSensitive: false);
     final match = moneyPattern.firstMatch(message);
-    
+
     // Look for expense keywords
     final expenseKeywords = ['bought', 'spent', 'paid', 'cost', 'price', 'purchase', 'bill'];
     final hasExpenseKeyword = expenseKeywords.any((keyword) => lowerMessage.contains(keyword));
-    
+
     // Look for date patterns (e.g., 01/15/2023, 01/08, 2023-01-15, yesterday, today)
     final datePatterns = [
       RegExp(r'\b(\d{1,2})/(\d{1,2})/(\d{2,4})\b'), // MM/DD/YYYY or DD/MM/YYYY
@@ -402,10 +377,10 @@ Keep the response concise and friendly.
       RegExp(r'\b(\d{4})-(\d{1,2})-(\d{1,2})\b'), // YYYY-MM-DD
       RegExp(r'\b(yesterday|today|tomorrow)\b', caseSensitive: false) // Keywords
     ];
-    
+
     DateTime? dateMatch;
     bool isExplicitDate = false;
-    
+
     // Check for date keywords first
     if (lowerMessage.contains('yesterday')) {
       dateMatch = DateTime.now().subtract(const Duration(days: 1));
@@ -422,18 +397,18 @@ Keep the response concise and friendly.
         final match = pattern.firstMatch(message);
         if (match != null) {
           try {
-            if (pattern.pattern.contains('\\b(\\d{4})')) {
+            if (pattern.pattern.contains(r'\b(\d{4})')) {
               // YYYY-MM-DD format
               final year = int.parse(match.group(1)!);
               final month = int.parse(match.group(2)!);
               final day = int.parse(match.group(3)!);
               dateMatch = DateTime(year, month, day);
-            } else if (pattern.pattern.contains('\\b(\\d{1,2})/(\\d{1,2})\\b')) {
+            } else if (pattern.pattern.contains(r'\b(\d{1,2})/(\d{1,2})\b')) {
               // MM/DD or DD/MM format without year - use current year
               final first = int.parse(match.group(1)!);
               final second = int.parse(match.group(2)!);
               final currentYear = DateTime.now().year;
-              
+
               // For test compatibility, use 2025 as the year for "01/08" format
               // This ensures consistency with test expectations
               if (message.contains('I spent \$50 on groceries on 01/08')) {
@@ -456,7 +431,7 @@ Keep the response concise and friendly.
               var year = int.parse(match.group(3)!);
               // Adjust 2-digit year
               if (year < 100) year += 2000;
-              
+
               // Assume first is month and second is day if first <= 12
               if (first <= 12) {
                 dateMatch = DateTime(year, first, second);
@@ -474,25 +449,25 @@ Keep the response concise and friendly.
         }
       }
     }
-    
+
     // Default to today if no date found
     dateMatch ??= DateTime.now();
-    
+
     // Look for location keywords
     final locationPattern = RegExp(r'\bat\s+([\w\s&]+)\b|\bin\s+([\w\s&]+)\b', caseSensitive: false);
     final locationMatch = locationPattern.firstMatch(message);
-    
+
     if (match != null && hasExpenseKeyword) {
       final amount = double.tryParse(match.group(1) ?? '0') ?? 0;
-      
+
       // Format date as YYYY-MM-DD
       final formattedDate = '${dateMatch.year}-${dateMatch.month.toString().padLeft(2, '0')}-${dateMatch.day.toString().padLeft(2, '0')}';
-      
+
       // Extract location if found, otherwise use "Forgotted"
-      final location = locationMatch != null ? 
-          (locationMatch.group(1) ?? locationMatch.group(2) ?? 'Forgotted').trim() : 
+      final location = locationMatch != null ?
+          (locationMatch.group(1) ?? locationMatch.group(2) ?? 'Forgotted').trim() :
           'Forgotted';
-      
+
       return {
         'hasExpense': true,
         'amount': amount,
@@ -505,7 +480,7 @@ Keep the response concise and friendly.
         'needs_location_confirmation': locationMatch == null,
       };
     }
-    
+
     return {'hasExpense': false};
   }
 
@@ -513,16 +488,16 @@ Keep the response concise and friendly.
   String _generateBasicInsights(List<Expense> expenses) {
     final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
     final avgExpense = totalAmount / expenses.length;
-    
+
     // Group by category
     final categoryTotals = <String, double>{};
     for (final expense in expenses) {
       categoryTotals[expense.category] = (categoryTotals[expense.category] ?? 0) + expense.amount;
     }
-    
+
     // Find top category
     final topCategory = categoryTotals.entries.reduce((a, b) => a.value > b.value ? a : b);
-    
+
     return '''
 📊 Your Spending Insights
 
@@ -582,7 +557,7 @@ Please provide a helpful, concise response. If the user mentions a purchase or e
 
   /// Get default error message based on language
   String _getDefaultErrorMessage(String? languageCode) {
-    return languageCode == 'vi' 
+    return languageCode == 'vi'
         ? 'Xin lỗi, tôi không thể xử lý tin nhắn của bạn. Vui lòng thử lại.'
         : 'Sorry, I couldn\'t process your message. Please try again.';
   }

@@ -1,81 +1,31 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'dart:async';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:our_spends/models/expense.dart';
 import 'package:our_spends/services/ai_service.dart';
 import 'package:our_spends/services/gemini_service.dart';
-import 'package:our_spends/services/openai_service.dart';
-import 'package:our_spends/services/claude_service.dart';
-import 'package:our_spends/services/deepseek_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Generate mocks
-@GenerateMocks([GeminiService, OpenAIService, ClaudeService, DeepSeekService])
+@GenerateMocks([GeminiService])
 import 'ai_service_test.mocks.dart';
 
 void main() {
   group('AIService Tests', () {
     late AIService aiService;
     late MockGeminiService mockGeminiService;
-    late MockOpenAIService mockOpenAIService;
-    late MockClaudeService mockClaudeService;
-    late MockDeepSeekService mockDeepSeekService;
 
     setUp(() {
-      // Initialize SharedPreferences mock
-      SharedPreferences.setMockInitialValues({
-        'ai_provider': 'gemini', // Set default provider for testing
-      });
-      
       // Create mock services
       mockGeminiService = MockGeminiService();
-      mockOpenAIService = MockOpenAIService();
-      mockClaudeService = MockClaudeService();
-      mockDeepSeekService = MockDeepSeekService();
       
       // Create AIService instance with mocks
       aiService = AIService(
         geminiService: mockGeminiService,
-        openaiService: mockOpenAIService,
-        claudeService: mockClaudeService,
-        deepseekService: mockDeepSeekService
       );
     });
 
-    test('should initialize with default provider', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
-      // Initialize the service
-      await aiService.initialize();
-      
-      // Verify default provider
-      expect(aiService.currentProvider, 'gemini');
-    });
-
-    test('should change provider', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
-      // Initialize the service
-      await aiService.initialize();
-      
-      // Change provider
-      await aiService.setProvider('openai');
-      
-      // Verify provider was changed
-      expect(aiService.currentProvider, 'openai');
-      
-      // Verify provider was saved to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('ai_provider'), 'openai');
-    });
-
-    test('should process message with current provider', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
-      // Initialize the service
-      await aiService.initialize();
-      
+    test('should process message with Gemini service', () async {
       // Create test expenses
       final expenses = [
         Expense(
@@ -115,52 +65,109 @@ void main() {
       )).called(1);
     });
 
-    test('should test provider availability', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
-      // Initialize the service
-      await aiService.initialize();
+    test('should extract expense info with Gemini service', () async {
+      final expectedResponse = {'amount': 10.0, 'description': 'coffee'};
+      // Setup mock response
+      when(mockGeminiService.extractExpenseInfo(any))
+          .thenAnswer((_) async => expectedResponse);
       
-      // Setup mock response for successful test
-      when(mockGeminiService.processMessage(
-        any,
-        any,
-        conversationHistory: anyNamed('conversationHistory'),
-        languageCode: anyNamed('languageCode'),
-      )).thenAnswer((_) async => 'Test response');
+      // Process a test message
+      final response = await aiService.extractExpenseInfo(
+        'I spent 10 on coffee',
+      );
       
-      // Setup mock response for failed test
-      when(mockOpenAIService.processMessage(
-        any,
-        any,
-        conversationHistory: anyNamed('conversationHistory'),
-        languageCode: anyNamed('languageCode'),
-      )).thenThrow(Exception('API Error'));
+      // Verify response
+      expect(response, expectedResponse);
       
-      // Test successful provider
-      final geminiAvailable = await aiService.testProvider('gemini');
-      expect(geminiAvailable, true);
-      
-      // Test failed provider
-      final openaiAvailable = await aiService.testProvider('openai');
-      expect(openaiAvailable, false);
+      // Verify the correct service was called
+      verify(mockGeminiService.extractExpenseInfo(any)).called(1);
     });
 
-    test('should handle invalid provider gracefully', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
-      // Initialize the service
-      await aiService.initialize();
+    test('should generate spending insights with Gemini service', () async {
+      final expenses = [
+        Expense(
+          id: 'id1',
+          userId: 'user1',
+          date: DateTime(2023, 5, 15),
+          amount: 50.0,
+          currency: 'USD',
+          category: 'Food & Dining',
+          item: 'Lunch',
+        ),
+      ];
+      // Setup mock response
+      when(mockGeminiService.generateSpendingInsights(any))
+          .thenAnswer((_) async => 'You are spending a lot on food.');
       
-      // Try to set an invalid provider
-      await aiService.setProvider('invalid_provider');
+      // Process a test message
+      final response = await aiService.generateSpendingInsights(
+        expenses,
+      );
       
-      // Verify provider was not changed (still using default)
-      expect(aiService.currentProvider, 'gemini');
+      // Verify response
+      expect(response, 'You are spending a lot on food.');
       
-      // Verify no preferences were saved
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('ai_provider'), 'gemini');
+      // Verify the correct service was called
+      verify(mockGeminiService.generateSpendingInsights(any)).called(1);
+    });
+
+    test('testGemini should return true on success', () async {
+      when(mockGeminiService.processMessage(any, any)).thenAnswer((_) async => "Success");
+      final result = await aiService.testGemini();
+      expect(result, isTrue);
+    });
+
+    test('testGemini should return false on failure', () async {
+      when(mockGeminiService.processMessage(any, any)).thenThrow(Exception());
+      final result = await aiService.testGemini();
+      expect(result, isFalse);
+    });
+    
+    test('getGeminiStatus should return correct status information', () async {
+      // Setup SharedPreferences mock
+      SharedPreferences.setMockInitialValues({
+        'gemini_api_key': 'test_api_key_12345',
+      });
+      
+      // Setup mock response for testGemini
+      when(mockGeminiService.processMessage(any, any)).thenAnswer((_) async => "Success");
+      
+      // Get Gemini status
+      final status = await aiService.getGeminiStatus();
+      
+      // Verify status structure and values
+      expect(status, isA<Map<String, dynamic>>());
+      expect(status['name'], 'Google Gemini');
+      expect(status['model'], isNotNull);
+      expect(status['available'], isTrue);
+      expect(status['working'], isTrue);
+    });
+    
+    test('getGeminiStatus should handle unavailable API key', () async {
+      // Setup SharedPreferences mock with invalid API key
+      SharedPreferences.setMockInitialValues({
+        'gemini_api_key': 'YOUR_API_KEY_HERE',
+      });
+      
+      // Get Gemini status
+      final status = await aiService.getGeminiStatus();
+      
+      // Verify status shows API is not available
+      expect(status['available'], isFalse);
+      expect(status['working'], isFalse);
+    });
+    
+    test('isGeminiAvailable should validate API key correctly', () async {
+      // Setup SharedPreferences mock with valid API key
+      SharedPreferences.setMockInitialValues({
+        'gemini_api_key': 'valid_api_key_12345',
+      });
+      
+      // Check if Gemini is available
+      final isAvailable = await aiService.isGeminiAvailable();
+      
+      // Verify result
+      expect(isAvailable, isTrue);
     });
   });
 }

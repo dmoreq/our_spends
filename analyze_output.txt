@@ -1,0 +1,309 @@
+Analyzing our_spends...                                         
+
+   info • The import of 'package:flutter/material.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/foundation.dart' • lib/providers/auth_provider.dart:4:8 • unnecessary_import
+warning • The value of the field '_queryService' isn't used • lib/providers/expense_provider.dart:10:34 • unused_field
+  error • The getter 'expenseTitleLabel' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:82:41 • undefined_getter
+  error • The getter 'expenseTitlePlaceholder' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:83:40 • undefined_getter
+  error • The getter 'fieldRequired' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:88:39 • undefined_getter
+  error • The getter 'expenseAmountLabel' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:105:47 • undefined_getter
+  error • The getter 'expenseAmountPlaceholder' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:106:46 • undefined_getter
+  error • The getter 'fieldRequired' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:111:45 • undefined_getter
+  error • The getter 'invalidNumber' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:114:45 • undefined_getter
+  error • The getter 'expenseDateLabel' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:153:43 • undefined_getter
+  error • The getter 'expenseCategoryLabel' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:171:41 • undefined_getter
+  error • The getter 'paymentMethod' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:194:41 • undefined_getter
+  error • The getter 'location' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:214:41 • undefined_getter
+  error • The getter 'locationPlaceholder' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:215:40 • undefined_getter
+  error • The getter 'expenseNotesLabel' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:230:41 • undefined_getter
+  error • The getter 'expenseNotesPlaceholder' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:231:40 • undefined_getter
+  error • The getter 'save' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:246:42 • undefined_getter
+  error • The getter 'expenseCategoryFood' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:281:21 • undefined_getter
+  error • The getter 'expenseCategoryTransport' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:283:21 • undefined_getter
+  error • The getter 'expenseCategoryShopping' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:285:21 • undefined_getter
+  error • The getter 'expenseCategoryEntertainment' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:287:21 • undefined_getter
+  error • The getter 'expenseCategoryUtilities' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:289:21 • undefined_getter
+  error • The getter 'expenseCategoryHealth' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:291:21 • undefined_getter
+  error • The getter 'expenseCategoryTravel' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:293:21 • undefined_getter
+  error • The getter 'expenseCategoryEducation' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:295:21 • undefined_getter
+  error • The getter 'expenseCategoryOther' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:297:21 • undefined_getter
+  error • The getter 'expenseAddedSuccess' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:335:68 • undefined_getter
+  error • The getter 'expenseAddedError' isn't defined for the type 'AppLocalizations' • lib/screens/add_expense_screen.dart:342:68 • undefined_getter
+warning • Unused import: 'package:intl/intl.dart' • lib/screens/ai_chat_screen.dart:2:8 • unused_import
+warning • Unused import: '../widgets/facility_card.dart' • lib/screens/ai_chat_screen.dart:14:8 • unused_import
+warning • The value of the local variable 'userId' isn't used • lib/screens/ai_chat_screen.dart:104:14 • unused_local_variable
+warning • The value of the local variable 'systemPrompt' isn't used • lib/screens/ai_chat_screen.dart:198:13 • unused_local_variable
+warning • The declaration '_buildMessageBubble' isn't referenced • lib/screens/ai_chat_screen.dart:313:10 • unused_element
+warning • The value of the local variable 'languageCode' isn't used • lib/screens/ai_chat_screen.dart:316:11 • unused_local_variable
+   info • 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead. This feature was deprecated after v3.18.0-0.1.pre • lib/screens/ai_chat_screen.dart:351:90 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/screens/ai_chat_screen.dart:454:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/ai_chat_screen.dart:486:7 • avoid_print
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/ai_chat_screen.dart:527:22 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/ai_chat_screen.dart:533:11 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/ai_chat_screen.dart:554:35 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/ai_chat_screen.dart:555:22 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/ai_chat_screen.dart:561:11 • use_build_context_synchronously
+warning • Unused import: '../config/api_config.dart' • lib/screens/ai_settings_screen.dart:3:8 • unused_import
+  error • The getter 'overview' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:45:28 • undefined_getter
+  error • The getter 'categories' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:46:28 • undefined_getter
+  error • The getter 'week' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:92:21 • undefined_getter
+  error • The getter 'month' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:94:21 • undefined_getter
+  error • The getter 'year' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:96:21 • undefined_getter
+  error • The getter 'noExpensesForPeriod' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:107:38 • undefined_getter
+  error • The getter 'totalSpending' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:133:26 • undefined_getter
+  error • The getter 'spendingTrend' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:151:18 • undefined_getter
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/analytics_screen.dart:199:68 • deprecated_member_use
+  error • The getter 'recentTransactions' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:210:18 • undefined_getter
+  error • The getter 'noExpensesForPeriod' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:225:38 • undefined_getter
+  error • The getter 'categoryBreakdown' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:299:18 • undefined_getter
+  error • The getter 'expenseCategoryFood' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:346:21 • undefined_getter
+  error • The getter 'expenseCategoryTransport' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:348:21 • undefined_getter
+  error • The getter 'expenseCategoryShopping' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:350:21 • undefined_getter
+  error • The getter 'expenseCategoryEntertainment' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:352:21 • undefined_getter
+  error • The getter 'expenseCategoryUtilities' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:354:21 • undefined_getter
+  error • The getter 'expenseCategoryHealth' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:356:21 • undefined_getter
+  error • The getter 'expenseCategoryTravel' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:358:21 • undefined_getter
+  error • The getter 'expenseCategoryEducation' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:360:21 • undefined_getter
+  error • The getter 'expenseCategoryOther' isn't defined for the type 'AppLocalizations' • lib/screens/analytics_screen.dart:362:21 • undefined_getter
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:38:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:39:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:40:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:44:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:47:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:83:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:84:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:85:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:87:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:154:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/screens/chat_screen.dart:333:7 • avoid_print
+warning • The left operand can't be null, so the right operand is never executed • lib/screens/chat_screen.dart:391:50 • dead_null_aware_expression
+warning • The left operand can't be null, so the right operand is never executed • lib/screens/chat_screen.dart:398:53 • dead_null_aware_expression
+  error • The getter 'location' isn't defined for the type 'AppLocalizations' • lib/screens/expenses_screen.dart:169:38 • undefined_getter
+  error • The getter 'paymentMethod' isn't defined for the type 'AppLocalizations' • lib/screens/expenses_screen.dart:171:38 • undefined_getter
+  error • The getter 'close' isn't defined for the type 'AppLocalizations' • lib/screens/expenses_screen.dart:182:38 • undefined_getter
+warning • The value of the local variable 'expenseProvider' isn't used • lib/screens/home_screen.dart:32:11 • unused_local_variable
+  error • The getter 'chat' isn't defined for the type 'AppLocalizations' • lib/screens/home_screen.dart:78:25 • undefined_getter
+warning • The declaration '_saveTags' isn't referenced • lib/services/database_service.dart:87:16 • unused_element
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:25:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:27:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:30:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:53:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:57:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:62:7 • avoid_print
+   info • Statements in an if should be enclosed in a block • lib/services/gemini_service.dart:94:41 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/services/gemini_service.dart:95:47 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/services/gemini_service.dart:96:50 • curly_braces_in_flow_control_structures
+warning • The value of the local variable 'yesterday' isn't used • lib/services/gemini_service.dart:187:13 • unused_local_variable
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:231:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:235:11 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:240:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:293:11 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:297:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:301:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:329:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:333:11 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:337:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:340:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:358:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:367:13 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:372:11 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:376:11 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:382:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:400:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:404:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/services/gemini_service.dart:546:13 • avoid_print
+   info • The imported package 'web' isn't a dependency of the importing package • lib/web/js_interop.dart:3:8 • depend_on_referenced_packages
+warning • Unused import: 'package:web/web.dart' • lib/web/js_interop.dart:3:8 • unused_import
+  error • The library directive must appear before all other directives • lib/web/js_interop.dart:7:1 • library_directive_not_first
+   info • Library names are not necessary • lib/web/js_interop.dart:7:9 • unnecessary_library_name
+warning • Unused import: 'dart:js_interop' • lib/web/web_integration.dart:1:8 • unused_import
+   info • The imported package 'web' isn't a dependency of the importing package • lib/web/web_integration.dart:4:8 • depend_on_referenced_packages
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/chat_app_bar.dart:27:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/chat_input_field.dart:26:33 • deprecated_member_use
+warning • Unused import: 'dart:async' • test/models/expense_test.dart:2:8 • unused_import
+warning • The value of the local variable 'testOnTimeout' isn't used • test/models/expense_test.dart:9:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/models/expense_test.dart:32:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/models/expense_test.dart:62:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/models/expense_test.dart:92:13 • unused_local_variable
+  error • The operator '[]' isn't defined for the type 'User' • test/providers/auth_provider_test.dart:32:19 • undefined_operator
+  error • The operator '[]' isn't defined for the type 'User' • test/providers/auth_provider_test.dart:33:19 • undefined_operator
+  error • The operator '[]' isn't defined for the type 'User' • test/providers/auth_provider_test.dart:34:19 • undefined_operator
+  error • The method 'setError' isn't defined for the type 'AuthProvider' • test/providers/auth_provider_test.dart:53:20 • undefined_method
+  error • The method 'clearError' isn't defined for the type 'AuthProvider' • test/providers/auth_provider_test.dart:59:20 • undefined_method
+  error • The method 'setLoading' isn't defined for the type 'AuthProvider' • test/providers/auth_provider_test.dart:67:20 • undefined_method
+  error • The method 'setLoading' isn't defined for the type 'AuthProvider' • test/providers/auth_provider_test.dart:73:20 • undefined_method
+warning • Unused import: 'dart:convert' • test/providers/expense_provider_persistence_test.dart:1:8 • unused_import
+warning • The value of the local variable 'expenseProvider' isn't used • test/providers/expense_provider_persistence_test.dart:11:26 • unused_local_variable
+warning • The value of the local variable 'databaseService' isn't used • test/providers/expense_provider_persistence_test.dart:12:26 • unused_local_variable
+warning • The value of the local variable 'expenseId' isn't used • test/providers/expense_provider_persistence_test.dart:92:13 • unused_local_variable
+   info • The import of 'dart:async' is unnecessary because all of the used elements are also provided by the import of 'package:flutter_test/flutter_test.dart' • test/providers/expense_provider_test.dart:2:8 • unnecessary_import
+warning • The value of the local variable 'testOnTimeout' isn't used • test/providers/expense_provider_test.dart:22:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/providers/expense_provider_test.dart:35:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/providers/expense_provider_test.dart:88:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/providers/expense_provider_test.dart:108:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/providers/expense_provider_test.dart:125:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/providers/expense_provider_test.dart:144:13 • unused_local_variable
+  error • Target of URI doesn't exist: 'package:our_spends/services/auth_service.dart' • test/screens/ai_chat_screen_test.dart:11:8 • uri_does_not_exist
+   info • The imported package 'firebase_ai' isn't a dependency of the importing package • test/screens/ai_chat_screen_test.dart:14:8 • depend_on_referenced_packages
+  error • Target of URI doesn't exist: 'package:firebase_ai/firebase_ai.dart' • test/screens/ai_chat_screen_test.dart:14:8 • uri_does_not_exist
+   info • The imported package 'flutter_ai_toolkit' isn't a dependency of the importing package • test/screens/ai_chat_screen_test.dart:15:8 • depend_on_referenced_packages
+  error • Target of URI doesn't exist: 'package:flutter_ai_toolkit/flutter_ai_toolkit.dart' • test/screens/ai_chat_screen_test.dart:15:8 • uri_does_not_exist
+  error • Arguments of a constant creation must be constant expressions • test/screens/ai_chat_screen_test.dart:18:66 • const_with_non_constant_argument
+  error • The values in a const list literal must be constants • test/screens/ai_chat_screen_test.dart:18:66 • non_constant_list_element
+  error • Undefined name 'AuthService' • test/screens/ai_chat_screen_test.dart:18:66 • undefined_identifier
+  error • Target of URI doesn't exist: 'ai_chat_screen_test.mocks.dart' • test/screens/ai_chat_screen_test.dart:21:8 • uri_does_not_exist
+  error • Undefined class 'MockExpenseProvider' • test/screens/ai_chat_screen_test.dart:25:10 • undefined_class
+  error • Undefined class 'MockAuthProvider' • test/screens/ai_chat_screen_test.dart:26:10 • undefined_class
+  error • Undefined class 'MockLanguageProvider' • test/screens/ai_chat_screen_test.dart:27:10 • undefined_class
+  error • Undefined class 'MockAuthService' • test/screens/ai_chat_screen_test.dart:28:10 • undefined_class
+  error • Undefined class 'MockDatabaseService' • test/screens/ai_chat_screen_test.dart:29:10 • undefined_class
+  error • The function 'MockExpenseProvider' isn't defined • test/screens/ai_chat_screen_test.dart:32:29 • undefined_function
+  error • The function 'MockAuthProvider' isn't defined • test/screens/ai_chat_screen_test.dart:33:26 • undefined_function
+  error • The function 'MockLanguageProvider' isn't defined • test/screens/ai_chat_screen_test.dart:34:30 • undefined_function
+  error • The function 'MockAuthService' isn't defined • test/screens/ai_chat_screen_test.dart:35:25 • undefined_function
+  error • The function 'MockDatabaseService' isn't defined • test/screens/ai_chat_screen_test.dart:36:29 • undefined_function
+  error • The name 'AuthService' isn't a type, so it can't be used as a type argument • test/screens/ai_chat_screen_test.dart:55:24 • non_type_as_type_argument
+warning • The label 'skip' isn't used • test/screens/ai_chat_screen_test.dart:75:7 • unused_label
+warning • The label 'skip' isn't used • test/screens/ai_chat_screen_test.dart:102:7 • unused_label
+warning • The label 'skip' isn't used • test/screens/ai_chat_screen_test.dart:115:7 • unused_label
+  error • Target of URI doesn't exist: 'package:our_spends/services/auth_service.dart' • test/screens/chat_screen_test.dart:9:8 • uri_does_not_exist
+  error • Arguments of a constant creation must be constant expressions • test/screens/chat_screen_test.dart:13:34 • const_with_non_constant_argument
+  error • The values in a const list literal must be constants • test/screens/chat_screen_test.dart:13:34 • non_constant_list_element
+  error • Undefined name 'AuthService' • test/screens/chat_screen_test.dart:13:34 • undefined_identifier
+  error • Target of URI doesn't exist: 'chat_screen_test.mocks.dart' • test/screens/chat_screen_test.dart:16:8 • uri_does_not_exist
+  error • Undefined class 'MockExpenseProvider' • test/screens/chat_screen_test.dart:20:10 • undefined_class
+  error • Undefined class 'MockAuthService' • test/screens/chat_screen_test.dart:21:10 • undefined_class
+  error • Undefined class 'MockDatabaseService' • test/screens/chat_screen_test.dart:22:10 • undefined_class
+  error • The function 'MockExpenseProvider' isn't defined • test/screens/chat_screen_test.dart:25:29 • undefined_function
+  error • The function 'MockAuthService' isn't defined • test/screens/chat_screen_test.dart:26:25 • undefined_function
+  error • The function 'MockDatabaseService' isn't defined • test/screens/chat_screen_test.dart:27:29 • undefined_function
+  error • The name 'AuthService' isn't a type, so it can't be used as a type argument • test/screens/chat_screen_test.dart:53:24 • non_type_as_type_argument
+  error • The name 'AuthService' isn't a type, so it can't be used as a type argument • test/screens/chat_screen_test.dart:113:24 • non_type_as_type_argument
+  error • The name 'AuthService' isn't a type, so it can't be used as a type argument • test/screens/chat_screen_test.dart:169:24 • non_type_as_type_argument
+  error • The name 'AuthService' isn't a type, so it can't be used as a type argument • test/screens/chat_screen_test.dart:216:24 • non_type_as_type_argument
+warning • Unused import: 'dart:async' • test/services/ai_chat_expense_extraction_test.dart:2:8 • unused_import
+warning • The value of the local variable 'mockDatabaseService' isn't used • test/services/ai_chat_expense_extraction_test.dart:19:30 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_chat_expense_extraction_test.dart:29:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_chat_expense_extraction_test.dart:68:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_chat_expense_extraction_test.dart:92:13 • unused_local_variable
+warning • Unused import: 'dart:async' • test/services/ai_chat_insights_test.dart:2:8 • unused_import
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_chat_insights_test.dart:25:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_chat_insights_test.dart:46:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_chat_insights_test.dart:63:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_chat_insights_test.dart:84:13 • unused_local_variable
+  error • The method 'initialize' isn't defined for the type 'DatabaseService' • test/services/ai_database_integration_test.dart:24:29 • undefined_method
+  error • 2 positional arguments expected by 'processMessage', but 0 found • test/services/ai_database_integration_test.dart:40:9 • not_enough_positional_arguments
+  error • The named parameter 'message' isn't defined • test/services/ai_database_integration_test.dart:40:9 • undefined_named_parameter
+  error • The argument type 'List<dynamic>' can't be assigned to the parameter type 'List<Map<String, String>>?'.  • test/services/ai_database_integration_test.dart:41:30 • argument_type_not_assignable
+warning • The '!' will have no effect because the receiver can't be null • test/services/ai_database_integration_test.dart:47:20 • unnecessary_non_null_assertion
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:47:22 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:48:21 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:49:21 • argument_type_not_assignable
+warning • The left operand can't be null, so the right operand is never executed • test/services/ai_database_integration_test.dart:49:39 • dead_null_aware_expression
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:49:46 • argument_type_not_assignable
+  error • The argument type 'Object' can't be assigned to the parameter type 'double'.  • test/services/ai_database_integration_test.dart:63:17 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:63:24 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:64:22 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:65:35 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:66:26 • argument_type_not_assignable
+warning • The left operand can't be null, so the right operand is never executed • test/services/ai_database_integration_test.dart:66:41 • dead_null_aware_expression
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:67:26 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:68:22 • argument_type_not_assignable
+warning • The left operand can't be null, so the right operand is never executed • test/services/ai_database_integration_test.dart:68:40 • dead_null_aware_expression
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:68:47 • argument_type_not_assignable
+warning • The left operand can't be null, so the right operand is never executed • test/services/ai_database_integration_test.dart:68:58 • dead_null_aware_expression
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:69:29 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:70:26 • argument_type_not_assignable
+warning • The left operand can't be null, so the right operand is never executed • test/services/ai_database_integration_test.dart:70:41 • dead_null_aware_expression
+  error • The method 'addExpense' isn't defined for the type 'DatabaseService' • test/services/ai_database_integration_test.dart:74:47 • undefined_method
+  error • Too many positional arguments: 0 expected, but 1 found • test/services/ai_database_integration_test.dart:81:58 • extra_positional_arguments_could_be_named
+  error • The method 'addExpense' isn't defined for the type 'DatabaseService' • test/services/ai_database_integration_test.dart:138:31 • undefined_method
+  error • Too many positional arguments: 0 expected, but 1 found • test/services/ai_database_integration_test.dart:142:60 • extra_positional_arguments_could_be_named
+  error • 1 positional argument expected by 'generateSpendingInsights', but 0 found • test/services/ai_database_integration_test.dart:149:9 • not_enough_positional_arguments
+  error • The named parameter 'expenses' isn't defined • test/services/ai_database_integration_test.dart:149:9 • undefined_named_parameter
+  error • The named parameter 'languageCode' isn't defined • test/services/ai_database_integration_test.dart:150:9 • undefined_named_parameter
+warning • The '!' will have no effect because the receiver can't be null • test/services/ai_database_integration_test.dart:155:22 • unnecessary_non_null_assertion
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:155:24 • argument_type_not_assignable
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:156:23 • argument_type_not_assignable
+warning • Unnecessary cast • test/services/ai_database_integration_test.dart:159:23 • unnecessary_cast
+  error • The argument type 'String' can't be assigned to the parameter type 'int'.  • test/services/ai_database_integration_test.dart:159:32 • argument_type_not_assignable
+warning • Unused import: 'dart:async' • test/services/ai_provider_switching_test.dart:2:8 • unused_import
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_provider_switching_test.dart:25:13 • unused_local_variable
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:26:24 • undefined_getter
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_provider_switching_test.dart:31:13 • unused_local_variable
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:33:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:36:24 • undefined_getter
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:43:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:46:24 • undefined_getter
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:53:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:56:24 • undefined_getter
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:63:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:66:24 • undefined_getter
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_provider_switching_test.dart:75:13 • unused_local_variable
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:77:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_provider_switching_test.dart:80:24 • undefined_getter
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_provider_switching_test.dart:89:13 • unused_local_variable
+  error • Target of URI doesn't exist: 'package:our_spends/services/openai_service.dart' • test/services/ai_service_integration_test.dart:4:8 • uri_does_not_exist
+  error • Target of URI doesn't exist: 'package:our_spends/services/claude_service.dart' • test/services/ai_service_integration_test.dart:5:8 • uri_does_not_exist
+  error • Target of URI doesn't exist: 'package:our_spends/services/deepseek_service.dart' • test/services/ai_service_integration_test.dart:6:8 • uri_does_not_exist
+   info • 'package:test_api/test_api.dart' is deprecated and shouldn't be used. package:test_api is not intended for general use. Please use package:test • test/services/ai_service_integration_test.dart:9:1 • deprecated_member_use
+   info • The imported package 'test_api' isn't a dependency of the importing package • test/services/ai_service_integration_test.dart:9:8 • depend_on_referenced_packages
+  error • Undefined class 'OpenAIService' • test/services/ai_service_integration_test.dart:15:10 • undefined_class
+  error • Undefined class 'ClaudeService' • test/services/ai_service_integration_test.dart:16:10 • undefined_class
+  error • Undefined class 'DeepSeekService' • test/services/ai_service_integration_test.dart:17:10 • undefined_class
+  error • The function 'OpenAIService' isn't defined • test/services/ai_service_integration_test.dart:27:23 • undefined_function
+  error • The function 'ClaudeService' isn't defined • test/services/ai_service_integration_test.dart:28:23 • undefined_function
+  error • The function 'DeepSeekService' isn't defined • test/services/ai_service_integration_test.dart:29:25 • undefined_function
+  error • The named parameter 'openaiService' isn't defined • test/services/ai_service_integration_test.dart:34:9 • undefined_named_parameter
+  error • The named parameter 'claudeService' isn't defined • test/services/ai_service_integration_test.dart:35:9 • undefined_named_parameter
+  error • The named parameter 'deepseekService' isn't defined • test/services/ai_service_integration_test.dart:36:9 • undefined_named_parameter
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_service_integration_test.dart:44:24 • undefined_getter
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_service_integration_test.dart:49:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_service_integration_test.dart:52:24 • undefined_getter
+  error • Undefined class 'OpenAIService' • test/services/ai_service_integration_test.dart:110:10 • undefined_class
+  error • The function 'OpenAIService' isn't defined • test/services/ai_service_integration_test.dart:113:23 • undefined_function
+  error • Undefined class 'ClaudeService' • test/services/ai_service_integration_test.dart:155:10 • undefined_class
+  error • The function 'ClaudeService' isn't defined • test/services/ai_service_integration_test.dart:158:23 • undefined_function
+  error • Undefined class 'DeepSeekService' • test/services/ai_service_integration_test.dart:200:10 • undefined_class
+  error • The function 'DeepSeekService' isn't defined • test/services/ai_service_integration_test.dart:203:25 • undefined_function
+  error • Target of URI doesn't exist: 'package:our_spends/services/openai_service.dart' • test/services/ai_service_test.dart:8:8 • uri_does_not_exist
+  error • Target of URI doesn't exist: 'package:our_spends/services/claude_service.dart' • test/services/ai_service_test.dart:9:8 • uri_does_not_exist
+  error • Target of URI doesn't exist: 'package:our_spends/services/deepseek_service.dart' • test/services/ai_service_test.dart:10:8 • uri_does_not_exist
+  error • Arguments of a constant creation must be constant expressions • test/services/ai_service_test.dart:14:32 • const_with_non_constant_argument
+  error • The values in a const list literal must be constants • test/services/ai_service_test.dart:14:32 • non_constant_list_element
+  error • Undefined name 'OpenAIService' • test/services/ai_service_test.dart:14:32 • undefined_identifier
+  error • The values in a const list literal must be constants • test/services/ai_service_test.dart:14:47 • non_constant_list_element
+  error • Undefined name 'ClaudeService' • test/services/ai_service_test.dart:14:47 • undefined_identifier
+  error • The values in a const list literal must be constants • test/services/ai_service_test.dart:14:62 • non_constant_list_element
+  error • Undefined name 'DeepSeekService' • test/services/ai_service_test.dart:14:62 • undefined_identifier
+  error • The named parameter 'openaiService' isn't defined • test/services/ai_service_test.dart:40:9 • undefined_named_parameter
+  error • The named parameter 'claudeService' isn't defined • test/services/ai_service_test.dart:41:9 • undefined_named_parameter
+  error • The named parameter 'deepseekService' isn't defined • test/services/ai_service_test.dart:42:9 • undefined_named_parameter
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_service_test.dart:48:13 • unused_local_variable
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_service_test.dart:53:24 • undefined_getter
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_service_test.dart:58:13 • unused_local_variable
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_service_test.dart:63:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_service_test.dart:66:24 • undefined_getter
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_service_test.dart:75:13 • unused_local_variable
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_service_test.dart:120:13 • unused_local_variable
+  error • The method 'testProvider' isn't defined for the type 'AIService' • test/services/ai_service_test.dart:141:47 • undefined_method
+  error • The method 'testProvider' isn't defined for the type 'AIService' • test/services/ai_service_test.dart:145:47 • undefined_method
+warning • The value of the local variable 'testOnTimeout' isn't used • test/services/ai_service_test.dart:151:13 • unused_local_variable
+  error • The method 'setProvider' isn't defined for the type 'AIService' • test/services/ai_service_test.dart:156:23 • undefined_method
+  error • The getter 'currentProvider' isn't defined for the type 'AIService' • test/services/ai_service_test.dart:159:24 • undefined_getter
+  error • Target of URI doesn't exist: 'package:our_spends/services/claude_service.dart' • test/services/ai_service_test.mocks.dart:11:8 • uri_does_not_exist
+  error • Target of URI doesn't exist: 'package:our_spends/services/deepseek_service.dart' • test/services/ai_service_test.mocks.dart:12:8 • uri_does_not_exist
+  error • Target of URI doesn't exist: 'package:our_spends/services/openai_service.dart' • test/services/ai_service_test.mocks.dart:14:8 • uri_does_not_exist
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:101:22 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:133:37 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:141:22 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:163:22 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:195:37 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:203:22 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:225:22 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:257:37 • override_on_non_overriding_member
+warning • The method doesn't override an inherited method • test/services/ai_service_test.mocks.dart:265:22 • override_on_non_overriding_member
+warning • Unused import: 'package:mockito/mockito.dart' • test/test_mocks.dart:2:8 • unused_import
+  error • Target of URI doesn't exist: 'file:///Users/quy.doan/Workspace/personal/our_spends/test/test_mocks.mocks.dart' • test/test_mocks.dart:8:6 • uri_does_not_exist
+warning • Unused import: 'dart:async' • test/widget_test.dart:9:8 • unused_import
+warning • Unused import: 'package:our_spends/main.dart' • test/widget_test.dart:14:8 • unused_import
+

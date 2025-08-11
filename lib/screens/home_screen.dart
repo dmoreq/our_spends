@@ -4,7 +4,6 @@ import '../providers/expense_provider.dart';
 import '../l10n/app_localizations.dart';
 import 'expenses_screen.dart';
 import 'add_expense_screen.dart';
-import 'analytics_screen.dart';
 import 'chat_screen.dart';
 import 'settings_screen.dart';
 
@@ -29,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final expenseProvider = Provider.of<ExpenseProvider>(context);
     
     return Scaffold(
       body: PageView(
@@ -37,8 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const NeverScrollableScrollPhysics(),
         children: const [
           ExpensesScreen(),
-          AddExpenseScreen(),
-          AnalyticsScreen(),
           ChatScreen(),
           SettingsScreen(),
         ],
@@ -63,16 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: l10n.expenses,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.add_circle_outline),
-            selectedIcon: const Icon(Icons.add_circle),
-            label: l10n.addExpense,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.analytics_outlined),
-            selectedIcon: const Icon(Icons.analytics),
-            label: l10n.analytics,
-          ),
-          NavigationDestination(
             icon: const Icon(Icons.chat_outlined),
             selectedIcon: const Icon(Icons.chat),
             label: l10n.chat,
@@ -87,10 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: _currentIndex == 0
           ? FloatingActionButton(
               onPressed: () {
-                setState(() {
-                  _currentIndex = 1; // Switch to Add Expense tab
-                  _pageController.jumpToPage(1);
-                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
+                );
               },
               child: const Icon(Icons.add),
             )

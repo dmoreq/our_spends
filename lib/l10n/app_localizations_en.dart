@@ -12,15 +12,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Our Spends';
 
   @override
-  String get loginTitle => 'Welcome';
-
-  @override
-  String get loginSubtitle => 'Track your family expenses with AI';
-
-  @override
-  String get signInWithGoogle => 'Sign in with Google';
-
-  @override
   String get chatTitle => 'Expense Chat';
 
   @override
@@ -38,9 +29,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings => 'Settings';
-
-  @override
-  String get logout => 'Logout';
 
   @override
   String get currency => 'Currency';
@@ -103,8 +91,161 @@ class AppLocalizationsEn extends AppLocalizations {
   String get networkError => 'Network error. Please check your connection.';
 
   @override
-  String get authError => 'Authentication failed. Please try again.';
+  String get unknownError => 'An unknown error occurred.';
 
   @override
-  String get unknownError => 'An unknown error occurred.';
+  String get expenses => 'Expenses';
+
+  @override
+  String get addExpense => 'Add Expense';
+
+  @override
+  String get analytics => 'Analytics';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get monthlyOverview => 'Monthly Overview';
+
+  @override
+  String get spendingByCategory => 'Spending by Category';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get themeColor => 'Theme Color';
+
+  @override
+  String get general => 'General';
+
+  @override
+  String get location => 'Location';
+
+  @override
+  String get paymentMethod => 'Payment Method';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get chat => 'Chat';
+
+  @override
+  String get expenseCategoryFood => 'Food';
+
+  @override
+  String get expenseCategoryShopping => 'Shopping';
+
+  @override
+  String get expenseCategoryHousing => 'Housing';
+
+  @override
+  String get expenseCategoryTransportation => 'Transportation';
+
+  @override
+  String get expenseCategoryTransport => 'Transportation';
+
+  @override
+  String get expenseCategoryEntertainment => 'Entertainment';
+
+  @override
+  String get expenseCategoryUtilities => 'Utilities';
+
+  @override
+  String get expenseCategoryHealth => 'Health';
+
+  @override
+  String get expenseCategoryTravel => 'Travel';
+
+  @override
+  String get expenseCategoryEducation => 'Education';
+
+  @override
+  String get expenseCategoryOther => 'Other';
+
+  @override
+  String get overview => 'Overview';
+
+  @override
+  String get categories => 'Categories';
+
+  @override
+  String get spendingTrend => 'Spending Trend';
+
+  @override
+  String get totalSpending => 'Total Spending';
+
+  @override
+  String get categoryBreakdown => 'Category Breakdown';
+
+  @override
+  String get noExpensesForPeriod => 'No expenses for this period';
+
+  @override
+  String get recentTransactions => 'Recent Transactions';
+
+  @override
+  String get week => 'Week';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get year => 'Year';
+
+  @override
+  String get expenseTitleLabel => 'Title';
+
+  @override
+  String get expenseTitlePlaceholder => 'Enter expense title';
+
+  @override
+  String get expenseAmountLabel => 'Amount';
+
+  @override
+  String get expenseAmountPlaceholder => 'Enter amount';
+
+  @override
+  String get expenseDateLabel => 'Date';
+
+  @override
+  String get expenseCategoryLabel => 'Category';
+
+  @override
+  String get expenseNotesLabel => 'Notes';
+
+  @override
+  String get expenseNotesPlaceholder => 'Add any additional notes';
+
+  @override
+  String get locationPlaceholder => 'Enter location (optional)';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get invalidNumber => 'Please enter a valid number';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get expenseAddedSuccess => 'Expense added successfully';
+
+  @override
+  String get expenseAddedError => 'Error adding expense';
 }

@@ -12,15 +12,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appTitle => 'Our Spends';
 
   @override
-  String get loginTitle => 'Chào Mừng';
-
-  @override
-  String get loginSubtitle => 'Theo dõi chi tiêu gia đình với AI';
-
-  @override
-  String get signInWithGoogle => 'Đăng nhập với Google';
-
-  @override
   String get chatTitle => 'Chat Chi Tiêu';
 
   @override
@@ -38,9 +29,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settings => 'Cài Đặt';
-
-  @override
-  String get logout => 'Đăng Xuất';
 
   @override
   String get currency => 'Tiền Tệ';
@@ -103,8 +91,162 @@ class AppLocalizationsVi extends AppLocalizations {
   String get networkError => 'Lỗi mạng. Vui lòng kiểm tra kết nối.';
 
   @override
-  String get authError => 'Xác thực thất bại. Vui lòng thử lại.';
+  String get unknownError => 'Đã xảy ra lỗi không xác định.';
 
   @override
-  String get unknownError => 'Đã xảy ra lỗi không xác định.';
+  String get expenses => 'Chi Tiêu';
+
+  @override
+  String get addExpense => 'Thêm Chi Tiêu';
+
+  @override
+  String get analytics => 'Phân Tích';
+
+  @override
+  String get title => 'Tiêu Đề';
+
+  @override
+  String get date => 'Ngày';
+
+  @override
+  String get notes => 'Ghi Chú';
+
+  @override
+  String get submit => 'Gửi';
+
+  @override
+  String get monthlyOverview => 'Tổng Quan Hàng Tháng';
+
+  @override
+  String get spendingByCategory => 'Chi Tiêu Theo Danh Mục';
+
+  @override
+  String get appearance => 'Giao Diện';
+
+  @override
+  String get darkMode => 'Chế Độ Tối';
+
+  @override
+  String get themeColor => 'Màu Chủ Đề';
+
+  @override
+  String get general => 'Chung';
+
+  @override
+  String get location => 'Địa Điểm';
+
+  @override
+  String get paymentMethod => 'Phương Thức Thanh Toán';
+
+  @override
+  String get close => 'Đóng';
+
+  @override
+  String get chat => 'Trò Chuyện';
+
+  @override
+  String get expenseCategoryFood => 'Thực Phẩm';
+
+  @override
+  String get expenseCategoryShopping => 'Mua Sắm';
+
+  @override
+  String get expenseCategoryHousing => 'Nhà Ở';
+
+  @override
+  String get expenseCategoryTransportation => 'Di Chuyển';
+
+  @override
+  String get expenseCategoryTransport => 'Di Chuyển';
+
+  @override
+  String get expenseCategoryEntertainment => 'Giải Trí';
+
+  @override
+  String get expenseCategoryUtilities => 'Tiện Ích';
+
+  @override
+  String get expenseCategoryHealth => 'Sức Khỏe';
+
+  @override
+  String get expenseCategoryTravel => 'Du Lịch';
+
+  @override
+  String get expenseCategoryEducation => 'Giáo Dục';
+
+  @override
+  String get expenseCategoryOther => 'Khác';
+
+  @override
+  String get overview => 'Tổng Quan';
+
+  @override
+  String get categories => 'Danh Mục';
+
+  @override
+  String get spendingTrend => 'Xu Hướng Chi Tiêu';
+
+  @override
+  String get totalSpending => 'Tổng Chi Tiêu';
+
+  @override
+  String get categoryBreakdown => 'Chi Tiết Theo Danh Mục';
+
+  @override
+  String get noExpensesForPeriod =>
+      'Không có chi tiêu trong khoảng thời gian này';
+
+  @override
+  String get recentTransactions => 'Giao Dịch Gần Đây';
+
+  @override
+  String get week => 'Tuần';
+
+  @override
+  String get month => 'Tháng';
+
+  @override
+  String get year => 'Năm';
+
+  @override
+  String get expenseTitleLabel => 'Tiêu Đề';
+
+  @override
+  String get expenseTitlePlaceholder => 'Nhập tiêu đề chi tiêu';
+
+  @override
+  String get expenseAmountLabel => 'Số Tiền';
+
+  @override
+  String get expenseAmountPlaceholder => 'Nhập số tiền';
+
+  @override
+  String get expenseDateLabel => 'Ngày';
+
+  @override
+  String get expenseCategoryLabel => 'Danh Mục';
+
+  @override
+  String get expenseNotesLabel => 'Ghi Chú';
+
+  @override
+  String get expenseNotesPlaceholder => 'Thêm ghi chú bổ sung';
+
+  @override
+  String get locationPlaceholder => 'Nhập địa điểm (tùy chọn)';
+
+  @override
+  String get fieldRequired => 'Trường này là bắt buộc';
+
+  @override
+  String get invalidNumber => 'Vui lòng nhập số hợp lệ';
+
+  @override
+  String get save => 'Lưu';
+
+  @override
+  String get expenseAddedSuccess => 'Đã thêm chi tiêu thành công';
+
+  @override
+  String get expenseAddedError => 'Lỗi khi thêm chi tiêu';
 }

@@ -104,24 +104,6 @@ abstract class AppLocalizations {
   /// **'Our Spends'**
   String get appTitle;
 
-  /// No description provided for @loginTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome'**
-  String get loginTitle;
-
-  /// No description provided for @loginSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Track your family expenses with AI'**
-  String get loginSubtitle;
-
-  /// No description provided for @signInWithGoogle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in with Google'**
-  String get signInWithGoogle;
-
   /// No description provided for @chatTitle.
   ///
   /// In en, this message translates to:
@@ -157,12 +139,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings;
-
-  /// No description provided for @logout.
-  ///
-  /// In en, this message translates to:
-  /// **'Logout'**
-  String get logout;
 
   /// No description provided for @currency.
   ///
@@ -284,17 +260,323 @@ abstract class AppLocalizations {
   /// **'Network error. Please check your connection.'**
   String get networkError;
 
-  /// No description provided for @authError.
-  ///
-  /// In en, this message translates to:
-  /// **'Authentication failed. Please try again.'**
-  String get authError;
-
   /// No description provided for @unknownError.
   ///
   /// In en, this message translates to:
   /// **'An unknown error occurred.'**
   String get unknownError;
+
+  /// No description provided for @expenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get expenses;
+
+  /// No description provided for @addExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Expense'**
+  String get addExpense;
+
+  /// No description provided for @analytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get analytics;
+
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @monthlyOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Overview'**
+  String get monthlyOverview;
+
+  /// No description provided for @spendingByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending by Category'**
+  String get spendingByCategory;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @themeColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Color'**
+  String get themeColor;
+
+  /// No description provided for @general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get general;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @paymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Method'**
+  String get paymentMethod;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chat;
+
+  /// No description provided for @expenseCategoryFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get expenseCategoryFood;
+
+  /// No description provided for @expenseCategoryShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get expenseCategoryShopping;
+
+  /// No description provided for @expenseCategoryHousing.
+  ///
+  /// In en, this message translates to:
+  /// **'Housing'**
+  String get expenseCategoryHousing;
+
+  /// No description provided for @expenseCategoryTransportation.
+  ///
+  /// In en, this message translates to:
+  /// **'Transportation'**
+  String get expenseCategoryTransportation;
+
+  /// No description provided for @expenseCategoryTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transportation'**
+  String get expenseCategoryTransport;
+
+  /// No description provided for @expenseCategoryEntertainment.
+  ///
+  /// In en, this message translates to:
+  /// **'Entertainment'**
+  String get expenseCategoryEntertainment;
+
+  /// No description provided for @expenseCategoryUtilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Utilities'**
+  String get expenseCategoryUtilities;
+
+  /// No description provided for @expenseCategoryHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get expenseCategoryHealth;
+
+  /// No description provided for @expenseCategoryTravel.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel'**
+  String get expenseCategoryTravel;
+
+  /// No description provided for @expenseCategoryEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get expenseCategoryEducation;
+
+  /// No description provided for @expenseCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get expenseCategoryOther;
+
+  /// No description provided for @overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overview;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// No description provided for @spendingTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Trend'**
+  String get spendingTrend;
+
+  /// No description provided for @totalSpending.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spending'**
+  String get totalSpending;
+
+  /// No description provided for @categoryBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Breakdown'**
+  String get categoryBreakdown;
+
+  /// No description provided for @noExpensesForPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses for this period'**
+  String get noExpensesForPeriod;
+
+  /// No description provided for @recentTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Transactions'**
+  String get recentTransactions;
+
+  /// No description provided for @week.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get week;
+
+  /// No description provided for @month.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get month;
+
+  /// No description provided for @year.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get year;
+
+  /// No description provided for @expenseTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get expenseTitleLabel;
+
+  /// No description provided for @expenseTitlePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter expense title'**
+  String get expenseTitlePlaceholder;
+
+  /// No description provided for @expenseAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get expenseAmountLabel;
+
+  /// No description provided for @expenseAmountPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter amount'**
+  String get expenseAmountPlaceholder;
+
+  /// No description provided for @expenseDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get expenseDateLabel;
+
+  /// No description provided for @expenseCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get expenseCategoryLabel;
+
+  /// No description provided for @expenseNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get expenseNotesLabel;
+
+  /// No description provided for @expenseNotesPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add any additional notes'**
+  String get expenseNotesPlaceholder;
+
+  /// No description provided for @locationPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter location (optional)'**
+  String get locationPlaceholder;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// No description provided for @invalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid number'**
+  String get invalidNumber;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @expenseAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense added successfully'**
+  String get expenseAddedSuccess;
+
+  /// No description provided for @expenseAddedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error adding expense'**
+  String get expenseAddedError;
 }
 
 class _AppLocalizationsDelegate

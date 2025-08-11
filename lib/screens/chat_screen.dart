@@ -19,6 +19,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   final List<Map<String, String>> _conversationHistory = [];
+  bool _isTyping = false;
 
   @override
   void dispose() {
@@ -32,29 +33,17 @@ class _ChatScreenState extends State<ChatScreen> {
     if (message.isEmpty) return;
 
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-    
-    // Debug logging
-    print('DEBUG: Sending message: $message');
-    print('DEBUG: ExpenseProvider loading: ${expenseProvider.isLoading}');
-    
-    // Use fixed demo user ID
     final demoUserId = 'demo-user';
-    print('DEBUG: Using demo mode with user ID: $demoUserId');
-    
-    await _processChatMessage(message, demoUserId, expenseProvider);
-  }
 
-  Future<void> _processChatMessage(String message, String userId, ExpenseProvider expenseProvider) async {
-    // Add user message to chat and conversation history
     setState(() {
       _messages.add(ChatMessage(
         text: message,
         isUser: true,
         timestamp: DateTime.now(),
       ));
+      _isTyping = true;
     });
 
-    // Add user message to conversation history
     _conversationHistory.add({
       'role': 'user',
       'content': message,
@@ -63,530 +52,338 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.clear();
     _scrollToBottom();
 
-    // Get current language code
+    await _processChatMessage(message, demoUserId, expenseProvider);
+  }
+
+  Future<void> _processChatMessage(String message, String userId, ExpenseProvider expenseProvider) async {
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     final languageCode = languageProvider.currentLocale.languageCode;
 
-    // Send message to Gemini AI with conversation history and language
     try {
-      print('DEBUG: Calling expenseProvider.sendMessage with userId: $userId');
-      print('DEBUG: Conversation history length: ${_conversationHistory.length}');
-      print('DEBUG: Language code: $languageCode');
       final response = await expenseProvider.sendMessage(message, userId, conversationHistory: _conversationHistory, languageCode: languageCode);
-      print('DEBUG: Received response: $response');
-      
+
       if (response['status'] == 'success') {
         final aiResponse = response['data'] ?? "I received your message!";
-        
-        // Add AI response to chat
-        setState(() {
-          _messages.add(ChatMessage(
-            text: aiResponse,
-            isUser: false,
-            timestamp: DateTime.now(),
-          ));
-        });
+        _addMessage(aiResponse, isUser: false);
 
-        // Add AI response to conversation history
-        _conversationHistory.add({
-          'role': 'assistant',
-          'content': aiResponse,
-        });
-
-        // Check if expense information was extracted
         if (response['expense_info'] != null && response['expense_info']['hasExpense'] == true) {
-          // Extract expense information
           final expenseInfo = response['expense_info'];
-          
-          // Save expense to database
           await _saveExpenseToDatabase(expenseInfo, userId);
-          
-          // Notify user that expense was saved
-          final expenseMessage = languageCode == 'vi' 
+          final expenseMessage = languageCode == 'vi'
               ? "💡 Tôi đã tự động lưu khoản chi tiêu của bạn vào trình theo dõi chi tiêu!"
               : "💡 I've automatically saved your expense to your expense tracker!";
-          
-          setState(() {
-            _messages.add(ChatMessage(
-              text: expenseMessage,
-              isUser: false,
-              timestamp: DateTime.now(),
-            ));
-          });
-
-          // Add expense detection message to conversation history
-          _conversationHistory.add({
-            'role': 'assistant',
-            'content': expenseMessage,
-          });
+          _addMessage(expenseMessage, isUser: false);
         }
       } else {
-        final errorMessage = response['data'] ?? (languageCode == 'vi' 
+        final errorMessage = response['data'] ?? (languageCode == 'vi'
             ? "Xin lỗi, tôi không thể xử lý tin nhắn của bạn. Vui lòng thử lại."
             : "Sorry, I couldn't process your message. Please try again.");
-        
-        setState(() {
-          _messages.add(ChatMessage(
-            text: errorMessage,
-            isUser: false,
-            timestamp: DateTime.now(),
-          ));
-        });
-
-        // Add error response to conversation history
-        _conversationHistory.add({
-          'role': 'assistant',
-          'content': errorMessage,
-        });
+        _addMessage(errorMessage, isUser: false);
       }
     } catch (e) {
-      print('DEBUG: Error in sendMessage: $e');
-      final errorMessage = languageCode == 'vi' 
+      final errorMessage = languageCode == 'vi'
           ? "Xin lỗi, tôi gặp lỗi. Vui lòng thử lại."
           : "Sorry, I encountered an error. Please try again.";
-      
-      setState(() {
-        _messages.add(ChatMessage(
-          text: errorMessage,
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-      });
-
-      // Add error message to conversation history
-      _conversationHistory.add({
-        'role': 'assistant',
-        'content': errorMessage,
-      });
+      _addMessage(errorMessage, isUser: false);
     }
 
+    setState(() {
+      _isTyping = false;
+    });
     _scrollToBottom();
+  }
+
+  void _addMessage(String text, {required bool isUser}) {
+    setState(() {
+      _messages.add(ChatMessage(
+        text: text,
+        isUser: isUser,
+        timestamp: DateTime.now(),
+      ));
+    });
+    _conversationHistory.add({
+      'role': isUser ? 'user' : 'assistant',
+      'content': text,
+    });
   }
 
   void _generateInsights() async {
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-    
-    // Use fixed demo user ID
-    String userId = 'demo-user';
-    
+    final userId = 'demo-user';
+
+    setState(() {
+      _isTyping = true;
+    });
+
     try {
       final response = await expenseProvider.generateInsights(userId);
-      
-      setState(() {
-        _messages.add(ChatMessage(
-          text: "📊 Here are your spending insights:",
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-        
-        _messages.add(ChatMessage(
-          text: response['data'] ?? "Unable to generate insights at the moment.",
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-      });
-      
-      _scrollToBottom();
+      final insights = response['data'] ?? "Unable to generate insights at the moment.";
+      _addMessage("📊 Here are your spending insights:", isUser: false);
+      _addMessage(insights, isUser: false);
     } catch (e) {
-      setState(() {
-        _messages.add(ChatMessage(
-          text: "Sorry, I couldn't generate insights right now. Please try again.",
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-      });
-      
-      _scrollToBottom();
+      _addMessage("Sorry, I couldn't generate insights right now. Please try again.", isUser: false);
     }
+
+    setState(() {
+      _isTyping = false;
+    });
+    _scrollToBottom();
   }
 
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-  
   Future<void> _saveExpenseToDatabase(Map<String, dynamic> expenseInfo, String userId) async {
     try {
-      // Get database service from expense provider
-      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-      
       // Get current date if not provided
-      final date = expenseInfo['date'] != null 
+      final expenseDate = expenseInfo['date'] != null 
           ? DateTime.parse(expenseInfo['date']) 
           : DateTime.now();
       
-      // Use the date directly without time component
-      DateTime dateTime = DateTime(
-        date.year,
-        date.month,
-        date.day,
-      );
-      
-      // Map category from AI response to app category
-      String category = 'Other';
-      if (expenseInfo['category'] != null) {
-        // Convert AI category to app category format
-        final aiCategory = expenseInfo['category'].toString().toLowerCase();
-        
-        // Map AI categories to app categories
-        final categoryMap = {
-          'food': 'Food & Dining',
-          'transport': 'Transportation',
-          'shopping': 'Shopping',
-          'entertainment': 'Entertainment',
-          'bills': 'Bills & Utilities',
-          'healthcare': 'Healthcare',
-          'education': 'Education',
-          'travel': 'Travel',
-          'family': 'Family & Kids',
-        };
-        
-        category = categoryMap[aiCategory] ?? 'Other';
-      }
-      
-      // Get location information (default is "Forgotted" if not provided)
-      final location = expenseInfo['location'] ?? 'Forgotted';
-      
-      // Check if date or location needs confirmation
-      final needsDateConfirmation = expenseInfo['needs_date_confirmation'] == true;
-      final needsLocationConfirmation = expenseInfo['needs_location_confirmation'] == true;
-      
       // Create expense object
       final expense = Expense(
-        id: '', // Will be generated by database service
+        id: DateTime.now().toIso8601String(),
         userId: userId,
-        date: dateTime, // Use the date without time information
-        amount: expenseInfo['amount'] is double 
-            ? expenseInfo['amount'] 
-            : double.parse(expenseInfo['amount'].toString()),
-        currency: expenseInfo['currency'] ?? 'VND',
-        category: category,
-        item: expenseInfo['description'] ?? expenseInfo['item'] ?? 'Expense',
-        description: expenseInfo['description'],
-        location: location, // Use the extracted or default location
+        item: expenseInfo['item'] ?? 'Unknown Item',
+        amount: (expenseInfo['amount'] as num?)?.toDouble() ?? 0.0,
+        date: expenseDate,
+        category: expenseInfo['category'] ?? 'Other',
+        notes: expenseInfo['notes'] ?? '',
+        location: expenseInfo['location'] ?? '',
+        paymentMethod: expenseInfo['payment_method'] ?? '',
+        currency: expenseInfo['currency'] ?? 'USD',
       );
-      
-      // If date or location needs confirmation, show confirmation dialog
-      if (needsDateConfirmation || needsLocationConfirmation) {
-        // Add a message to inform the user about the default values
-        setState(() {
-          String confirmationMessage = "I've detected an expense";
-          
-          if (needsDateConfirmation) {
-            final formattedDate = "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
-            confirmationMessage += ", using date: $formattedDate";
-          }
-          
-          if (needsLocationConfirmation) {
-            confirmationMessage += ", location marked as 'Forgotted'";
-          }
-          
-          confirmationMessage += ". Please confirm:";
-          
-          _messages.add(ChatMessage(
-            text: confirmationMessage,
-            isUser: false,
-            timestamp: DateTime.now(),
-          ));
-        });
-        
-        // Show confirmation buttons in a separate message
-        _showConfirmationButtons(expense);
-      } else {
-        // If no confirmation needed, save directly
-        await expenseProvider.addExpense(expense);
-        
-        // Notify user that expense was saved
-        setState(() {
-          _messages.add(ChatMessage(
-            text: "💡 I've automatically saved your expense to your expense tracker!",
-            isUser: false,
-            timestamp: DateTime.now(),
-          ));
-        });
-      }
+
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      await expenseProvider.addExpense(expense);
     } catch (e) {
       print('ERROR: Failed to save expense to database: $e');
       // We don't want to show an error message to the user if this fails
       // The conversation will continue normally
     }
   }
-  
-  void _showConfirmationButtons(Expense expense) {
-    setState(() {
-      _messages.add(ChatMessage(
-        text: "_confirmation_buttons_", // Special marker for confirmation buttons
-        isUser: false,
-        timestamp: DateTime.now(),
-        confirmationData: {
-          'expense': expense,
-          'type': 'expense_confirmation'
-        },
-      ));
-    });
-    
-    _scrollToBottom();
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.chatTitle),
-        centerTitle: true,
-        actions: [
-          Consumer<ExpenseProvider>(
-            builder: (context, expenseProvider, child) {
-              return IconButton(
-                onPressed: expenseProvider.isLoading ? null : _generateInsights,
-                icon: const Icon(Icons.insights),
-                tooltip: 'Generate Spending Insights',
-              );
-            },
+        title: Text(
+          l10n.chatTitle,
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
+        centerTitle: true,
       ),
       body: Column(
         children: [
-          // Chat messages
           Expanded(
             child: _messages.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.chat,
-                          size: 64,
-                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.chatEmptyTitle ?? 'Start tracking your expenses',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.chatEmptySubtitle ?? 'Tell me about your purchases and I\'ll help you track them',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final message = _messages[index];
-                      return _buildMessageBubble(message);
-                    },
-                  ),
+                ? _buildEmptyChat(l10n, theme)
+                : _buildMessageList(theme),
           ),
-
-          // Message input
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              border: Border(
-                top: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 1,
-                ),
+          if (_isTyping)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16),
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'OurSpends is thinking...',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: l10n.chatHint,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                    ),
-                    onSubmitted: (_) => _sendMessage(),
-                    textInputAction: TextInputAction.send,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Consumer<ExpenseProvider>(
-                  builder: (context, expenseProvider, child) {
-                    return Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: IconButton(
-                        onPressed: expenseProvider.isLoading ? null : _sendMessage,
-                        icon: expenseProvider.isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.send,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
+          _buildMessageInputField(l10n, theme),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
-    // Check if this is a confirmation buttons message
-    if (!message.isUser && message.text == "_confirmation_buttons_" && message.confirmationData != null) {
-      return _buildConfirmationButtons(message);
-    }
-    
-    return Align(
-      alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        decoration: BoxDecoration(
-          color: message.isUser
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(18).copyWith(
-            bottomRight: message.isUser ? const Radius.circular(4) : null,
-            bottomLeft: !message.isUser ? const Radius.circular(4) : null,
-          ),
-          border: message.isUser ? null : Border.all(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: Text(
-          message.text,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: message.isUser
-                ? Theme.of(context).colorScheme.onPrimary
-                : Theme.of(context).colorScheme.onSurface,
-          ),
+  Widget _buildEmptyChat(AppLocalizations l10n, ThemeData theme) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(
+              radius: 40,
+              // TODO: Add an app icon or relevant image
+              child: Icon(Icons.chat_bubble_outline, size: 40),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              l10n.chatEmptyTitle,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.chatEmptySubtitle,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              alignment: WrapAlignment.center,
+              children: [
+                _buildSuggestionChip('Log a new expense', Icons.add_shopping_cart),
+                _buildSuggestionChip('Summarize my spending', Icons.pie_chart_outline),
+                _buildSuggestionChip('Show recent transactions', Icons.receipt_long),
+              ],
+            )
+          ],
         ),
       ),
     );
   }
-  
-  Widget _buildConfirmationButtons(ChatMessage message) {
-    final expense = message.confirmationData!['expense'] as Expense;
-    
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(18).copyWith(
-            bottomLeft: const Radius.circular(4),
+
+  Widget _buildSuggestionChip(String label, IconData icon) {
+    return ActionChip(
+      avatar: Icon(icon, size: 16),
+      label: Text(label),
+      onPressed: () {
+        _messageController.text = label;
+        _sendMessage();
+      },
+    );
+  }
+
+  Widget _buildMessageList(ThemeData theme) {
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.all(16.0),
+      itemCount: _messages.length,
+      itemBuilder: (context, index) {
+        final message = _messages[index];
+        return MessageBubble(
+          message: message,
+          isUser: message.isUser,
+        );
+      },
+    );
+  }
+
+  Widget _buildMessageInputField(AppLocalizations l10n, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: SafeArea(
+        child: Row(
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // Save the expense to the database
-                      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-                      await expenseProvider.addExpense(expense);
-                      
-                      // Add confirmation message
-                      setState(() {
-                        _messages.add(ChatMessage(
-                          text: "💡 Expense saved successfully!",
-                          isUser: false,
-                          timestamp: DateTime.now(),
-                        ));
-                      });
-                      
-                      _scrollToBottom();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    child: const Text('Confirm'),
+            Expanded(
+              child: TextField(
+                controller: _messageController,
+                decoration: InputDecoration(
+                  hintText: l10n.chatHint,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
                   ),
+                  filled: true,
+                  fillColor: theme.scaffoldBackgroundColor,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // Add message to edit the expense
-                      setState(() {
-                        _messages.add(ChatMessage(
-                          text: "Please provide the correct details.",
-                          isUser: false,
-                          timestamp: DateTime.now(),
-                        ));
-                      });
-                      
-                      _scrollToBottom();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    child: const Text('Edit'),
-                  ),
-                ),
-              ],
+                onSubmitted: (_) => _sendMessage(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.send_rounded),
+              onPressed: _sendMessage,
+              style: IconButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                padding: const EdgeInsets.all(12),
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class MessageBubble extends StatelessWidget {
+  final ChatMessage message;
+  final bool isUser;
+
+  const MessageBubble({super.key, required this.message, required this.isUser});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final alignment = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final color = isUser ? theme.colorScheme.primary : theme.cardColor;
+    final textColor = isUser ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
+
+    return Column(
+      crossAxisAlignment: alignment,
+      children: [
+        Container(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+          margin: const EdgeInsets.symmetric(vertical: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Text(
+            message.text,
+            style: theme.textTheme.bodyLarge?.copyWith(color: textColor),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            _formatTimestamp(message.timestamp),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatTimestamp(DateTime timestamp) {
+    // Simple time formatting (e.g., 10:30 AM)
+    final hour = timestamp.hour > 12 ? timestamp.hour - 12 : timestamp.hour;
+    final minute = timestamp.minute.toString().padLeft(2, '0');
+    final period = timestamp.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
   }
 }

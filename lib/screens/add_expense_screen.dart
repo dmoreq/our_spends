@@ -57,195 +57,272 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     super.dispose();
   }
 
+  Widget _buildInputCard({required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.addExpense),
-        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close_outlined),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else
+            TextButton(
+              onPressed: _submitForm,
+              child: Text(
+                l10n.save,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+        ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title field
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        labelText: l10n.expenseTitleLabel,
-                        hintText: l10n.expenseTitlePlaceholder,
-                        border: const OutlineInputBorder(),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title field
+              _buildInputCard(
+                child: TextFormField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                     labelText: l10n.expenseTitleLabel,
+                     hintText: l10n.expenseTitlePlaceholder,
+                     prefixIcon: const Icon(Icons.receipt_long_outlined),
+                     border: InputBorder.none,
+                     contentPadding: const EdgeInsets.all(20),
+                   ),
+                   validator: (value) {
+                     if (value == null || value.isEmpty) {
+                       return l10n.fieldRequired;
+                     }
+                     return null;
+                   },
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Amount and Currency row
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _buildInputCard(
+                      child: TextFormField(
+                        controller: _amountController,
+                        decoration: InputDecoration(
+                          labelText: l10n.expenseAmountLabel,
+                          hintText: l10n.expenseAmountPlaceholder,
+                          prefixIcon: const Icon(Icons.attach_money_outlined),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(20),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return l10n.fieldRequired;
+                          }
+                          if (double.tryParse(value) == null) {
+                            return l10n.invalidNumber;
+                          }
+                          return null;
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.fieldRequired;
-                        }
-                        return null;
-                      },
                     ),
-                    const SizedBox(height: 16),
-                    
-                    // Amount and Currency row
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildInputCard(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedCurrency,
+                        decoration: InputDecoration(
+                          labelText: l10n.currency,
+                          prefixIcon: const Icon(Icons.currency_exchange_outlined),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(20),
+                        ),
+                        items: _currencies.map((currency) {
+                          return DropdownMenuItem(
+                            value: currency,
+                            child: Text(currency),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _selectedCurrency = value;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              
+              // Date picker
+              _buildInputCard(
+                child: InkWell(
+                  onTap: () => _selectDate(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    child: Row(
                       children: [
-                        Expanded(
-                          flex: 2,
-                          child: TextFormField(
-                            controller: _amountController,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            decoration: InputDecoration(
-                              labelText: l10n.expenseAmountLabel,
-                              hintText: l10n.expenseAmountPlaceholder,
-                              border: const OutlineInputBorder(),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return l10n.fieldRequired;
-                              }
-                              if (double.tryParse(value) == null) {
-                                return l10n.invalidNumber;
-                              }
-                              return null;
-                            },
-                          ),
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                         const SizedBox(width: 16),
-                        Expanded(
-                          flex: 1,
-                          child: DropdownButtonFormField<String>(
-                            value: _selectedCurrency,
-                            decoration: InputDecoration(
-                              labelText: l10n.currency,
-                              border: const OutlineInputBorder(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.expenseDateLabel,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              ),
                             ),
-                            items: _currencies.map((currency) {
-                              return DropdownMenuItem(
-                                value: currency,
-                                child: Text(currency),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  _selectedCurrency = value;
-                                });
-                              }
-                            },
-                          ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatDate(_selectedDate),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: theme.colorScheme.onSurface.withOpacity(0.4),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
                     
-                    // Date picker
-                    InkWell(
-                      onTap: () => _selectDate(context),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: l10n.expenseDateLabel,
-                          border: const OutlineInputBorder(),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(_formatDate(_selectedDate)),
-                            const Icon(Icons.calendar_today),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Category dropdown
-                    DropdownButtonFormField<String>(
-                      value: _selectedCategory,
-                      decoration: InputDecoration(
-                        labelText: l10n.expenseCategoryLabel,
-                        border: const OutlineInputBorder(),
-                      ),
-                      items: _categories.map((category) {
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(_getCategoryTranslation(category, l10n)),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _selectedCategory = value;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Payment method dropdown
-                    DropdownButtonFormField<String>(
-                      value: _selectedPaymentMethod,
-                      decoration: InputDecoration(
-                        labelText: l10n.paymentMethod,
-                        border: const OutlineInputBorder(),
-                      ),
-                      items: _paymentMethods.map((method) {
-                        return DropdownMenuItem(
-                          value: method,
-                          child: Text(method),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedPaymentMethod = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Location field
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: l10n.location,
-                        hintText: l10n.locationPlaceholder,
-                        border: const OutlineInputBorder(),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _location = value.isEmpty ? null : value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Notes field
-                    TextFormField(
-                      controller: _notesController,
-                      decoration: InputDecoration(
-                        labelText: l10n.expenseNotesLabel,
-                        hintText: l10n.expenseNotesPlaceholder,
-                        border: const OutlineInputBorder(),
-                      ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Submit button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _submitForm,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: Text(l10n.save),
-                      ),
-                    ),
+              // Category dropdown
+              _buildInputCard(
+                child: DropdownButtonFormField<String>(
+                  value: _selectedCategory,
+                  decoration: InputDecoration(
+                    labelText: l10n.expenseCategoryLabel,
+                    prefixIcon: const Icon(Icons.category_outlined),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(20),
+                  ),
+                  items: _categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(_getCategoryTranslation(category, l10n)),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Payment method dropdown
+              _buildInputCard(
+                child: DropdownButtonFormField<String>(
+                  value: _selectedPaymentMethod,
+                  decoration: InputDecoration(
+                    labelText: l10n.paymentMethod,
+                    prefixIcon: const Icon(Icons.payment_outlined),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(20),
+                  ),
+                  items: _paymentMethods.map((method) {
+                    return DropdownMenuItem(
+                      value: method,
+                      child: Text(method),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedPaymentMethod = value;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Location field
+              _buildInputCard(
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: l10n.location,
+                    hintText: l10n.locationPlaceholder,
+                    prefixIcon: const Icon(Icons.location_on_outlined),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(20),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _location = value.isEmpty ? null : value;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Notes field
+              _buildInputCard(
+                child: TextFormField(
+                  controller: _notesController,
+                  decoration: InputDecoration(
+                    labelText: l10n.expenseNotesLabel,
+                    hintText: l10n.expenseNotesPlaceholder,
+                    prefixIcon: const Icon(Icons.notes_outlined),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(20),
+                  ),
+                  maxLines: 3,
+                ),
+              ),
+              const SizedBox(height: 32),
                   ],
                 ),
               ),

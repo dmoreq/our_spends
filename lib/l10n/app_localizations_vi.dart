@@ -28,16 +28,122 @@ class AppLocalizationsVi extends AppLocalizations {
   String get send => 'Gửi';
 
   @override
-  String get settings => 'Cài Đặt';
+  String get settings => 'Cài đặt';
 
   @override
-  String get currency => 'Tiền Tệ';
+  String get search => 'Tìm kiếm';
 
   @override
-  String get language => 'Ngôn Ngữ';
+  String get expenses => 'Chi tiêu';
 
   @override
-  String get selectLanguage => 'Chọn Ngôn Ngữ';
+  String get error => 'Lỗi';
+
+  @override
+  String get noExpenses => 'Không có chi tiêu';
+
+  @override
+  String get addExpense => 'Thêm chi tiêu';
+
+  @override
+  String get category => 'Danh mục';
+
+  @override
+  String get date => 'Ngày';
+
+  @override
+  String get location => 'Vị trí';
+
+  @override
+  String get paymentMethod => 'Phương thức thanh toán';
+
+  @override
+  String get notes => 'Ghi chú';
+
+  @override
+  String get chat => 'Trò chuyện';
+
+  @override
+  String get save => 'Lưu';
+
+  @override
+  String get expenseTitleLabel => 'Tiêu đề';
+
+  @override
+  String get expenseTitlePlaceholder => 'ví dụ: Ăn trưa với đồng nghiệp';
+
+  @override
+  String get fieldRequired => 'Trường này là bắt buộc';
+
+  @override
+  String get expenseAmountLabel => 'Số tiền';
+
+  @override
+  String get expenseAmountPlaceholder => 'ví dụ: 15.50';
+
+  @override
+  String get invalidNumber => 'Vui lòng nhập một số hợp lệ';
+
+  @override
+  String get currency => 'Tiền tệ';
+
+  @override
+  String get expenseDateLabel => 'Ngày';
+
+  @override
+  String get expenseCategoryLabel => 'Danh mục';
+
+  @override
+  String get locationPlaceholder => 'ví dụ: Cafe Central';
+
+  @override
+  String get expenseNotesLabel => 'Ghi chú';
+
+  @override
+  String get expenseNotesPlaceholder =>
+      'ví dụ: Đã thảo luận về các mốc quan trọng của dự án';
+
+  @override
+  String get expenseCategoryFood => 'Đồ ăn';
+
+  @override
+  String get expenseCategoryTransport => 'Đi lại';
+
+  @override
+  String get expenseCategoryShopping => 'Mua sắm';
+
+  @override
+  String get expenseCategoryEntertainment => 'Giải trí';
+
+  @override
+  String get expenseCategoryUtilities => 'Tiện ích';
+
+  @override
+  String get expenseCategoryHealth => 'Sức khỏe';
+
+  @override
+  String get expenseCategoryTravel => 'Du lịch';
+
+  @override
+  String get expenseCategoryEducation => 'Giáo dục';
+
+  @override
+  String get expenseCategoryOther => 'Khác';
+
+  @override
+  String get expenseAddedSuccess => 'Thêm chi phí thành công';
+
+  @override
+  String get expenseAddedError => 'Lỗi khi thêm chi phí';
+
+  @override
+  String get language => 'Ngôn ngữ';
+
+  @override
+  String get reports => 'Báo cáo';
+
+  @override
+  String get selectLanguage => 'Chọn ngôn ngữ';
 
   @override
   String get english => 'Tiếng Anh';
@@ -46,207 +152,44 @@ class AppLocalizationsVi extends AppLocalizations {
   String get vietnamese => 'Tiếng Việt';
 
   @override
-  String get reports => 'Báo Cáo';
+  String get support => 'Hỗ trợ';
 
   @override
-  String get weekly => 'Hàng Tuần';
+  String get helpAndFaq => 'Trợ giúp & FAQ';
 
   @override
-  String get monthly => 'Hàng Tháng';
+  String get helpAndFaqSubtitle => 'Nhận trợ giúp và tìm câu trả lời';
 
   @override
-  String get yearly => 'Hàng Năm';
+  String get sendFeedback => 'Gửi phản hồi';
 
   @override
-  String get total => 'Tổng Cộng';
+  String get sendFeedbackSubtitle => 'Chia sẻ suy nghĩ của bạn với chúng tôi';
 
   @override
-  String get category => 'Danh Mục';
+  String get userProfile => 'Hồ sơ người dùng';
 
   @override
-  String get amount => 'Số Tiền';
+  String get manageAccount => 'Quản lý cài đặt tài khoản của bạn';
 
   @override
-  String get noExpenses => 'Không tìm thấy chi tiêu nào';
+  String get preferences => 'Tùy chọn';
 
   @override
-  String get loading => 'Đang tải...';
+  String get aiSettings => 'Cài đặt AI';
 
   @override
-  String get error => 'Lỗi';
+  String get aiSettingsSubtitle => 'Định cấu hình nhà cung cấp AI và khóa API';
 
   @override
-  String get retry => 'Thử Lại';
+  String get dataAndAnalytics => 'Dữ liệu & Phân tích';
 
   @override
-  String get cancel => 'Hủy';
+  String get reportsSubtitle => 'Xem báo cáo chi phí và thông tin chi tiết';
 
   @override
-  String get ok => 'OK';
+  String get dataSync => 'Đồng bộ hóa dữ liệu';
 
   @override
-  String get expenseLogged => 'Đã ghi nhận chi tiêu thành công';
-
-  @override
-  String get networkError => 'Lỗi mạng. Vui lòng kiểm tra kết nối.';
-
-  @override
-  String get unknownError => 'Đã xảy ra lỗi không xác định.';
-
-  @override
-  String get expenses => 'Chi Tiêu';
-
-  @override
-  String get addExpense => 'Thêm Chi Tiêu';
-
-  @override
-  String get analytics => 'Phân Tích';
-
-  @override
-  String get title => 'Tiêu Đề';
-
-  @override
-  String get date => 'Ngày';
-
-  @override
-  String get notes => 'Ghi Chú';
-
-  @override
-  String get submit => 'Gửi';
-
-  @override
-  String get monthlyOverview => 'Tổng Quan Hàng Tháng';
-
-  @override
-  String get spendingByCategory => 'Chi Tiêu Theo Danh Mục';
-
-  @override
-  String get appearance => 'Giao Diện';
-
-  @override
-  String get darkMode => 'Chế Độ Tối';
-
-  @override
-  String get themeColor => 'Màu Chủ Đề';
-
-  @override
-  String get general => 'Chung';
-
-  @override
-  String get location => 'Địa Điểm';
-
-  @override
-  String get paymentMethod => 'Phương Thức Thanh Toán';
-
-  @override
-  String get close => 'Đóng';
-
-  @override
-  String get chat => 'Trò Chuyện';
-
-  @override
-  String get expenseCategoryFood => 'Thực Phẩm';
-
-  @override
-  String get expenseCategoryShopping => 'Mua Sắm';
-
-  @override
-  String get expenseCategoryHousing => 'Nhà Ở';
-
-  @override
-  String get expenseCategoryTransportation => 'Di Chuyển';
-
-  @override
-  String get expenseCategoryTransport => 'Di Chuyển';
-
-  @override
-  String get expenseCategoryEntertainment => 'Giải Trí';
-
-  @override
-  String get expenseCategoryUtilities => 'Tiện Ích';
-
-  @override
-  String get expenseCategoryHealth => 'Sức Khỏe';
-
-  @override
-  String get expenseCategoryTravel => 'Du Lịch';
-
-  @override
-  String get expenseCategoryEducation => 'Giáo Dục';
-
-  @override
-  String get expenseCategoryOther => 'Khác';
-
-  @override
-  String get overview => 'Tổng Quan';
-
-  @override
-  String get categories => 'Danh Mục';
-
-  @override
-  String get spendingTrend => 'Xu Hướng Chi Tiêu';
-
-  @override
-  String get totalSpending => 'Tổng Chi Tiêu';
-
-  @override
-  String get categoryBreakdown => 'Chi Tiết Theo Danh Mục';
-
-  @override
-  String get noExpensesForPeriod =>
-      'Không có chi tiêu trong khoảng thời gian này';
-
-  @override
-  String get recentTransactions => 'Giao Dịch Gần Đây';
-
-  @override
-  String get week => 'Tuần';
-
-  @override
-  String get month => 'Tháng';
-
-  @override
-  String get year => 'Năm';
-
-  @override
-  String get expenseTitleLabel => 'Tiêu Đề';
-
-  @override
-  String get expenseTitlePlaceholder => 'Nhập tiêu đề chi tiêu';
-
-  @override
-  String get expenseAmountLabel => 'Số Tiền';
-
-  @override
-  String get expenseAmountPlaceholder => 'Nhập số tiền';
-
-  @override
-  String get expenseDateLabel => 'Ngày';
-
-  @override
-  String get expenseCategoryLabel => 'Danh Mục';
-
-  @override
-  String get expenseNotesLabel => 'Ghi Chú';
-
-  @override
-  String get expenseNotesPlaceholder => 'Thêm ghi chú bổ sung';
-
-  @override
-  String get locationPlaceholder => 'Nhập địa điểm (tùy chọn)';
-
-  @override
-  String get fieldRequired => 'Trường này là bắt buộc';
-
-  @override
-  String get invalidNumber => 'Vui lòng nhập số hợp lệ';
-
-  @override
-  String get save => 'Lưu';
-
-  @override
-  String get expenseAddedSuccess => 'Đã thêm chi tiêu thành công';
-
-  @override
-  String get expenseAddedError => 'Lỗi khi thêm chi tiêu';
+  String get dataSyncSubtitle => 'Sao lưu và đồng bộ hóa dữ liệu của bạn';
 }

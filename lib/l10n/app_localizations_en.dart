@@ -31,106 +31,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
-  String get currency => 'Currency';
-
-  @override
-  String get language => 'Language';
-
-  @override
-  String get selectLanguage => 'Select Language';
-
-  @override
-  String get english => 'English';
-
-  @override
-  String get vietnamese => 'Vietnamese';
-
-  @override
-  String get reports => 'Reports';
-
-  @override
-  String get weekly => 'Weekly';
-
-  @override
-  String get monthly => 'Monthly';
-
-  @override
-  String get yearly => 'Yearly';
-
-  @override
-  String get total => 'Total';
-
-  @override
-  String get category => 'Category';
-
-  @override
-  String get amount => 'Amount';
-
-  @override
-  String get noExpenses => 'No expenses found';
-
-  @override
-  String get loading => 'Loading...';
-
-  @override
-  String get error => 'Error';
-
-  @override
-  String get retry => 'Retry';
-
-  @override
-  String get cancel => 'Cancel';
-
-  @override
-  String get ok => 'OK';
-
-  @override
-  String get expenseLogged => 'Expense logged successfully';
-
-  @override
-  String get networkError => 'Network error. Please check your connection.';
-
-  @override
-  String get unknownError => 'An unknown error occurred.';
+  String get search => 'Search';
 
   @override
   String get expenses => 'Expenses';
 
   @override
+  String get error => 'Error';
+
+  @override
+  String get noExpenses => 'No Expenses';
+
+  @override
   String get addExpense => 'Add Expense';
 
   @override
-  String get analytics => 'Analytics';
-
-  @override
-  String get title => 'Title';
+  String get category => 'Category';
 
   @override
   String get date => 'Date';
-
-  @override
-  String get notes => 'Notes';
-
-  @override
-  String get submit => 'Submit';
-
-  @override
-  String get monthlyOverview => 'Monthly Overview';
-
-  @override
-  String get spendingByCategory => 'Spending by Category';
-
-  @override
-  String get appearance => 'Appearance';
-
-  @override
-  String get darkMode => 'Dark Mode';
-
-  @override
-  String get themeColor => 'Theme Color';
-
-  @override
-  String get general => 'General';
 
   @override
   String get location => 'Location';
@@ -139,25 +58,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentMethod => 'Payment Method';
 
   @override
-  String get close => 'Close';
+  String get notes => 'Notes';
 
   @override
   String get chat => 'Chat';
 
   @override
+  String get save => 'Save';
+
+  @override
+  String get expenseTitleLabel => 'Title';
+
+  @override
+  String get expenseTitlePlaceholder => 'e.g., Lunch with colleagues';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get expenseAmountLabel => 'Amount';
+
+  @override
+  String get expenseAmountPlaceholder => 'e.g., 15.50';
+
+  @override
+  String get invalidNumber => 'Please enter a valid number';
+
+  @override
+  String get currency => 'Currency';
+
+  @override
+  String get expenseDateLabel => 'Date';
+
+  @override
+  String get expenseCategoryLabel => 'Category';
+
+  @override
+  String get locationPlaceholder => 'e.g., Cafe Central';
+
+  @override
+  String get expenseNotesLabel => 'Notes';
+
+  @override
+  String get expenseNotesPlaceholder => 'e.g., Discussed project milestones';
+
+  @override
   String get expenseCategoryFood => 'Food';
 
   @override
+  String get expenseCategoryTransport => 'Transport';
+
+  @override
   String get expenseCategoryShopping => 'Shopping';
-
-  @override
-  String get expenseCategoryHousing => 'Housing';
-
-  @override
-  String get expenseCategoryTransportation => 'Transportation';
-
-  @override
-  String get expenseCategoryTransport => 'Transportation';
 
   @override
   String get expenseCategoryEntertainment => 'Entertainment';
@@ -178,74 +130,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseCategoryOther => 'Other';
 
   @override
-  String get overview => 'Overview';
-
-  @override
-  String get categories => 'Categories';
-
-  @override
-  String get spendingTrend => 'Spending Trend';
-
-  @override
-  String get totalSpending => 'Total Spending';
-
-  @override
-  String get categoryBreakdown => 'Category Breakdown';
-
-  @override
-  String get noExpensesForPeriod => 'No expenses for this period';
-
-  @override
-  String get recentTransactions => 'Recent Transactions';
-
-  @override
-  String get week => 'Week';
-
-  @override
-  String get month => 'Month';
-
-  @override
-  String get year => 'Year';
-
-  @override
-  String get expenseTitleLabel => 'Title';
-
-  @override
-  String get expenseTitlePlaceholder => 'Enter expense title';
-
-  @override
-  String get expenseAmountLabel => 'Amount';
-
-  @override
-  String get expenseAmountPlaceholder => 'Enter amount';
-
-  @override
-  String get expenseDateLabel => 'Date';
-
-  @override
-  String get expenseCategoryLabel => 'Category';
-
-  @override
-  String get expenseNotesLabel => 'Notes';
-
-  @override
-  String get expenseNotesPlaceholder => 'Add any additional notes';
-
-  @override
-  String get locationPlaceholder => 'Enter location (optional)';
-
-  @override
-  String get fieldRequired => 'This field is required';
-
-  @override
-  String get invalidNumber => 'Please enter a valid number';
-
-  @override
-  String get save => 'Save';
-
-  @override
   String get expenseAddedSuccess => 'Expense added successfully';
 
   @override
   String get expenseAddedError => 'Error adding expense';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get reports => 'Reports';
+
+  @override
+  String get selectLanguage => 'Select Language';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get vietnamese => 'Vietnamese';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get helpAndFaq => 'Help & FAQ';
+
+  @override
+  String get helpAndFaqSubtitle => 'Get help and find answers';
+
+  @override
+  String get sendFeedback => 'Send Feedback';
+
+  @override
+  String get sendFeedbackSubtitle => 'Share your thoughts with us';
+
+  @override
+  String get userProfile => 'User Profile';
+
+  @override
+  String get manageAccount => 'Manage your account settings';
+
+  @override
+  String get preferences => 'Preferences';
+
+  @override
+  String get aiSettings => 'AI Settings';
+
+  @override
+  String get aiSettingsSubtitle => 'Configure AI providers and API keys';
+
+  @override
+  String get dataAndAnalytics => 'Data & Analytics';
+
+  @override
+  String get reportsSubtitle => 'View expense reports and insights';
+
+  @override
+  String get dataSync => 'Data Sync';
+
+  @override
+  String get dataSyncSubtitle => 'Backup and sync your data';
 }

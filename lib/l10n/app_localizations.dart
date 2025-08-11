@@ -140,131 +140,11 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
-  /// No description provided for @currency.
+  /// No description provided for @search.
   ///
   /// In en, this message translates to:
-  /// **'Currency'**
-  String get currency;
-
-  /// No description provided for @language.
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
-
-  /// No description provided for @selectLanguage.
-  ///
-  /// In en, this message translates to:
-  /// **'Select Language'**
-  String get selectLanguage;
-
-  /// No description provided for @english.
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
-  String get english;
-
-  /// No description provided for @vietnamese.
-  ///
-  /// In en, this message translates to:
-  /// **'Vietnamese'**
-  String get vietnamese;
-
-  /// No description provided for @reports.
-  ///
-  /// In en, this message translates to:
-  /// **'Reports'**
-  String get reports;
-
-  /// No description provided for @weekly.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekly'**
-  String get weekly;
-
-  /// No description provided for @monthly.
-  ///
-  /// In en, this message translates to:
-  /// **'Monthly'**
-  String get monthly;
-
-  /// No description provided for @yearly.
-  ///
-  /// In en, this message translates to:
-  /// **'Yearly'**
-  String get yearly;
-
-  /// No description provided for @total.
-  ///
-  /// In en, this message translates to:
-  /// **'Total'**
-  String get total;
-
-  /// No description provided for @category.
-  ///
-  /// In en, this message translates to:
-  /// **'Category'**
-  String get category;
-
-  /// No description provided for @amount.
-  ///
-  /// In en, this message translates to:
-  /// **'Amount'**
-  String get amount;
-
-  /// No description provided for @noExpenses.
-  ///
-  /// In en, this message translates to:
-  /// **'No expenses found'**
-  String get noExpenses;
-
-  /// No description provided for @loading.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading...'**
-  String get loading;
-
-  /// No description provided for @error.
-  ///
-  /// In en, this message translates to:
-  /// **'Error'**
-  String get error;
-
-  /// No description provided for @retry.
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retry;
-
-  /// No description provided for @cancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
-
-  /// No description provided for @ok.
-  ///
-  /// In en, this message translates to:
-  /// **'OK'**
-  String get ok;
-
-  /// No description provided for @expenseLogged.
-  ///
-  /// In en, this message translates to:
-  /// **'Expense logged successfully'**
-  String get expenseLogged;
-
-  /// No description provided for @networkError.
-  ///
-  /// In en, this message translates to:
-  /// **'Network error. Please check your connection.'**
-  String get networkError;
-
-  /// No description provided for @unknownError.
-  ///
-  /// In en, this message translates to:
-  /// **'An unknown error occurred.'**
-  String get unknownError;
+  /// **'Search'**
+  String get search;
 
   /// No description provided for @expenses.
   ///
@@ -272,77 +152,35 @@ abstract class AppLocalizations {
   /// **'Expenses'**
   String get expenses;
 
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @noExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'No Expenses'**
+  String get noExpenses;
+
   /// No description provided for @addExpense.
   ///
   /// In en, this message translates to:
   /// **'Add Expense'**
   String get addExpense;
 
-  /// No description provided for @analytics.
+  /// No description provided for @category.
   ///
   /// In en, this message translates to:
-  /// **'Analytics'**
-  String get analytics;
-
-  /// No description provided for @title.
-  ///
-  /// In en, this message translates to:
-  /// **'Title'**
-  String get title;
+  /// **'Category'**
+  String get category;
 
   /// No description provided for @date.
   ///
   /// In en, this message translates to:
   /// **'Date'**
   String get date;
-
-  /// No description provided for @notes.
-  ///
-  /// In en, this message translates to:
-  /// **'Notes'**
-  String get notes;
-
-  /// No description provided for @submit.
-  ///
-  /// In en, this message translates to:
-  /// **'Submit'**
-  String get submit;
-
-  /// No description provided for @monthlyOverview.
-  ///
-  /// In en, this message translates to:
-  /// **'Monthly Overview'**
-  String get monthlyOverview;
-
-  /// No description provided for @spendingByCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'Spending by Category'**
-  String get spendingByCategory;
-
-  /// No description provided for @appearance.
-  ///
-  /// In en, this message translates to:
-  /// **'Appearance'**
-  String get appearance;
-
-  /// No description provided for @darkMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get darkMode;
-
-  /// No description provided for @themeColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Theme Color'**
-  String get themeColor;
-
-  /// No description provided for @general.
-  ///
-  /// In en, this message translates to:
-  /// **'General'**
-  String get general;
 
   /// No description provided for @location.
   ///
@@ -356,11 +194,11 @@ abstract class AppLocalizations {
   /// **'Payment Method'**
   String get paymentMethod;
 
-  /// No description provided for @close.
+  /// No description provided for @notes.
   ///
   /// In en, this message translates to:
-  /// **'Close'**
-  String get close;
+  /// **'Notes'**
+  String get notes;
 
   /// No description provided for @chat.
   ///
@@ -368,35 +206,101 @@ abstract class AppLocalizations {
   /// **'Chat'**
   String get chat;
 
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @expenseTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get expenseTitleLabel;
+
+  /// No description provided for @expenseTitlePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Lunch with colleagues'**
+  String get expenseTitlePlaceholder;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// No description provided for @expenseAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get expenseAmountLabel;
+
+  /// No description provided for @expenseAmountPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 15.50'**
+  String get expenseAmountPlaceholder;
+
+  /// No description provided for @invalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid number'**
+  String get invalidNumber;
+
+  /// No description provided for @currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currency;
+
+  /// No description provided for @expenseDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get expenseDateLabel;
+
+  /// No description provided for @expenseCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get expenseCategoryLabel;
+
+  /// No description provided for @locationPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Cafe Central'**
+  String get locationPlaceholder;
+
+  /// No description provided for @expenseNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get expenseNotesLabel;
+
+  /// No description provided for @expenseNotesPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Discussed project milestones'**
+  String get expenseNotesPlaceholder;
+
   /// No description provided for @expenseCategoryFood.
   ///
   /// In en, this message translates to:
   /// **'Food'**
   String get expenseCategoryFood;
 
+  /// No description provided for @expenseCategoryTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get expenseCategoryTransport;
+
   /// No description provided for @expenseCategoryShopping.
   ///
   /// In en, this message translates to:
   /// **'Shopping'**
   String get expenseCategoryShopping;
-
-  /// No description provided for @expenseCategoryHousing.
-  ///
-  /// In en, this message translates to:
-  /// **'Housing'**
-  String get expenseCategoryHousing;
-
-  /// No description provided for @expenseCategoryTransportation.
-  ///
-  /// In en, this message translates to:
-  /// **'Transportation'**
-  String get expenseCategoryTransportation;
-
-  /// No description provided for @expenseCategoryTransport.
-  ///
-  /// In en, this message translates to:
-  /// **'Transportation'**
-  String get expenseCategoryTransport;
 
   /// No description provided for @expenseCategoryEntertainment.
   ///
@@ -434,138 +338,6 @@ abstract class AppLocalizations {
   /// **'Other'**
   String get expenseCategoryOther;
 
-  /// No description provided for @overview.
-  ///
-  /// In en, this message translates to:
-  /// **'Overview'**
-  String get overview;
-
-  /// No description provided for @categories.
-  ///
-  /// In en, this message translates to:
-  /// **'Categories'**
-  String get categories;
-
-  /// No description provided for @spendingTrend.
-  ///
-  /// In en, this message translates to:
-  /// **'Spending Trend'**
-  String get spendingTrend;
-
-  /// No description provided for @totalSpending.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Spending'**
-  String get totalSpending;
-
-  /// No description provided for @categoryBreakdown.
-  ///
-  /// In en, this message translates to:
-  /// **'Category Breakdown'**
-  String get categoryBreakdown;
-
-  /// No description provided for @noExpensesForPeriod.
-  ///
-  /// In en, this message translates to:
-  /// **'No expenses for this period'**
-  String get noExpensesForPeriod;
-
-  /// No description provided for @recentTransactions.
-  ///
-  /// In en, this message translates to:
-  /// **'Recent Transactions'**
-  String get recentTransactions;
-
-  /// No description provided for @week.
-  ///
-  /// In en, this message translates to:
-  /// **'Week'**
-  String get week;
-
-  /// No description provided for @month.
-  ///
-  /// In en, this message translates to:
-  /// **'Month'**
-  String get month;
-
-  /// No description provided for @year.
-  ///
-  /// In en, this message translates to:
-  /// **'Year'**
-  String get year;
-
-  /// No description provided for @expenseTitleLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Title'**
-  String get expenseTitleLabel;
-
-  /// No description provided for @expenseTitlePlaceholder.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter expense title'**
-  String get expenseTitlePlaceholder;
-
-  /// No description provided for @expenseAmountLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Amount'**
-  String get expenseAmountLabel;
-
-  /// No description provided for @expenseAmountPlaceholder.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter amount'**
-  String get expenseAmountPlaceholder;
-
-  /// No description provided for @expenseDateLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Date'**
-  String get expenseDateLabel;
-
-  /// No description provided for @expenseCategoryLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Category'**
-  String get expenseCategoryLabel;
-
-  /// No description provided for @expenseNotesLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Notes'**
-  String get expenseNotesLabel;
-
-  /// No description provided for @expenseNotesPlaceholder.
-  ///
-  /// In en, this message translates to:
-  /// **'Add any additional notes'**
-  String get expenseNotesPlaceholder;
-
-  /// No description provided for @locationPlaceholder.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter location (optional)'**
-  String get locationPlaceholder;
-
-  /// No description provided for @fieldRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'This field is required'**
-  String get fieldRequired;
-
-  /// No description provided for @invalidNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a valid number'**
-  String get invalidNumber;
-
-  /// No description provided for @save.
-  ///
-  /// In en, this message translates to:
-  /// **'Save'**
-  String get save;
-
   /// No description provided for @expenseAddedSuccess.
   ///
   /// In en, this message translates to:
@@ -577,6 +349,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error adding expense'**
   String get expenseAddedError;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @reports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get reports;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @vietnamese.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese'**
+  String get vietnamese;
+
+  /// No description provided for @support.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get support;
+
+  /// No description provided for @helpAndFaq.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & FAQ'**
+  String get helpAndFaq;
+
+  /// No description provided for @helpAndFaqSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get help and find answers'**
+  String get helpAndFaqSubtitle;
+
+  /// No description provided for @sendFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Feedback'**
+  String get sendFeedback;
+
+  /// No description provided for @sendFeedbackSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your thoughts with us'**
+  String get sendFeedbackSubtitle;
+
+  /// No description provided for @userProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'User Profile'**
+  String get userProfile;
+
+  /// No description provided for @manageAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your account settings'**
+  String get manageAccount;
+
+  /// No description provided for @preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get preferences;
+
+  /// No description provided for @aiSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Settings'**
+  String get aiSettings;
+
+  /// No description provided for @aiSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure AI providers and API keys'**
+  String get aiSettingsSubtitle;
+
+  /// No description provided for @dataAndAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Data & Analytics'**
+  String get dataAndAnalytics;
+
+  /// No description provided for @reportsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View expense reports and insights'**
+  String get reportsSubtitle;
+
+  /// No description provided for @dataSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Sync'**
+  String get dataSync;
+
+  /// No description provided for @dataSyncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup and sync your data'**
+  String get dataSyncSubtitle;
 }
 
 class _AppLocalizationsDelegate

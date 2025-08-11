@@ -1,9 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:our_spends/services/ai_service.dart';
 import 'package:our_spends/services/gemini_service.dart';
-import 'package:our_spends/services/openai_service.dart';
-import 'package:our_spends/services/claude_service.dart';
-import 'package:our_spends/services/deepseek_service.dart';
 import 'package:our_spends/models/expense.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_api/test_api.dart' show Timeout;
@@ -12,48 +9,39 @@ void main() {
   group('AI Service Integration Tests', () {
     late AIService aiService;
     late GeminiService geminiService;
-    late OpenAIService openaiService;
-    late ClaudeService claudeService;
-    late DeepSeekService deepseekService;
     
     setUp(() async {
       // Initialize SharedPreferences mock
       SharedPreferences.setMockInitialValues({
-        'ai_provider': 'gemini', // Set default provider for testing
+        'gemini_api_key': 'test_api_key_12345', // Set test API key
       });
       
       // Create service instances
       geminiService = GeminiService();
-      openaiService = OpenAIService();
-      claudeService = ClaudeService();
-      deepseekService = DeepSeekService();
       
       // Create AIService instance with real services
       aiService = AIService(
         geminiService: geminiService,
-        openaiService: openaiService,
-        claudeService: claudeService,
-        deepseekService: deepseekService
       );
       
       // Initialize the service
       await aiService.initialize();
     });
 
-    test('AIService should initialize with default provider', timeout: Timeout(Duration(seconds: 10)), () {
-      expect(aiService.currentProvider, 'gemini');
+    test('AIService should initialize correctly', timeout: Timeout(Duration(seconds: 10)), () {
+      expect(aiService, isNotNull);
     });
 
-    test('AIService should change provider', timeout: Timeout(Duration(seconds: 10)), () async {
-      // Change provider
-      await aiService.setProvider('openai');
-      
-      // Verify provider was changed
-      expect(aiService.currentProvider, 'openai');
-      
-      // Verify provider was saved to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('ai_provider'), 'openai');
+    test('AIService should return correct provider information', timeout: Timeout(Duration(seconds: 10)), () {
+      expect(aiService.getProviderName(), 'Google Gemini');
+      expect(aiService.getProviderModel(), isNotNull);
+    });
+    
+    test('AIService should check Gemini availability', timeout: Timeout(Duration(seconds: 10)), () async {
+      final status = await aiService.getGeminiStatus();
+      expect(status, isA<Map<String, dynamic>>());
+      expect(status['name'], 'Google Gemini');
+      expect(status['available'], isTrue);
     });
   });
   
@@ -106,138 +94,94 @@ void main() {
     });
   });
   
-  group('OpenAIService Integration Tests', () {
-    late OpenAIService openaiService;
+  // Add additional integration tests for AIService with GeminiService
+  test('AIService should process messages through GeminiService', timeout: Timeout(Duration(seconds: 30)), () async {
+    // Skip if API key is not configured
+    final prefs = await SharedPreferences.getInstance();
+    final apiKey = prefs.getString('gemini_api_key');
+    if (apiKey == null || apiKey.isEmpty || apiKey.contains('YOUR_') || apiKey.length < 10) {
+      markTestSkipped('Skipping test because valid Gemini API key is not set');
+      return;
+    }
     
-    setUp(() {
-      openaiService = OpenAIService();
-    });
+    // Create test expenses
+    final expenses = [
+      Expense(
+        id: 'id1',
+        userId: 'user1',
+        date: DateTime(2023, 5, 15),
+        amount: 50.0,
+        currency: 'USD',
+        category: 'Food & Dining',
+        item: 'Lunch',
+      ),
+    ];
     
-    test('OpenAIService should extract expense information', timeout: Timeout(Duration(seconds: 10)), () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('OPENAI_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because OPENAI_API_KEY is not set');
-        return;
-      }
-      
-      // Test expense extraction with a simple message
-      final result = await openaiService.extractExpenseInfo('I spent \$50 on groceries yesterday');
-      
-      // Verify result structure
-      expect(result, isNotNull);
-      
-      // Verify date is yesterday
-      final yesterday = DateTime.now().subtract(const Duration(days: 1));
-      final yesterdayFormatted = '${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
-      expect(result!['date'], yesterdayFormatted);
-    });
+    // Process a test message
+    final response = await aiService.processMessage(
+      'How much did I spend on food?',
+      expenses,
+    );
     
-    test('OpenAIService should extract expense with DD/MM format', timeout: Timeout(Duration(seconds: 10)), () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('OPENAI_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because OPENAI_API_KEY is not set');
-        return;
-      }
-      
-      // Test expense extraction with DD/MM format
-      final result = await openaiService.extractExpenseInfo('I spent \$50 on groceries on 01/08');
-      
-      // Verify result structure
-      expect(result, isNotNull);
-      
-      // Verify date is August 1st of current year
-      final currentYear = DateTime.now().year;
-      expect(result!['date'], '$currentYear-08-01');
-    });
+    // Verify response is not empty
+    expect(response, isNotNull);
+    expect(response.isNotEmpty, isTrue);
   });
   
-  group('ClaudeService Integration Tests', () {
-    late ClaudeService claudeService;
+  test('AIService should extract expense information through GeminiService', timeout: Timeout(Duration(seconds: 30)), () async {
+    // Skip if API key is not configured
+    final prefs = await SharedPreferences.getInstance();
+    final apiKey = prefs.getString('gemini_api_key');
+    if (apiKey == null || apiKey.isEmpty || apiKey.contains('YOUR_') || apiKey.length < 10) {
+      markTestSkipped('Skipping test because valid Gemini API key is not set');
+      return;
+    }
     
-    setUp(() {
-      claudeService = ClaudeService();
-    });
+    // Extract expense info
+    final result = await aiService.extractExpenseInfo('I spent \$50 on groceries yesterday');
     
-    test('ClaudeService should extract expense information', timeout: Timeout(Duration(seconds: 10)), () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('CLAUDE_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because CLAUDE_API_KEY is not set');
-        return;
-      }
-      
-      // Test expense extraction with a simple message
-      final result = await claudeService.extractExpenseInfo('I spent \$50 on groceries yesterday');
-      
-      // Verify result structure
-      expect(result, isNotNull);
-      
-      // Verify date is yesterday
-      final yesterday = DateTime.now().subtract(const Duration(days: 1));
-      final yesterdayFormatted = '${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
-      expect(result!['date'], yesterdayFormatted);
-    });
-    
-    test('ClaudeService should extract expense with DD/MM format', timeout: Timeout(Duration(seconds: 10)), () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('CLAUDE_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because CLAUDE_API_KEY is not set');
-        return;
-      }
-      
-      // Test expense extraction with DD/MM format
-      final result = await claudeService.extractExpenseInfo('I spent \$50 on groceries on 01/08');
-      
-      // Verify result structure
-      expect(result, isNotNull);
-      
-      // Verify date is August 1st of current year
-      final currentYear = DateTime.now().year;
-      expect(result!['date'], '$currentYear-08-01');
-    });
+    // Verify result structure
+    expect(result, isNotNull);
+    expect(result!['amount'], 50);
+    expect(result['description'] ?? result['item'], contains('groceries'));
   });
   
-  group('DeepSeekService Integration Tests', () {
-    late DeepSeekService deepseekService;
+  test('AIService should generate spending insights through GeminiService', timeout: Timeout(Duration(seconds: 30)), () async {
+    // Skip if API key is not configured
+    final prefs = await SharedPreferences.getInstance();
+    final apiKey = prefs.getString('gemini_api_key');
+    if (apiKey == null || apiKey.isEmpty || apiKey.contains('YOUR_') || apiKey.length < 10) {
+      markTestSkipped('Skipping test because valid Gemini API key is not set');
+      return;
+    }
     
-    setUp(() {
-      deepseekService = DeepSeekService();
-    });
+    // Create test expenses
+    final expenses = [
+      Expense(
+        id: 'id1',
+        userId: 'user1',
+        date: DateTime(2023, 5, 15),
+        amount: 50.0,
+        currency: 'USD',
+        category: 'Food & Dining',
+        item: 'Lunch',
+      ),
+      Expense(
+        id: 'id2',
+        userId: 'user1',
+        date: DateTime(2023, 5, 16),
+        amount: 30.0,
+        currency: 'USD',
+        category: 'Transportation',
+        item: 'Taxi',
+      ),
+    ];
     
-    test('DeepSeekService should extract expense information', timeout: Timeout(Duration(seconds: 10)), () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('DEEPSEEK_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because DEEPSEEK_API_KEY is not set');
-        return;
-      }
-      
-      // Test expense extraction with a simple message
-      final result = await deepseekService.extractExpenseInfo('I spent \$50 on groceries yesterday');
-      
-      // Verify result structure
-      expect(result, isNotNull);
-      
-      // Verify date is yesterday
-      final yesterday = DateTime.now().subtract(const Duration(days: 1));
-      final yesterdayFormatted = '${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
-      expect(result!['date'], yesterdayFormatted);
-    });
+    // Generate insights
+    final insights = await aiService.generateSpendingInsights(expenses);
     
-    test('DeepSeekService should extract expense with DD/MM format', timeout: Timeout(Duration(seconds: 10)), () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('DEEPSEEK_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because DEEPSEEK_API_KEY is not set');
-        return;
-      }
-      
-      // Test expense extraction with DD/MM format
-      final result = await deepseekService.extractExpenseInfo('I spent \$50 on groceries on 01/08');
-      
-      // Verify result structure
-      expect(result, isNotNull);
-      
-      // Verify date is August 1st of current year
-      final currentYear = DateTime.now().year;
-      expect(result!['date'], '$currentYear-08-01');
-    });
+    // Verify insights are not empty
+    expect(insights, isNotNull);
+    expect(insights.isNotEmpty, isTrue);
   });
 }

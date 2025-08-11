@@ -4,6 +4,7 @@ class ChatMessage {
   final DateTime timestamp;
   final Map<String, dynamic>? confirmationData;
   final bool isError;
+  final bool isOption;
 
   ChatMessage({
     required this.text,
@@ -11,6 +12,7 @@ class ChatMessage {
     required this.timestamp,
     this.confirmationData,
     this.isError = false,
+    this.isOption = false,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class ChatMessage {
           : DateTime.now(),
       confirmationData: json['confirmation_data'],
       isError: json['is_error'] ?? false,
+      isOption: json['is_option'] ?? false,
     );
   }
 
@@ -32,6 +35,7 @@ class ChatMessage {
       'timestamp': timestamp.toIso8601String(),
       'confirmation_data': confirmationData,
       'is_error': isError,
+      'is_option': isOption,
     };
   }
 
@@ -41,6 +45,7 @@ class ChatMessage {
     DateTime? timestamp,
     Map<String, dynamic>? confirmationData,
     bool? isError,
+    bool? isOption,
   }) {
     return ChatMessage(
       text: text ?? this.text,
@@ -48,6 +53,7 @@ class ChatMessage {
       timestamp: timestamp ?? this.timestamp,
       confirmationData: confirmationData ?? this.confirmationData,
       isError: isError ?? this.isError,
+      isOption: isOption ?? this.isOption,
     );
   }
 }

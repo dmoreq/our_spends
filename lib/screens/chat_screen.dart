@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
+
 import '../providers/expense_provider.dart';
 import '../providers/language_provider.dart';
 import '../models/chat_message.dart';
@@ -31,28 +31,17 @@ class _ChatScreenState extends State<ChatScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     
     // Debug logging
     print('DEBUG: Sending message: $message');
-    print('DEBUG: User authenticated: ${authProvider.user != null}');
     print('DEBUG: ExpenseProvider loading: ${expenseProvider.isLoading}');
     
-    // Allow demo mode when Gemini API key is configured
-    if (authProvider.user == null) {
-      print('DEBUG: User not authenticated, checking for demo mode');
-      // Create a demo user ID for testing
-      final demoUserId = 'demo_user_${DateTime.now().millisecondsSinceEpoch}';
-      print('DEBUG: Using demo mode with user ID: $demoUserId');
-      
-      // Continue with demo user ID instead of returning
-      await _processChatMessage(message, demoUserId, expenseProvider);
-      return;
-    }
+    // Use fixed demo user ID
+    final demoUserId = 'demo-user';
+    print('DEBUG: Using demo mode with user ID: $demoUserId');
     
-    // Normal authenticated flow
-    await _processChatMessage(message, authProvider.user!.uid, expenseProvider);
+    await _processChatMessage(message, demoUserId, expenseProvider);
   }
 
   Future<void> _processChatMessage(String message, String userId, ExpenseProvider expenseProvider) async {
@@ -176,15 +165,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _generateInsights() async {
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    // Get userId (either authenticated user or demo user)
-    String userId;
-    if (authProvider.user != null) {
-      userId = authProvider.user!.uid;
-    } else {
-      userId = 'demo_user_${DateTime.now().millisecondsSinceEpoch}';
-    }
+    // Use fixed demo user ID
+    String userId = 'demo-user';
     
     try {
       final response = await expenseProvider.generateInsights(userId);

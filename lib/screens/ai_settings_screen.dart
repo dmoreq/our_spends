@@ -202,9 +202,8 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
             const Text('How to get your API key:'),
             const SizedBox(height: 8),
             const Text(instructions),
-              const SizedBox(height: 16),
-              Text('Visit: $url'),
-            ],
+            const SizedBox(height: 16),
+            Text('Visit: $url'),
           ],
         ),
         actions: [

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../providers/auth_provider.dart';
+
 import '../l10n/app_localizations.dart';
 import 'ai_settings_screen.dart';
 
@@ -20,82 +20,6 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // User Profile Section
-          Consumer<AuthProvider>(
-            builder: (context, authProvider, child) {
-              final user = authProvider.user;
-              final demoUser = authProvider.demoUser;
-              
-              // Show user info if either real user or demo user is available
-              if (user == null && demoUser == null) return const SizedBox.shrink();
-              
-              final displayName = user?.displayName ?? demoUser?['displayName'] ?? 'User';
-              final email = user?.email ?? demoUser?['email'] ?? '';
-              final isDemo = demoUser != null;
-              
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                            child: Text(
-                              displayName.substring(0, 1).toUpperCase(),
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  displayName,
-                                  style: Theme.of(context).textTheme.titleMedium,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  email,
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (isDemo) ...[
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            'Demo Mode',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-
-          const SizedBox(height: 24),
 
           // Settings Options
           _buildSettingsSection(
@@ -156,48 +80,7 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 24),
 
-          _buildSettingsSection(
-            context,
-            title: 'Account',
-            children: [
-              Consumer<AuthProvider>(
-                builder: (context, authProvider, child) {
-                  return _buildSettingsTile(
-                    context,
-                    icon: Icons.logout,
-                    title: l10n.logout,
-                    subtitle: 'Sign out of your account',
-                    onTap: () async {
-                      final shouldLogout = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(l10n.logout),
-                          content: const Text('Are you sure you want to sign out?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(false),
-                              child: Text(l10n.cancel),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(true),
-                              child: Text(l10n.logout),
-                            ),
-                          ],
-                        ),
-                      );
-
-                      if (shouldLogout == true) {
-                        await authProvider.signOut();
-                      }
-                    },
-                    isDestructive: true,
-                  );
-                },
-              ),
-            ],
-          ),
         ],
       ),
     );

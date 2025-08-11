@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
+
 import '../providers/expense_provider.dart';
 import '../providers/language_provider.dart';
 import '../models/expense.dart';
 import '../models/chat_message.dart';
 import '../services/ai_service.dart';
+import '../widgets/chat_message_bubble.dart';
+import '../widgets/chat_option_button.dart';
+import '../widgets/chat_app_bar.dart';
+import '../widgets/chat_input_field.dart';
+import '../widgets/facility_card.dart';
+import '../theme/chat_theme.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -68,7 +75,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty || _isProcessing) return;
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     final languageCode = languageProvider.currentLocale.languageCode;
@@ -93,13 +99,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _scrollToBottom();
 
     try {
-      // Get userId (either authenticated user or demo user)
-      String userId;
-      if (authProvider.user != null) {
-        userId = authProvider.user!.uid;
-      } else {
-        userId = 'demo_user_${DateTime.now().millisecondsSinceEpoch}';
-      }
+      // Use fixed demo user ID
+      String userId = 'demo-user';
 
       // Process message using AI service
       final aiResponse = await _aiService.processMessage(
@@ -128,7 +129,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
       _scrollToBottom();
 
       // Process message for expense extraction
-      await _processMessageForExpenses(message, aiResponse, authProvider, expenseProvider, languageCode);
+      await _processMessageForExpenses(message, aiResponse, expenseProvider, languageCode);
     } catch (e) {
       // Handle error
       setState(() {
@@ -148,7 +149,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
     final expenseProvider = Provider.of<ExpenseProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
     final languageCode = languageProvider.currentLocale.languageCode;
@@ -156,19 +156,19 @@ class _AIChatScreenState extends State<AIChatScreen> {
     // Show loading indicator while initializing
     if (!_isInitialized) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(languageCode == 'vi' ? 'Trò chuyện AI' : 'AI Chat'),
-        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircularProgressIndicator(),
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(ChatTheme.primaryColor),
+              ),
               const SizedBox(height: 16),
               Text(
                 languageCode == 'vi' 
                     ? 'Đang khởi tạo trò chuyện AI...'
                     : 'Initializing AI chat...',
+                style: const TextStyle(color: ChatTheme.textPrimary),
               ),
               if (_errorMessage != null)
                 Padding(
@@ -185,29 +185,22 @@ class _AIChatScreenState extends State<AIChatScreen> {
       );
     }
 
-    // Add welcome message if this is the first time
+    // Initialize system prompt for AI context
     if (_messages.isEmpty) {
       // Create a custom system prompt that includes user's expense context
       final systemPrompt = _buildSystemPrompt(expenseProvider.expenses, languageCode);
       
-      // Add welcome message
-      _messages.add(ChatMessage(
-        text: systemPrompt,
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
+      // Add suggested options only (no welcome message)
+      _addSuggestedOptions();
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(languageCode == 'vi' ? 'Trò chuyện AI' : 'AI Chat'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.insights),
-            onPressed: () => _generateInsights(context, expenseProvider, authProvider, languageCode),
-            tooltip: languageCode == 'vi' ? 'Tạo phân tích' : 'Generate Insights',
-          ),
-        ],
+      backgroundColor: ChatTheme.backgroundColor,
+      appBar: ChatAppBar(
+        onBackPressed: () => Navigator.of(context).pop(),
+        onMenuPressed: () => _showMenuOptions(context, expenseProvider, languageCode),
+        botName: languageCode == 'vi' ? 'Trợ lý AI' : 'AI Assistant',
+        statusText: languageCode == 'vi' ? 'Luôn hoạt động' : 'Always active',
       ),
       body: Column(
         children: [
@@ -215,56 +208,81 @@ class _AIChatScreenState extends State<AIChatScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
-                return _buildMessageBubble(message);
+                return ChatMessageBubble(message: message);
               },
             ),
           ),
           
           // Input area
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                // Text input field
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: languageCode == 'vi' 
-                          ? 'Nhập tin nhắn...'
-                          : 'Type a message...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    ),
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: (_) => _sendMessage(),
-                    enabled: !_isProcessing,
-                  ),
-                ),
-                
-                // Send button
-                const SizedBox(width: 8.0),
-                FloatingActionButton(
-                  onPressed: _isProcessing ? null : _sendMessage,
-                  mini: true,
-                  child: _isProcessing 
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.send),
-                ),
-              ],
-            ),
+          ChatInputField(
+            controller: _messageController,
+            onSend: _sendMessage,
+            isProcessing: _isProcessing,
+            hintText: languageCode == 'vi' ? 'Nhập tin nhắn...' : 'Type a message...',
           ),
         ],
+      ),
+    );
+  }
+  
+  void _addSuggestedOptions() {
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final languageCode = languageProvider.currentLocale.languageCode;
+    
+    // Add suggested options as special messages
+    _messages.add(ChatMessage(
+      text: languageCode == 'vi' ? 'Tạo báo cáo chi tiêu' : 'Generate expense report',
+      isUser: false,
+      timestamp: DateTime.now(),
+      isOption: true,
+    ));
+    
+    _messages.add(ChatMessage(
+      text: languageCode == 'vi' ? 'Thêm khoản chi tiêu mới' : 'Add a new expense',
+      isUser: false,
+      timestamp: DateTime.now(),
+      isOption: true,
+    ));
+  }
+  
+  void _showMenuOptions(BuildContext context, ExpenseProvider expenseProvider, String languageCode) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.insights, color: ChatTheme.primaryColor),
+              title: Text(languageCode == 'vi' ? 'Tạo phân tích' : 'Generate Insights'),
+              onTap: () {
+                Navigator.pop(context);
+                _generateInsights(context, expenseProvider, languageCode);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: ChatTheme.primaryColor),
+              title: Text(languageCode == 'vi' ? 'Xóa cuộc trò chuyện' : 'Clear conversation'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _messages.clear();
+                  _conversationHistory.clear();
+                  // Add suggested options only (no welcome message)
+                  _addSuggestedOptions();
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -273,6 +291,17 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final isUser = message.isUser;
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     final languageCode = languageProvider.currentLocale.languageCode;
+    
+    // If this is an option message, render it as a button
+    if (message.isOption) {
+      return ChatOptionButton(
+        text: message.text,
+        onTap: () {
+          _messageController.text = message.text;
+          _sendMessage();
+        },
+      );
+    }
     
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -363,15 +392,10 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   // Process messages to extract expense information
-  Future<void> _processMessageForExpenses(String message, String response, AuthProvider authProvider, ExpenseProvider expenseProvider, String languageCode) async {
+  Future<void> _processMessageForExpenses(String message, String response, ExpenseProvider expenseProvider, String languageCode) async {
     try {
-      // Get userId (either authenticated user or demo user)
-      String userId;
-      if (authProvider.user != null) {
-        userId = authProvider.user!.uid;
-      } else {
-        userId = 'demo_user_${DateTime.now().millisecondsSinceEpoch}';
-      }
+      // Use fixed demo user ID
+      String userId = 'demo-user';
       
       // Use the existing API service to extract expense information
       final apiResponse = await expenseProvider.sendMessage(message, userId, languageCode: languageCode);
@@ -437,15 +461,10 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   // Generate insights using the existing provider
-  Future<void> _generateInsights(BuildContext context, ExpenseProvider expenseProvider, AuthProvider authProvider, String languageCode) async {
+  Future<void> _generateInsights(BuildContext context, ExpenseProvider expenseProvider, String languageCode) async {
     try {
-      // Get userId (either authenticated user or demo user)
-      String userId;
-      if (authProvider.user != null) {
-        userId = authProvider.user!.uid;
-      } else {
-        userId = 'demo_user_${DateTime.now().millisecondsSinceEpoch}';
-      }
+      // Use fixed demo user ID
+      String userId = 'demo-user';
       
       // Show loading dialog
       showDialog(

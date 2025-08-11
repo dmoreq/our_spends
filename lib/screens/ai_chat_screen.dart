@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../providers/expense_provider.dart';
 import '../providers/language_provider.dart';
@@ -56,7 +57,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to initialize AI provider: ${e.toString()}';
+        _errorMessage = AppLocalizations.of(context)!.failedToInitializeAiProvider(e.toString());
       });
     }
   }
@@ -78,6 +79,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     final languageCode = languageProvider.currentLocale.languageCode;
+    final l10n = AppLocalizations.of(context)!;
     
     // Add user message to chat
     setState(() {
@@ -134,9 +136,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
       // Handle error
       setState(() {
         _messages.add(ChatMessage(
-          text: languageCode == 'vi' 
-              ? 'Đã xảy ra lỗi: ${e.toString()}'
-              : 'An error occurred: ${e.toString()}',
+          text: l10n.anErrorOccurred(e.toString()),
           isUser: false,
           timestamp: DateTime.now(),
           isError: true,
@@ -152,6 +152,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final expenseProvider = Provider.of<ExpenseProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
     final languageCode = languageProvider.currentLocale.languageCode;
+    final l10n = AppLocalizations.of(context)!;
     
     // Show loading indicator while initializing
     if (!_isInitialized) {
@@ -165,9 +166,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                languageCode == 'vi' 
-                    ? 'Đang khởi tạo trò chuyện AI...'
-                    : 'Initializing AI chat...',
+                l10n.initializingAiChat,
                 style: const TextStyle(color: ChatTheme.textPrimary),
               ),
               if (_errorMessage != null)
@@ -188,7 +187,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     // Initialize system prompt for AI context
     if (_messages.isEmpty) {
       // Create a custom system prompt that includes user's expense context
-      final systemPrompt = _buildSystemPrompt(expenseProvider.expenses, languageCode);
+      final systemPrompt = _buildSystemPrompt(expenseProvider.expenses, l10n);
       
       // Add suggested options only (no welcome message)
       _addSuggestedOptions();
@@ -198,9 +197,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
       backgroundColor: ChatTheme.backgroundColor,
       appBar: ChatAppBar(
         onBackPressed: () => Navigator.of(context).pop(),
-        onMenuPressed: () => _showMenuOptions(context, expenseProvider, languageCode),
-        botName: languageCode == 'vi' ? 'Trợ lý AI' : 'AI Assistant',
-        statusText: languageCode == 'vi' ? 'Luôn hoạt động' : 'Always active',
+        onMenuPressed: () => _showMenuOptions(context, expenseProvider, l10n),
+        botName: l10n.aiAssistant,
+        statusText: l10n.alwaysActive,
       ),
       body: Column(
         children: [
@@ -222,7 +221,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
             controller: _messageController,
             onSend: _sendMessage,
             isProcessing: _isProcessing,
-            hintText: languageCode == 'vi' ? 'Nhập tin nhắn...' : 'Type a message...',
+            hintText: l10n.typeAMessage,
           ),
         ],
       ),
@@ -230,26 +229,25 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
   
   void _addSuggestedOptions() {
-    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    final languageCode = languageProvider.currentLocale.languageCode;
+    final l10n = AppLocalizations.of(context)!;
     
     // Add suggested options as special messages
     _messages.add(ChatMessage(
-      text: languageCode == 'vi' ? 'Tạo báo cáo chi tiêu' : 'Generate expense report',
+      text: l10n.generateExpenseReport,
       isUser: false,
       timestamp: DateTime.now(),
       isOption: true,
     ));
     
     _messages.add(ChatMessage(
-      text: languageCode == 'vi' ? 'Thêm khoản chi tiêu mới' : 'Add a new expense',
+      text: l10n.addNewExpense,
       isUser: false,
       timestamp: DateTime.now(),
       isOption: true,
     ));
   }
   
-  void _showMenuOptions(BuildContext context, ExpenseProvider expenseProvider, String languageCode) {
+  void _showMenuOptions(BuildContext context, ExpenseProvider expenseProvider, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -262,15 +260,15 @@ class _AIChatScreenState extends State<AIChatScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.insights, color: ChatTheme.primaryColor),
-              title: Text(languageCode == 'vi' ? 'Tạo phân tích' : 'Generate Insights'),
+              title: Text(l10n.generateInsights),
               onTap: () {
                 Navigator.pop(context);
-                _generateInsights(context, expenseProvider, languageCode);
+                _generateInsights(context, expenseProvider, l10n);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: ChatTheme.primaryColor),
-              title: Text(languageCode == 'vi' ? 'Xóa cuộc trò chuyện' : 'Clear conversation'),
+              title: Text(l10n.clearConversation),
               onTap: () {
                 Navigator.pop(context);
                 setState(() {
@@ -289,8 +287,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   
   Widget _buildMessageBubble(ChatMessage message) {
     final isUser = message.isUser;
-    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    final languageCode = languageProvider.currentLocale.languageCode;
+    final l10n = AppLocalizations.of(context)!;
     
     // If this is an option message, render it as a button
     if (message.isOption) {
@@ -353,40 +350,31 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   // Build a system prompt that includes context about the user's expenses
-  String _buildSystemPrompt(List<dynamic> expenses, String languageCode) {
-    final isVietnamese = languageCode == 'vi';
-  
+  String _buildSystemPrompt(List<dynamic> expenses, AppLocalizations l10n) {
     // Base system prompt
-    String prompt = isVietnamese
-        ? 'Bạn là trợ lý AI cho ứng dụng theo dõi chi tiêu gia đình. Giúp người dùng theo dõi chi tiêu, trả lời câu hỏi về chi tiêu của họ và cung cấp thông tin tài chính.'
-        : 'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.';
+    String prompt = l10n.systemPrompt;
   
     // Add expense context if available
     if (expenses.isNotEmpty) {
-      final contextIntro = isVietnamese
-          ? '\n\nĐây là thông tin về các khoản chi tiêu gần đây của người dùng:'
-          : '\n\nHere is information about the user\'s recent expenses:';
-  
-      prompt += contextIntro;
+      prompt += l10n.systemPromptWithContext;
   
       // Add up to 10 most recent expenses
       final recentExpenses = expenses.take(10).toList();
       for (var i = 0; i < recentExpenses.length; i++) {
         final expense = recentExpenses[i];
-        final expenseInfo = isVietnamese
-            ? '\n${i + 1}. Khoản chi: ${expense.item}, Số tiền: ${expense.amount} ${expense.currency}, Danh mục: ${expense.category}, Ngày: ${expense.date.toString().split(' ')[0]}'
-            : '\n${i + 1}. Item: ${expense.item}, Amount: ${expense.amount} ${expense.currency}, Category: ${expense.category}, Date: ${expense.date.toString().split(' ')[0]}';
-  
-        prompt += expenseInfo;
+        prompt += l10n.expenseInfo(
+          (i + 1).toString(),
+          expense.item,
+          expense.amount.toString(),
+          expense.currency,
+          expense.category,
+          expense.date.toString().split(' ')[0],
+        );
       }
     }
   
     // Add instructions for expense extraction
-    final extractionInstructions = isVietnamese
-        ? '\n\nKhi người dùng đề cập đến một khoản chi tiêu mới, hãy trích xuất thông tin chi tiêu và thông báo cho họ rằng bạn có thể lưu nó vào ứng dụng theo dõi chi tiêu.'
-        : '\n\nWhen the user mentions a new expense, extract the expense information and let them know you can save it to their expense tracker.';
-  
-    prompt += extractionInstructions;
+    prompt += l10n.extractionInstruction;
   
     return prompt;
   }
@@ -396,6 +384,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     try {
       // Use fixed demo user ID
       String userId = 'demo-user';
+      final l10n = AppLocalizations.of(context)!;
       
       // Use the existing API service to extract expense information
       final apiResponse = await expenseProvider.sendMessage(message, userId, languageCode: languageCode);
@@ -412,11 +401,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                languageCode == 'vi'
-                    ? '💡 Đã lưu khoản chi tiêu của bạn!'
-                    : '💡 Expense saved to your tracker!',
-              ),
+              content: Text(l10n.expenseSavedToYourTracker),
               duration: const Duration(seconds: 3),
             ),
           );
@@ -461,7 +446,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   // Generate insights using the existing provider
-  Future<void> _generateInsights(BuildContext context, ExpenseProvider expenseProvider, String languageCode) async {
+  Future<void> _generateInsights(BuildContext context, ExpenseProvider expenseProvider, AppLocalizations l10n) async {
     try {
       // Use fixed demo user ID
       String userId = 'demo-user';
@@ -476,11 +461,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
             children: [
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              Text(
-                languageCode == 'vi'
-                    ? 'Đang tạo phân tích chi tiêu...'
-                    : 'Generating spending insights...',
-              ),
+              Text(l10n.generatingSpendingInsights),
             ],
           ),
         ),
@@ -499,12 +480,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text(
-              languageCode == 'vi' ? 'Phân tích chi tiêu' : 'Spending Insights',
-            ),
+            title: Text(l10n.spendingInsights),
             content: SingleChildScrollView(
-              child: Text(response['data'] ?? (languageCode == 'vi'
-                  ? 'Không thể tạo phân tích vào lúc này.'
+              child: Text(response['data'] ?? l10n.couldNotGenerateInsights),
                   : 'Unable to generate insights at the moment.')),
             ),
             actions: [

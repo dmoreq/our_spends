@@ -191,5 +191,130 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dataSync => 'Đồng bộ hóa dữ liệu';
 
   @override
-  String get dataSyncSubtitle => 'Sao lưu và đồng bộ hóa dữ liệu của bạn';
+  String get dataSyncSubtitle => 'Sao lưu và đồng bộ hoá dữ liệu của bạn';
+
+  @override
+  String get aiChat => 'Trò chuyện AI';
+
+  @override
+  String get initializingAiChat => 'Đang khởi tạo trò chuyện AI...';
+
+  @override
+  String failedToInitializeAiProvider(Object error) {
+    return 'Không thể khởi tạo nhà cung cấp AI: $error';
+  }
+
+  @override
+  String anErrorOccurred(Object error) {
+    return 'Đã xảy ra lỗi: $error';
+  }
+
+  @override
+  String get aiAssistant => 'Trợ lý AI';
+
+  @override
+  String get alwaysActive => 'Luôn hoạt động';
+
+  @override
+  String get typeAMessage => 'Nhập tin nhắn...';
+
+  @override
+  String get generateExpenseReport => 'Tạo báo cáo chi tiêu';
+
+  @override
+  String get addNewExpense => 'Thêm khoản chi tiêu mới';
+
+  @override
+  String get generateInsights => 'Tạo phân tích';
+
+  @override
+  String get clearConversation => 'Xóa cuộc trò chuyện';
+
+  @override
+  String get expenseSavedToYourTracker => '💡 Đã lưu khoản chi tiêu của bạn!';
+
+  @override
+  String get generatingSpendingInsights => 'Đang tạo phân tích chi tiêu...';
+
+  @override
+  String get spendingInsights => 'Phân tích chi tiêu';
+
+  @override
+  String get couldNotGenerateInsights => 'Không thể tạo phân tích vào lúc này.';
+
+  @override
+  String errorLoadingSettings(Object error) {
+    return 'Lỗi tải cài đặt: $error';
+  }
+
+  @override
+  String get settingsSavedSuccessfully => 'Đã lưu cài đặt thành công!';
+
+  @override
+  String errorSavingSettings(Object error) {
+    return 'Lỗi lưu cài đặt: $error';
+  }
+
+  @override
+  String get aiProvider => 'Nhà cung cấp AI';
+
+  @override
+  String get aiProviderDescription =>
+      'Ứng dụng này sử dụng Google Gemini để phân tích chi tiêu và thông tin chi tiết.';
+
+  @override
+  String get geminiGoogle => 'Gemini (Google)';
+
+  @override
+  String get apiKey => 'Khóa API';
+
+  @override
+  String get enterYourApiKey => 'Nhập khóa API của bạn';
+
+  @override
+  String get getYourApiKey => 'Lấy khóa API của bạn từ Google AI Studio';
+
+  @override
+  String get apiTermsOfService =>
+      'Bằng cách sử dụng tính năng này, bạn đồng ý với các điều khoản dịch vụ của API.';
+
+  @override
+  String get privacyPolicy => 'Chính sách bảo mật';
+
+  @override
+  String get termsOfService => 'Điều khoản dịch vụ';
+
+  @override
+  String get dataUsage => 'Sử dụng dữ liệu';
+
+  @override
+  String get dataUsageDescription =>
+      'Dữ liệu chi tiêu của bạn sẽ được gửi đến nhà cung cấp AI để phân tích. Chúng tôi không lưu trữ dữ liệu của bạn.';
+
+  @override
+  String get learnMore => 'Tìm hiểu thêm';
+
+  @override
+  String get systemPrompt =>
+      'Bạn là một trợ lý AI hữu ích cho một ứng dụng theo dõi chi tiêu gia đình. Giúp người dùng theo dõi chi tiêu, trả lời các câu hỏi về chi tiêu của họ và cung cấp thông tin chi tiết về tài chính.';
+
+  @override
+  String get systemPromptWithContext =>
+      'Bạn là một trợ lý AI hữu ích cho một ứng dụng theo dõi chi tiêu gia đình. Giúp người dùng theo dõi chi tiêu, trả lời các câu hỏi về chi tiêu của họ và cung cấp thông tin chi tiết về tài chính.\n\nĐây là thông tin về các khoản chi tiêu gần đây của người dùng:';
+
+  @override
+  String expenseInfo(
+    Object amount,
+    Object category,
+    Object currency,
+    Object date,
+    Object index,
+    Object item,
+  ) {
+    return '\n$index. Khoản chi: $item, Số tiền: $amount $currency, Danh mục: $category, Ngày: $date';
+  }
+
+  @override
+  String get extractionInstruction =>
+      '\n\nKhi người dùng đề cập đến một khoản chi tiêu mới, hãy trích xuất thông tin chi tiêu và cho họ biết bạn có thể lưu nó vào trình theo dõi chi tiêu của họ.';
 }

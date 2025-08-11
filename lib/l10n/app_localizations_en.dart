@@ -191,4 +191,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataSyncSubtitle => 'Backup and sync your data';
+
+  @override
+  String get aiChat => 'AI Chat';
+
+  @override
+  String get initializingAiChat => 'Initializing AI chat...';
+
+  @override
+  String failedToInitializeAiProvider(Object error) {
+    return 'Failed to initialize AI provider: $error';
+  }
+
+  @override
+  String anErrorOccurred(Object error) {
+    return 'An error occurred: $error';
+  }
+
+  @override
+  String get aiAssistant => 'AI Assistant';
+
+  @override
+  String get alwaysActive => 'Always active';
+
+  @override
+  String get typeAMessage => 'Type a message...';
+
+  @override
+  String get generateExpenseReport => 'Generate expense report';
+
+  @override
+  String get addNewExpense => 'Add a new expense';
+
+  @override
+  String get generateInsights => 'Generate Insights';
+
+  @override
+  String get clearConversation => 'Clear conversation';
+
+  @override
+  String get expenseSavedToYourTracker => '💡 Expense saved to your tracker!';
+
+  @override
+  String get generatingSpendingInsights => 'Generating spending insights...';
+
+  @override
+  String get spendingInsights => 'Spending Insights';
+
+  @override
+  String get couldNotGenerateInsights =>
+      'Could not generate insights at this time.';
+
+  @override
+  String errorLoadingSettings(Object error) {
+    return 'Error loading settings: $error';
+  }
+
+  @override
+  String get settingsSavedSuccessfully => 'Settings saved successfully!';
+
+  @override
+  String errorSavingSettings(Object error) {
+    return 'Error saving settings: $error';
+  }
+
+  @override
+  String get aiProvider => 'AI Provider';
+
+  @override
+  String get aiProviderDescription =>
+      'This app uses Google Gemini for expense analysis and insights.';
+
+  @override
+  String get geminiGoogle => 'Gemini (Google)';
+
+  @override
+  String get apiKey => 'API Key';
+
+  @override
+  String get enterYourApiKey => 'Enter your API key';
+
+  @override
+  String get getYourApiKey => 'Get your API key from Google AI Studio';
+
+  @override
+  String get apiTermsOfService =>
+      'By using this feature, you agree to the API\'s terms of service.';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get dataUsage => 'Data Usage';
+
+  @override
+  String get dataUsageDescription =>
+      'Your expense data will be sent to the AI provider for analysis. We do not store your data.';
+
+  @override
+  String get learnMore => 'Learn More';
+
+  @override
+  String get systemPrompt =>
+      'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.';
+
+  @override
+  String get systemPromptWithContext =>
+      'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.\n\nHere is information about the user\'s recent expenses:';
+
+  @override
+  String expenseInfo(
+    Object amount,
+    Object category,
+    Object currency,
+    Object date,
+    Object index,
+    Object item,
+  ) {
+    return '\n$index. Item: $item, Amount: $amount $currency, Category: $category, Date: $date';
+  }
+
+  @override
+  String get extractionInstruction =>
+      '\n\nWhen the user mentions a new expense, extract the expense information and let them know you can save it to their expense tracker.';
 }

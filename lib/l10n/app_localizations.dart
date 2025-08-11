@@ -463,6 +463,217 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backup and sync your data'**
   String get dataSyncSubtitle;
+
+  /// No description provided for @aiChat.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Chat'**
+  String get aiChat;
+
+  /// No description provided for @initializingAiChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing AI chat...'**
+  String get initializingAiChat;
+
+  /// No description provided for @failedToInitializeAiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize AI provider: {error}'**
+  String failedToInitializeAiProvider(Object error);
+
+  /// No description provided for @anErrorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred: {error}'**
+  String anErrorOccurred(Object error);
+
+  /// No description provided for @aiAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
+  String get aiAssistant;
+
+  /// No description provided for @alwaysActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Always active'**
+  String get alwaysActive;
+
+  /// No description provided for @typeAMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message...'**
+  String get typeAMessage;
+
+  /// No description provided for @generateExpenseReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate expense report'**
+  String get generateExpenseReport;
+
+  /// No description provided for @addNewExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a new expense'**
+  String get addNewExpense;
+
+  /// No description provided for @generateInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Insights'**
+  String get generateInsights;
+
+  /// No description provided for @clearConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear conversation'**
+  String get clearConversation;
+
+  /// No description provided for @expenseSavedToYourTracker.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 Expense saved to your tracker!'**
+  String get expenseSavedToYourTracker;
+
+  /// No description provided for @generatingSpendingInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating spending insights...'**
+  String get generatingSpendingInsights;
+
+  /// No description provided for @spendingInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Insights'**
+  String get spendingInsights;
+
+  /// No description provided for @couldNotGenerateInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not generate insights at this time.'**
+  String get couldNotGenerateInsights;
+
+  /// No description provided for @errorLoadingSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading settings: {error}'**
+  String errorLoadingSettings(Object error);
+
+  /// No description provided for @settingsSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings saved successfully!'**
+  String get settingsSavedSuccessfully;
+
+  /// No description provided for @errorSavingSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving settings: {error}'**
+  String errorSavingSettings(Object error);
+
+  /// No description provided for @aiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Provider'**
+  String get aiProvider;
+
+  /// No description provided for @aiProviderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This app uses Google Gemini for expense analysis and insights.'**
+  String get aiProviderDescription;
+
+  /// No description provided for @geminiGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini (Google)'**
+  String get geminiGoogle;
+
+  /// No description provided for @apiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get apiKey;
+
+  /// No description provided for @enterYourApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your API key'**
+  String get enterYourApiKey;
+
+  /// No description provided for @getYourApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Get your API key from Google AI Studio'**
+  String get getYourApiKey;
+
+  /// No description provided for @apiTermsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'By using this feature, you agree to the API\'s terms of service.'**
+  String get apiTermsOfService;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @termsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// No description provided for @dataUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Usage'**
+  String get dataUsage;
+
+  /// No description provided for @dataUsageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your expense data will be sent to the AI provider for analysis. We do not store your data.'**
+  String get dataUsageDescription;
+
+  /// No description provided for @learnMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get learnMore;
+
+  /// No description provided for @systemPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.'**
+  String get systemPrompt;
+
+  /// No description provided for @systemPromptWithContext.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.\n\nHere is information about the user\'s recent expenses:'**
+  String get systemPromptWithContext;
+
+  /// No description provided for @expenseInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'\n{index}. Item: {item}, Amount: {amount} {currency}, Category: {category}, Date: {date}'**
+  String expenseInfo(
+    Object amount,
+    Object category,
+    Object currency,
+    Object date,
+    Object index,
+    Object item,
+  );
+
+  /// No description provided for @extractionInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'\n\nWhen the user mentions a new expense, extract the expense information and let them know you can save it to their expense tracker.'**
+  String get extractionInstruction;
 }
 
 class _AppLocalizationsDelegate

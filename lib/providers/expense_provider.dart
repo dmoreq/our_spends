@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
 import '../services/api_service.dart';
@@ -14,14 +16,24 @@ class ExpenseProvider extends ChangeNotifier {
   String? _errorMessage;
   bool _isInitialized = false;
 
+  final _expenseStreamController = StreamController<List<Expense>>.broadcast();
+
   List<Expense> get expenses => _expenses;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isInitialized => _isInitialized;
 
+  Stream<List<Expense>> get expensesStream => _expenseStreamController.stream;
+
   ExpenseProvider() {
     _queryService = ExpenseQueryService();
     _initializeDatabase();
+  }
+
+  @override
+  void dispose() {
+    _expenseStreamController.close();
+    super.dispose();
   }
 
   Future<void> _initializeDatabase() async {
@@ -40,6 +52,7 @@ class ExpenseProvider extends ChangeNotifier {
       final expenses = await _databaseService.getExpenses();
       _expenses.clear();
       _expenses.addAll(expenses);
+      _expenseStreamController.add(_expenses);
       notifyListeners();
     } catch (e) {
       _setError('Failed to load expenses: ${e.toString()}');

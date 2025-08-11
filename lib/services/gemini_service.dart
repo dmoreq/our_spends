@@ -1,17 +1,35 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../models/expense.dart';
 import '../config/api_config.dart';
 
 class GeminiService {
-  static const String _apiKey = ApiConfig.geminiApiKey;
-  static String get _modelName => ApiConfig.defaultModels['gemini'] ?? 'gemini-1.5-flash';
+  // Get API key and model name from config
+  final String _apiKey = ApiConfig.geminiApiKey;
+  final String _modelName = ApiConfig.defaultModels['gemini'] ?? 'gemini-1.5-flash';
 
-  late final GenerativeModel _model;
-
+  // Lazy initialization of the model
+  GenerativeModel? _model;
+  
   GeminiService() {
-    _model = GenerativeModel(model: _modelName, apiKey: _apiKey);
+    _initModel();
+  }
+  
+  void _initModel() {
+    try {
+      if (_apiKey != 'YOUR_GEMINI_API_KEY_HERE' && _apiKey.isNotEmpty) {
+        // Initialize the model directly
+        _model = GenerativeModel(model: _modelName, apiKey: _apiKey);
+        print('DEBUG: Gemini model initialized successfully');
+      } else {
+        print('WARNING: Gemini API key not configured');
+      }
+    } catch (e) {
+      print('ERROR: Failed to initialize Gemini model: $e');
+      // Will be handled in the API request method
+    }
   }
 
   /// Process a chat message and return AI response with conversation memory
@@ -30,10 +48,18 @@ class GeminiService {
 
       // Create the prompt with context and conversation history
       final prompt = _buildPrompt(expenseContext, conversationContext, message, languageCode);
-
+      
+      // Make the API request with proper formatting
+      print('DEBUG: Sending prompt to Gemini: ${prompt.substring(0, prompt.length > 100 ? 100 : prompt.length)}...');
+      
       final response = await _makeGeminiRequest(prompt);
+      if (response != null) {
+        print('DEBUG: Received response from Gemini: ${response.substring(0, response.length > 100 ? 100 : response.length)}...');
+      }
+      
       return response ?? _getDefaultErrorMessage(languageCode);
     } catch (e) {
+      print('ERROR: Failed to process message with Gemini: $e');
       throw Exception('Failed to get AI response: ${e.toString()}');
     }
   }
@@ -200,17 +226,28 @@ Message: $message
 Only return the JSON object, no other text.
 ''';
 
-      final response = await _makeGeminiRequest(prompt);
+      // Use the model getter to access the initialized model
+      try {
+        print('DEBUG: Sending expense extraction prompt to Gemini');
+        final response = await _makeGeminiRequest(prompt);
+        
+        if (response == null || response.isEmpty) {
+          print('ERROR: Empty response from Gemini API during expense extraction');
+          return _detectExpenseManually(message);
+        }
+        
+        final responseText = response;
+        print('DEBUG: Expense extraction response: ${responseText.substring(0, responseText.length > 100 ? 100 : responseText.length)}...');
 
-      if (response != null) {
-        // Parse the JSON response
-        try {
-          final jsonStr = response.trim();
-          // Remove markdown code blocks if present
-          final cleanJson = jsonStr.replaceAll(RegExp(r'```json\s*|\s*```'), '');
 
-          // Try to parse as JSON
-          final parsed = jsonDecode(cleanJson);
+      // Parse the JSON response
+      try {
+        final jsonStr = responseText.trim();
+        // Remove markdown code blocks if present
+        final cleanJson = jsonStr.replaceAll(RegExp(r'```json\s*|\s*```'), '');
+
+        // Try to parse as JSON
+        final parsed = jsonDecode(cleanJson);
 
           // If it's a valid expense, ensure time and location have default values if not provided
           if (parsed is Map<String, dynamic> && parsed['hasExpense'] == true) {
@@ -253,11 +290,15 @@ Only return the JSON object, no other text.
           return parsed is Map<String, dynamic> ? parsed : {'hasExpense': false};
         } catch (e) {
           // If parsing fails, try to detect expense manually
+          print('ERROR: Failed to parse Gemini response as JSON: $e');
           return _detectExpenseManually(message);
         }
+      } catch (e) {
+        print('ERROR: Failed to make Gemini request for expense extraction: $e');
+        return _detectExpenseManually(message);
       }
-      return {'hasExpense': false};
     } catch (e) {
+      print('ERROR: Unexpected error during expense extraction: $e');
       return _detectExpenseManually(message);
     }
   }
@@ -284,8 +325,21 @@ Please provide:
 Keep the response concise and friendly.
 ''';
 
-      final response = await _makeGeminiRequest(prompt);
-      return response ?? _generateBasicInsights(expenses);
+      try {
+        print('DEBUG: Sending insights generation prompt to Gemini');
+        final response = await _makeGeminiRequest(prompt);
+        
+        if (response == null || response.isEmpty) {
+          print('ERROR: Empty response from Gemini API during insights generation');
+          return _generateBasicInsights(expenses);
+        }
+        
+        print('DEBUG: Insights generation response: ${response.substring(0, response.length > 100 ? 100 : response.length)}...');
+        return response;
+      } catch (e) {
+        print('ERROR: Failed to generate insights with Gemini: $e');
+        return _generateBasicInsights(expenses);
+      }
     } catch (e) {
       return _generateBasicInsights(expenses);
     }
@@ -293,16 +347,61 @@ Keep the response concise and friendly.
 
   /// Make HTTP request to Gemini API
   Future<String?> _makeGeminiRequest(String prompt) async {
-    if (_apiKey == 'YOUR_GEMINI_API_KEY_HERE') {
-      // Return a helpful message if API key is not configured
-      return 'Please configure your Gemini API key in lib/config/api_config.dart to enable AI features. Visit https://ai.google.dev/ to get your free API key.';
-    }
-
     try {
-      final content = [Content.text(prompt)];
-      final response = await _model.generateContent(content);
-      return response.text;
+      // Check if API key is configured
+      if (_apiKey == 'YOUR_GEMINI_API_KEY_HERE' || _apiKey.isEmpty) {
+        // Return a helpful message if API key is not configured
+        return 'Please configure your Gemini API key in lib/config/api_config.dart to enable AI features. Visit https://ai.google.dev/ to get your free API key.';
+      }
+
+      // Print the prompt for debugging
+      print('DEBUG: Sending prompt to Gemini: ${prompt.substring(0, prompt.length > 100 ? 100 : prompt.length)}...');
+      
+      // Try using the Google Generative AI package if model is initialized
+      if (_model != null) {
+        try {
+          final content = [Content.text(prompt)];
+          final response = await _model!.generateContent(content);
+          
+          if (response.text == null || response.text!.isEmpty) {
+            print('ERROR: Empty response from Gemini API');
+            return 'Sorry, I couldn\'t generate a response at this time.';
+          }
+          
+          // Print the response for debugging
+          print('DEBUG: Received response from Gemini: ${response.text!.substring(0, response.text!.length > 100 ? 100 : response.text!.length)}...');
+          
+          return response.text;
+        } catch (e) {
+          print('ERROR: Failed to use Gemini model: $e');
+          // Fall through to HTTP request fallback
+        }
+      }
+      
+      // Fallback to HTTP request if model initialization failed or not available
+      print('DEBUG: Using HTTP fallback for Gemini API request');
+      final url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$_apiKey';
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        'contents': [{
+          'parts': [{
+            'text': prompt
+          }]
+        }]
+      });
+      
+      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final text = jsonResponse['candidates'][0]['content']['parts'][0]['text'];
+        return text;
+      } else {
+        print('ERROR: HTTP request to Gemini API failed with status ${response.statusCode}: ${response.body}');
+        return null;
+      }
     } catch (e) {
+      print('ERROR: Gemini API request failed: $e');
       return null;
     }
   }
@@ -518,7 +617,7 @@ Configure your Gemini API key for more detailed AI insights!
   String _buildPrompt(String expenseContext, String conversationContext, String message, String? languageCode) {
     if (languageCode == 'vi') {
       return '''
-Bạn là một trợ lý AI hữu ích cho ứng dụng theo dõi chi tiêu gia đình. Vai trò của bạn là:
+Bạn là một trợ lý AI hữu ích cho ứng dụng theo dõi chi tiêu gia đình "Our Spends". Vai trò của bạn là:
 1. Giúp người dùng theo dõi và phân loại chi tiêu
 2. Cung cấp thông tin chi tiết về các mô hình chi tiêu
 3. Trả lời câu hỏi về dữ liệu tài chính của họ
@@ -532,16 +631,22 @@ $conversationContext
 
 Tin nhắn hiện tại của người dùng: $message
 
-Vui lòng cung cấp phản hồi hữu ích và ngắn gọn bằng tiếng Việt. Nếu người dùng đề cập đến việc mua hàng hoặc chi tiêu, hãy xác nhận và đề nghị giúp phân loại. Tham khảo cuộc trò chuyện trước đó khi có liên quan.
+Hướng dẫn quan trọng:
+- Vui lòng cung cấp phản hồi hữu ích và ngắn gọn bằng tiếng Việt
+- Nếu người dùng đề cập đến việc mua hàng hoặc chi tiêu, hãy xác nhận và đề nghị giúp phân loại
+- Tham khảo cuộc trò chuyện trước đó khi có liên quan
+- Nếu người dùng hỏi về chi tiêu, hãy cung cấp thông tin chi tiết dựa trên dữ liệu đã cho
+- Giữ giọng điệu thân thiện và hữu ích
+- Trả lời ngắn gọn, không quá 3-4 câu
 ''';
     } else {
       return '''
-You are a helpful AI assistant for the Our Spends app. Your role is to:
+You are a helpful AI assistant for the "Our Spends" expense tracking app. Your role is to:
 1. Help users track and categorize their expenses
 2. Provide insights about spending patterns
 3. Answer questions about their financial data
 4. Suggest ways to save money
-5. Remember and reference previous parts of our conversation
+5. Remember and reference previous parts of the conversation
 
 Current user expenses context:
 $expenseContext
@@ -550,7 +655,14 @@ $conversationContext
 
 Current user message: $message
 
-Please provide a helpful, concise response. If the user mentions a purchase or expense, acknowledge it and offer to help categorize it. Reference previous conversation when relevant.
+Important guidelines:
+- Provide helpful, concise responses (no more than 3-4 sentences)
+- If the user mentions a purchase or expense, acknowledge it and offer to help categorize it
+- Reference previous conversation when relevant
+- If asked about spending, provide insights based on the given data
+- Maintain a friendly and helpful tone
+- Be specific and actionable in your suggestions
+- Don't make up information not present in the context
 ''';
     }
   }

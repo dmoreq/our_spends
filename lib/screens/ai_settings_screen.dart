@@ -10,21 +10,13 @@ class AISettingsScreen extends StatefulWidget {
 }
 
 class _AISettingsScreenState extends State<AISettingsScreen> {
-  String _selectedProvider = ApiConfig.defaultProvider;
-  final Map<String, TextEditingController> _apiKeyControllers = {};
+  final TextEditingController _geminiApiKeyController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeControllers();
     _loadSettings();
-  }
-
-  void _initializeControllers() {
-    for (String provider in ApiConfig.supportedProviders) {
-      _apiKeyControllers[provider] = TextEditingController();
-    }
   }
 
   Future<void> _loadSettings() async {
@@ -33,14 +25,9 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       
-      // Load selected provider
-      _selectedProvider = prefs.getString('ai_provider') ?? ApiConfig.defaultProvider;
-      
-      // Load API keys
-      for (String provider in ApiConfig.supportedProviders) {
-        final apiKey = prefs.getString('${provider}_api_key') ?? '';
-        _apiKeyControllers[provider]?.text = apiKey;
-      }
+      // Load Gemini API key
+      final apiKey = prefs.getString('gemini_api_key') ?? '';
+      _geminiApiKeyController.text = apiKey;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,14 +45,9 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       
-      // Save selected provider
-      await prefs.setString('ai_provider', _selectedProvider);
-      
-      // Save API keys
-      for (String provider in ApiConfig.supportedProviders) {
-        final apiKey = _apiKeyControllers[provider]?.text ?? '';
-        await prefs.setString('${provider}_api_key', apiKey);
-      }
+      // Save Gemini API key
+      final apiKey = _geminiApiKeyController.text;
+      await prefs.setString('gemini_api_key', apiKey);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -85,9 +67,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
 
   @override
   void dispose() {
-    for (var controller in _apiKeyControllers.values) {
-      controller.dispose();
-    }
+    _geminiApiKeyController.dispose();
     super.dispose();
   }
 
@@ -122,23 +102,15 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Select which AI service to use for expense analysis and insights.',
+                            'This app uses Google Gemini for expense analysis and insights.',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           const SizedBox(height: 16),
-                          ...ApiConfig.supportedProviders.map((provider) {
-                            return RadioListTile<String>(
-                              title: Text(_getProviderDisplayName(provider)),
-                              subtitle: Text(_getProviderDescription(provider)),
-                              value: provider,
-                              groupValue: _selectedProvider,
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedProvider = value!;
-                                });
-                              },
-                            );
-                          }),
+                          ListTile(
+                            title: const Text('Gemini (Google)'),
+                            subtitle: const Text('Google\'s multimodal AI with strong analytical capabilities'),
+                            leading: const Icon(Icons.check_circle, color: Colors.green),
+                          ),
                         ],
                       ),
                     ),
@@ -160,33 +132,31 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           const SizedBox(height: 16),
-                          ...ApiConfig.supportedProviders.map((provider) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${_getProviderDisplayName(provider)} API Key',
-                                    style: Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  TextField(
-                                    controller: _apiKeyControllers[provider],
-                                    decoration: InputDecoration(
-                                      hintText: 'Enter your ${_getProviderDisplayName(provider)} API key',
-                                      border: const OutlineInputBorder(),
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(Icons.info_outline),
-                                        onPressed: () => _showApiKeyInfo(provider),
-                                      ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Gemini (Google) API Key',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 8),
+                                TextField(
+                                  controller: _geminiApiKeyController,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter your Gemini API key',
+                                    border: const OutlineInputBorder(),
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.info_outline),
+                                      onPressed: () => _showGeminiApiKeyInfo(),
                                     ),
-                                    obscureText: true,
                                   ),
-                                ],
-                              ),
-                            );
-                          }),
+                                  obscureText: true,
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -217,74 +187,21 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     );
   }
 
-  String _getProviderDisplayName(String provider) {
-    switch (provider) {
-      case 'openai':
-        return 'ChatGPT (OpenAI)';
-      case 'claude':
-        return 'Claude (Anthropic)';
-      case 'deepseek':
-        return 'DeepSeek';
-      case 'gemini':
-        return 'Gemini (Google)';
-      default:
-        return provider.toUpperCase();
-    }
-  }
-
-  String _getProviderDescription(String provider) {
-    switch (provider) {
-      case 'openai':
-        return 'Advanced language model with excellent reasoning capabilities';
-      case 'claude':
-        return 'Anthropic\'s AI assistant known for helpful and harmless responses';
-      case 'deepseek':
-        return 'Efficient AI model with competitive performance';
-      case 'gemini':
-        return 'Google\'s multimodal AI with strong analytical capabilities';
-      default:
-        return 'AI provider';
-    }
-  }
-
-  void _showApiKeyInfo(String provider) {
-    String url;
-    String instructions;
-    
-    switch (provider) {
-      case 'openai':
-        url = 'https://platform.openai.com/api-keys';
-        instructions = '1. Sign up at OpenAI\n2. Go to API Keys section\n3. Create a new secret key\n4. Copy and paste it here';
-        break;
-      case 'claude':
-        url = 'https://console.anthropic.com/';
-        instructions = '1. Sign up at Anthropic\n2. Go to API Keys section\n3. Create a new API key\n4. Copy and paste it here';
-        break;
-      case 'deepseek':
-        url = 'https://platform.deepseek.com/';
-        instructions = '1. Sign up at DeepSeek\n2. Go to API Keys section\n3. Create a new API key\n4. Copy and paste it here';
-        break;
-      case 'gemini':
-        url = 'https://makersuite.google.com/app/apikey';
-        instructions = '1. Sign up at Google AI Studio\n2. Create a new API key\n3. Copy and paste it here';
-        break;
-      default:
-        url = '';
-        instructions = 'Please check the provider\'s documentation for API key instructions.';
-    }
+  void _showGeminiApiKeyInfo() {
+    const String url = 'https://makersuite.google.com/app/apikey';
+    const String instructions = '1. Sign up at Google AI Studio\n2. Create a new API key\n3. Copy and paste it here';
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('${_getProviderDisplayName(provider)} API Key'),
+        title: const Text('Gemini (Google) API Key'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('How to get your API key:'),
+            const Text('How to get your API key:'),
             const SizedBox(height: 8),
-            Text(instructions),
-            if (url.isNotEmpty) ...[
+            const Text(instructions),
               const SizedBox(height: 16),
               Text('Visit: $url'),
             ],

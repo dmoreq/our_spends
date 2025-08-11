@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/expense_provider.dart';
 import '../providers/language_provider.dart';
-import '../config/api_config.dart';
 import '../models/expense.dart';
 import '../models/chat_message.dart';
 import '../services/ai_service.dart';

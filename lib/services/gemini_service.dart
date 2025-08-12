@@ -92,9 +92,15 @@ class GeminiService {
 
     // Extract meal type (lunch, dinner, etc.)
     String mealType = 'meal';
-    if (lowerMessage.contains('lunch')) mealType = 'lunch';
-    else if (lowerMessage.contains('dinner')) mealType = 'dinner';
-    else if (lowerMessage.contains('breakfast')) mealType = 'breakfast';
+    if (lowerMessage.contains('lunch')) {
+      mealType = 'lunch';
+    }
+    else if (lowerMessage.contains('dinner')) {
+      mealType = 'dinner';
+    }
+    else if (lowerMessage.contains('breakfast')) {
+      mealType = 'breakfast';
+    }
 
     // Find relevant past expenses for comparison
     final relevantExpenses = userExpenses.where((expense) {

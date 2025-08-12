@@ -18,8 +18,6 @@ void main() {
     });
 
     test('should initialize with empty expenses', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
       // Wait for initialization to complete
       await Future.delayed(const Duration(milliseconds: 100));
       
@@ -31,8 +29,7 @@ void main() {
     });
 
     test('should load expenses from database', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
+      
       // Setup test data
       final testExpenses = [
         Expense(
@@ -84,8 +81,7 @@ void main() {
     });
 
     test('should send message and process response', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
+      
       // Wait for initialization to complete
       await Future.delayed(const Duration(milliseconds: 100));
       
@@ -104,8 +100,7 @@ void main() {
     });
 
     test('should generate insights', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
+      
       // Wait for initialization to complete
       await Future.delayed(const Duration(milliseconds: 100));
       
@@ -121,8 +116,7 @@ void main() {
     });
 
     test('should handle loading state', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
+      
       // Wait for initialization to complete
       await Future.delayed(const Duration(milliseconds: 100));
       
@@ -140,8 +134,7 @@ void main() {
     });
 
     test('should handle error state', () async {
-      // Set timeout to 5 seconds
-      final testOnTimeout = Timeout(const Duration(seconds: 5));
+      
       // Wait for initialization to complete
       await Future.delayed(const Duration(milliseconds: 100));
       

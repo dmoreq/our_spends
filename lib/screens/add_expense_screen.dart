@@ -63,7 +63,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: child,
@@ -203,7 +203,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       children: [
                         Icon(
                           Icons.calendar_today_outlined,
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                         const SizedBox(width: 16),
                         Column(
@@ -212,7 +212,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                             Text(
                               l10n.expenseDateLabel,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -228,7 +228,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         Icon(
                           Icons.arrow_forward_ios,
                           size: 16,
-                          color: theme.colorScheme.onSurface.withOpacity(0.4),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                         ),
                       ],
                     ),

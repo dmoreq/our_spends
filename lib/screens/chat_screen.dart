@@ -242,7 +242,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Text(
               l10n.chatEmptySubtitle,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
@@ -296,7 +296,7 @@ class _ChatScreenState extends State<ChatScreen> {
         color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -372,7 +372,7 @@ class MessageBubble extends StatelessWidget {
           child: Text(
             _formatTimestamp(message.timestamp),
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
         ),

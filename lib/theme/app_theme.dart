@@ -66,7 +66,7 @@ class AppTheme {
         backgroundColor: _darkSurfaceColor,
         elevation: 8,
         shadowColor: const Color(0x1A000000),
-        indicatorColor: _primaryColor.withOpacity(0.2),
+        indicatorColor: _primaryColor.withValues(alpha: 0.2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const TextStyle(
@@ -154,7 +154,7 @@ class AppTheme {
           backgroundColor: _primaryColor,
           foregroundColor: Colors.white,
           elevation: 3,
-          shadowColor: _primaryColor.withOpacity(0.3),
+          shadowColor: _primaryColor.withValues(alpha: 0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -266,7 +266,7 @@ class AppTheme {
         backgroundColor: _darkSurfaceColor,
         elevation: 8,
         shadowColor: const Color(0x1A000000),
-        indicatorColor: _primaryColor.withOpacity(0.2),
+        indicatorColor: _primaryColor.withValues(alpha: 0.2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const TextStyle(
@@ -354,7 +354,7 @@ class AppTheme {
           backgroundColor: _primaryColor,
           foregroundColor: Colors.white,
           elevation: 3,
-          shadowColor: _primaryColor.withOpacity(0.3),
+          shadowColor: _primaryColor.withValues(alpha: 0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

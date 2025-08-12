@@ -21,7 +21,6 @@ class AppTheme {
   static const Color _darkTextTertiary = Color(0xFF595959);
 
   static const Color _errorColor = Color(0xFFE17055);
-  static const Color _successColor = Color(0xFF00B894);
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -32,12 +31,10 @@ class AppTheme {
         secondary: _secondaryColor,
         tertiary: _accentColor,
         surface: _lightSurfaceColor,
-        background: _lightBackgroundColor,
         error: _errorColor,
         onPrimary: Colors.white,
         onSecondary: Colors.black,
         onSurface: _lightTextPrimary,
-        onBackground: _lightTextPrimary,
         onError: Colors.white,
         outline: _lightTextTertiary,
         surfaceContainerHighest: Color(0xFFE0E0E0),
@@ -232,12 +229,10 @@ class AppTheme {
         secondary: _secondaryColor,
         tertiary: _accentColor,
         surface: _darkSurfaceColor,
-        background: _darkBackgroundColor,
         error: _errorColor,
         onPrimary: Colors.white,
         onSecondary: Colors.black,
         onSurface: _darkTextPrimary,
-        onBackground: _darkTextPrimary,
         onError: Colors.white,
         outline: _darkTextTertiary,
         surfaceContainerHighest: Color(0xFF333333),

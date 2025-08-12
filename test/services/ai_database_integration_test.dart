@@ -25,11 +25,7 @@ void main() {
     });
 
     test('Extract expense and save to database', () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('GEMINI_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because GEMINI_API_KEY is not set');
-        return;
-      }
+      // Using API key from config file, no need to skip
       
       const userId = 'test-user-id';
       const message = 'I spent \$50 on groceries yesterday';
@@ -101,11 +97,7 @@ void main() {
     });
 
     test('Generate spending insights from database expenses', () async {
-      // Skip if API key is not configured
-      if (const String.fromEnvironment('GEMINI_API_KEY').isEmpty) {
-        markTestSkipped('Skipping test because GEMINI_API_KEY is not set');
-        return;
-      }
+      // Using API key from config file, no need to skip
       
       const userId = 'test-user-id';
       

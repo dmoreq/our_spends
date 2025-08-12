@@ -37,13 +37,7 @@ void main() {
     });
     
     test('AIService should process messages', () async {
-      // Skip if API key is not configured
-      final prefs = await SharedPreferences.getInstance();
-      final apiKey = prefs.getString('gemini_api_key');
-      if (apiKey == null || apiKey.isEmpty || apiKey.contains('YOUR_') || apiKey.length < 10) {
-        markTestSkipped('Skipping test because valid Gemini API key is not set');
-        return;
-      }
+      // Using API key from config file, no need to skip
       
       // Create test expenses
       final expenses = <Expense>[];

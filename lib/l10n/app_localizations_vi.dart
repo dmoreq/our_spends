@@ -31,9 +31,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settings => 'Cài đặt';
 
   @override
-  String get search => 'Tìm kiếm';
-
-  @override
   String get expenses => 'Chi tiêu';
 
   @override

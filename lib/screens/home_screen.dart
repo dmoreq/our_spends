@@ -7,7 +7,6 @@ import 'expenses_screen.dart';
 import 'add_expense_screen.dart';
 import 'chat_screen.dart';
 import 'settings_screen.dart';
-import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
         children: const [
           ExpensesScreen(),
           ChatScreen(),
-          SearchScreen(),
           SettingsScreen(),
         ],
         onPageChanged: (index) {
@@ -65,11 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.chat_bubble_outline),
             selectedIcon: const Icon(Icons.chat_bubble),
             label: l10n.chat,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.search),
-            selectedIcon: const Icon(Icons.search_sharp),
-            label: l10n.search,
           ),
           NavigationDestination(
             icon: const Icon(Icons.person_outline),

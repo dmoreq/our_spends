@@ -42,7 +42,7 @@ class LanguageSelectionDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel),
+          child: Text('Cancel'),
         ),
       ],
     );

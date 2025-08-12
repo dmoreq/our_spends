@@ -6,6 +6,7 @@ import '../providers/language_provider.dart';
 import '../models/chat_message.dart';
 import '../models/expense.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/logger.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -154,7 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
       await expenseProvider.addExpense(expense);
     } catch (e) {
-      print('ERROR: Failed to save expense to database: $e');
+      logger.error('Failed to save expense to database', e);
       // We don't want to show an error message to the user if this fails
       // The conversation will continue normally
     }

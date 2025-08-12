@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 
 import '../providers/expense_provider.dart';
 import '../providers/language_provider.dart';
@@ -14,6 +13,7 @@ import '../widgets/chat_app_bar.dart';
 import '../widgets/chat_input_field.dart';
 import '../widgets/facility_card.dart';
 import '../theme/chat_theme.dart';
+import '../utils/logger.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -408,7 +408,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
         }
       }
     } catch (e) {
-      print('Error processing message for expenses: $e');
+      logger.error('Error processing message for expenses', e);
     }
   }
 
@@ -440,7 +440,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
       // Add the expense to the database
       await expenseProvider.addExpense(expense);
     } catch (e) {
-      print('Error saving expense to database: $e');
+      logger.error('Error saving expense to database', e);
       rethrow;
     }
   }
@@ -483,12 +483,11 @@ class _AIChatScreenState extends State<AIChatScreen> {
             title: Text(l10n.spendingInsights),
             content: SingleChildScrollView(
               child: Text(response['data'] ?? l10n.couldNotGenerateInsights),
-                  : 'Unable to generate insights at the moment.')),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(languageCode == 'vi' ? 'Đóng' : 'Close'),
+                child: Text(Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi' ? 'Đóng' : 'Close'),
               ),
             ],
           ),
@@ -505,16 +504,16 @@ class _AIChatScreenState extends State<AIChatScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text(languageCode == 'vi' ? 'Lỗi' : 'Error'),
+            title: Text(Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi' ? 'Lỗi' : 'Error'),
             content: Text(
-              languageCode == 'vi'
+              Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi'
                   ? 'Không thể tạo phân tích: ${e.toString()}'
                   : 'Failed to generate insights: ${e.toString()}',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(languageCode == 'vi' ? 'Đóng' : 'Close'),
+                child: Text(Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi' ? 'Đóng' : 'Close'),
               ),
             ],
           ),

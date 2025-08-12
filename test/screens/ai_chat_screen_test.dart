@@ -10,7 +10,7 @@ import 'package:our_spends/screens/ai_chat_screen.dart';
 import 'package:our_spends/services/database_service.dart';
 import 'package:our_spends/services/ai_service.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:our_spends/l10n/app_localizations.dart';
 
 // Generate mocks for these classes
 @GenerateMocks([

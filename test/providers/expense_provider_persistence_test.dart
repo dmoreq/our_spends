@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:our_spends/models/expense.dart';
 import 'package:our_spends/providers/expense_provider.dart';
 import 'package:our_spends/services/database_service.dart';
+import 'package:our_spends/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -159,7 +160,7 @@ void main() {
       if (expenseId != null) {
         // Get the original expense first
         final originalExpense = await testDatabaseService.getExpenseById(expenseId);
-        debugPrint('Original expense before update: ${originalExpense?.toJson()}');
+        logger.debug('Original expense before update: ${originalExpense?.toJson()}');
         
         // Update the expense in the database
         // Important: We need to preserve all fields from the original expense
@@ -168,10 +169,10 @@ void main() {
             amount: 75.0,
             item: 'Updated expense',
           );
-          debugPrint('Updated expense to save: ${updatedExpense.toJson()}');
+          logger.debug('Updated expense to save: ${updatedExpense.toJson()}');
           await testDatabaseService.updateExpense(updatedExpense);
         } else {
-          debugPrint('ERROR: Could not find original expense with ID: $expenseId');
+          logger.error('Could not find original expense with ID: $expenseId');
         }
         
         // Create a new provider instance to ensure we're not using cached data
@@ -188,19 +189,19 @@ void main() {
         
         // Print the expenses directly from the database to verify deletion
         final expensesFromDb = await testDatabaseService.getExpenses();
-        debugPrint('After deletion - Expenses directly from DB: ${expensesFromDb.length}');
+        logger.debug('After deletion - Expenses directly from DB: ${expensesFromDb.length}');
         for (var e in expensesFromDb) {
-          debugPrint('After deletion - DB Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+          logger.debug('After deletion - DB Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
         }
         
         // Check if the expense was updated in the database
         final checkExpense = await testDatabaseService.getExpenseById(expenseId);
-        debugPrint('After update - Database expense: ${checkExpense?.toJson()}');
+        logger.debug('After update - Database expense: ${checkExpense?.toJson()}');
         
         // Print SharedPreferences content to verify data was saved
         final prefsAfterUpdate = await SharedPreferences.getInstance();
         final expensesJsonAfterUpdate = prefsAfterUpdate.getString('expenses_data');
-        debugPrint('After update - SharedPreferences expenses_data: $expensesJsonAfterUpdate');
+        logger.debug('After update - SharedPreferences expenses_data: $expensesJsonAfterUpdate');
         
         // Find the updated expense in the provider
         final updatedExpense = testExpenseProvider.expenses.firstWhere(
@@ -209,21 +210,21 @@ void main() {
         );
         
         // Verify expense was updated in provider
-        debugPrint('Before restart - Provider expense amount: ${updatedExpense.amount}');
-        debugPrint('Before restart - Provider expense item: ${updatedExpense.item}');
+        logger.debug('Before restart - Provider expense amount: ${updatedExpense.amount}');
+        logger.debug('Before restart - Provider expense item: ${updatedExpense.item}');
         // We'll verify after restart instead of here
         
         // Print the current state before simulating restart
-        debugPrint('Updated test - Before restart - Original expense amount: ${testExpenseProvider.expenses[0].amount}');
+        logger.debug('Updated test - Before restart - Original expense amount: ${testExpenseProvider.expenses[0].amount}');
         
         // Verify the database has the updated expense
         final expenseBeforeRestart = await testDatabaseService.getExpenseById(expenseId);
-        debugPrint('Updated test - Before restart - Database expense amount: ${expenseBeforeRestart?.amount}');
+        logger.debug('Updated test - Before restart - Database expense amount: ${expenseBeforeRestart?.amount}');
         
         // Print SharedPreferences content before restart
         final prefsBeforeRestart = await SharedPreferences.getInstance();
         final expensesJsonBeforeRestart = prefsBeforeRestart.getString('expenses_data');
-        debugPrint('Before restart - SharedPreferences expenses_data: $expensesJsonBeforeRestart');
+        logger.debug('Before restart - SharedPreferences expenses_data: $expensesJsonBeforeRestart');
         
         // Simulate app restart
         final newDatabaseService = DatabaseService();
@@ -231,12 +232,12 @@ void main() {
         
         // Verify the database still has the updated expense after restart
         final expenseAfterRestart = await newDatabaseService.getExpenseById(expenseId);
-        debugPrint('After restart - Database expense: ${expenseAfterRestart?.toJson()}');
+        logger.debug('After restart - Database expense: ${expenseAfterRestart?.toJson()}');
         
         // Print SharedPreferences content after restart
         final prefsAfterRestart = await SharedPreferences.getInstance();
         final expensesJsonAfterRestart = prefsAfterRestart.getString('expenses_data');
-        debugPrint('After restart - SharedPreferences expenses_data: $expensesJsonAfterRestart');
+        logger.debug('After restart - SharedPreferences expenses_data: $expensesJsonAfterRestart');
         
         // Create a new provider
         final newExpenseProvider = ExpenseProvider();
@@ -248,18 +249,18 @@ void main() {
         await newExpenseProvider.loadExpensesForTesting();
         
         // Verify the expense ID is the same after restart
-        debugPrint('After restart - Expense ID we are looking for: $expenseId');
+        logger.debug('After restart - Expense ID we are looking for: $expenseId');
         
         // Print expenses for debugging
-        debugPrint('Updated test - Number of expenses: ${newExpenseProvider.expenses.length}');
+        logger.debug('Updated test - Number of expenses: ${newExpenseProvider.expenses.length}');
         for (var e in newExpenseProvider.expenses) {
-          debugPrint('Updated test - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+          logger.debug('Updated test - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
         }
         
         // Print SharedPreferences content for debugging
         final prefs = await SharedPreferences.getInstance();
         final expensesJson = prefs.getString('expenses_data');
-        debugPrint('Updated test - SharedPreferences expenses_data: $expensesJson');
+        logger.debug('Updated test - SharedPreferences expenses_data: $expensesJson');
         
         // Find the updated expense in the new provider
         // After restart, we need to find the expense by its properties since the ID might be different
@@ -271,7 +272,7 @@ void main() {
           : Expense(id: '', userId: '', date: DateTime.now(), amount: 0, currency: '', category: '', item: '');
         
         // Print the found expense
-        debugPrint('Updated test - Found expense: ${persistedExpense.id}, amount: ${persistedExpense.amount}, item: ${persistedExpense.item}');
+        logger.debug('Updated test - Found expense: ${persistedExpense.id}, amount: ${persistedExpense.amount}, item: ${persistedExpense.item}');
         
         // Verify update was persisted
         // The test is failing because we're looking for the wrong expense
@@ -279,7 +280,7 @@ void main() {
         if (newExpenseProvider.expenses.isNotEmpty) {
           // Print all expenses to debug
           for (var e in newExpenseProvider.expenses) {
-            debugPrint('All expenses after restart: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+            logger.debug('All expenses after restart: ${e.id}, amount: ${e.amount}, item: ${e.item}');
           }
           
           // Find any expense with amount 75.0 and item 'Updated expense'
@@ -338,13 +339,13 @@ void main() {
       expect(testExpenseProvider.expenses.length, 2);
       
       // Print expense IDs for debugging
-      debugPrint('Initial expense1 ID: $expenseId1');
-      debugPrint('Initial expense2 ID: $expenseId2');
+      logger.debug('Initial expense1 ID: $expenseId1');
+      logger.debug('Initial expense2 ID: $expenseId2');
       
       // Print all expenses before deletion
-      debugPrint('Before deletion - Number of expenses: ${testExpenseProvider.expenses.length}');
+      logger.debug('Before deletion - Number of expenses: ${testExpenseProvider.expenses.length}');
       for (var e in testExpenseProvider.expenses) {
-        debugPrint('Before deletion - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+        logger.debug('Before deletion - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
       }
       
       // Use the provider's delete method to delete an expense
@@ -352,7 +353,7 @@ void main() {
         // Print SharedPreferences content before deletion
         final prefsBefore = await SharedPreferences.getInstance();
         final expensesJsonBefore = prefsBefore.getString('expenses_data');
-        debugPrint('Before deletion - SharedPreferences expenses_data: $expensesJsonBefore');
+        logger.debug('Before deletion - SharedPreferences expenses_data: $expensesJsonBefore');
         
         // Delete the first expense using the provider's method
         final deleteSuccess = await testExpenseProvider.deleteExpense(expenseId1);
@@ -361,29 +362,29 @@ void main() {
         // Print SharedPreferences content after deletion
         final prefsAfter = await SharedPreferences.getInstance();
         final expensesJsonAfter = prefsAfter.getString('expenses_data');
-        debugPrint('After deletion - SharedPreferences expenses_data: $expensesJsonAfter');
+        logger.debug('After deletion - SharedPreferences expenses_data: $expensesJsonAfter');
         
         // Wait for the operations to complete
         await Future.delayed(Duration(milliseconds: 100));
         
         // Print the expenses directly from the database to verify deletion
         final expensesFromDb = await testDatabaseService.getExpenses();
-        debugPrint('After deletion - Expenses directly from DB: ${expensesFromDb.length}');
+        logger.debug('After deletion - Expenses directly from DB: ${expensesFromDb.length}');
         for (var e in expensesFromDb) {
-          debugPrint('After deletion - DB Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+          logger.debug('After deletion - DB Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
         }
         
         // Verify expense1 was deleted and expense2 still exists
         // Print all expenses after deletion
-        debugPrint('After deletion - Number of expenses: ${testExpenseProvider.expenses.length}');
+        logger.debug('After deletion - Number of expenses: ${testExpenseProvider.expenses.length}');
         for (var e in testExpenseProvider.expenses) {
-          debugPrint('After deletion - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+          logger.debug('After deletion - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
         }
         
         // Check if expense1 is still in the list
         final hasExpense1 = testExpenseProvider.expenses.any((e) => e.id == expenseId1);
-        debugPrint('After deletion - Has expense1 (should be false): $hasExpense1');
-        debugPrint('After deletion - Expense1 ID: $expenseId1');
+        logger.debug('After deletion - Has expense1 (should be false): $hasExpense1');
+        logger.debug('After deletion - Expense1 ID: $expenseId1');
         
         // Check that expense1 is no longer in the list
         expect(hasExpense1, false, reason: 'Expense1 should be deleted');
@@ -414,22 +415,22 @@ void main() {
         await newExpenseProvider.loadExpensesForTesting();
         
         // Print expenses for debugging
-        debugPrint('Deletion test - Looking for deleted expense with ID: $expenseId1');
-        debugPrint('Deletion test - Looking for remaining expense with ID: $expenseId2');
-        debugPrint('Deletion test - Number of expenses: ${newExpenseProvider.expenses.length}');
+        logger.debug('Deletion test - Looking for deleted expense with ID: $expenseId1');
+        logger.debug('Deletion test - Looking for remaining expense with ID: $expenseId2');
+        logger.debug('Deletion test - Number of expenses: ${newExpenseProvider.expenses.length}');
         for (var e in newExpenseProvider.expenses) {
-          debugPrint('Deletion test - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+          logger.debug('Deletion test - Expense: ${e.id}, amount: ${e.amount}, item: ${e.item}');
         }
         
         // Print SharedPreferences content for debugging
         final prefs = await SharedPreferences.getInstance();
         final expensesJson = prefs.getString('expenses_data');
-        debugPrint('Deletion test - SharedPreferences expenses_data: $expensesJson');
+        logger.debug('Deletion test - SharedPreferences expenses_data: $expensesJson');
         
         // Print all expenses after restart for debugging
-        debugPrint('Deletion test - Number of expenses after restart: ${newExpenseProvider.expenses.length}');
+        logger.debug('Deletion test - Number of expenses after restart: ${newExpenseProvider.expenses.length}');
         for (var e in newExpenseProvider.expenses) {
-          debugPrint('Deletion test - Expense after restart: ${e.id}, amount: ${e.amount}, item: ${e.item}');
+          logger.debug('Deletion test - Expense after restart: ${e.id}, amount: ${e.amount}, item: ${e.item}');
         }
         
         // After restart, we need to check for expenses by their properties, not IDs

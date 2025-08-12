@@ -6,7 +6,7 @@ import 'package:our_spends/providers/expense_provider.dart';
 import 'package:our_spends/providers/language_provider.dart';
 import 'package:our_spends/screens/ai_chat_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:our_spends/l10n/app_localizations.dart';
 
 @GenerateMocks([ExpenseProvider, LanguageProvider])
 import 'chat_screen_test.mocks.dart';

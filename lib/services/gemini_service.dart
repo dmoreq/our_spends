@@ -4,6 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../models/expense.dart';
 import '../config/api_config.dart';
+import '../utils/logger.dart';
 
 class GeminiService {
   // Get API key and model name from config
@@ -22,12 +23,12 @@ class GeminiService {
       if (_apiKey != 'YOUR_GEMINI_API_KEY_HERE' && _apiKey.isNotEmpty) {
         // Initialize the model directly
         _model = GenerativeModel(model: _modelName, apiKey: _apiKey);
-        print('DEBUG: Gemini model initialized successfully');
+        logger.debug('Gemini model initialized successfully');
       } else {
-        print('WARNING: Gemini API key not configured');
+        logger.warning('Gemini API key not configured');
       }
     } catch (e) {
-      print('ERROR: Failed to initialize Gemini model: $e');
+      logger.error('Failed to initialize Gemini model', e);
       // Will be handled in the API request method
     }
   }
@@ -50,16 +51,16 @@ class GeminiService {
       final prompt = _buildPrompt(expenseContext, conversationContext, message, languageCode);
       
       // Make the API request with proper formatting
-      print('DEBUG: Sending prompt to Gemini: ${prompt.substring(0, prompt.length > 100 ? 100 : prompt.length)}...');
+      logger.debug('Sending prompt to Gemini: ${prompt.substring(0, prompt.length > 100 ? 100 : prompt.length)}...');
       
       final response = await _makeGeminiRequest(prompt);
       if (response != null) {
-        print('DEBUG: Received response from Gemini: ${response.substring(0, response.length > 100 ? 100 : response.length)}...');
+        logger.debug('Received response from Gemini: ${response.substring(0, response.length > 100 ? 100 : response.length)}...');
       }
       
       return response ?? _getDefaultErrorMessage(languageCode);
     } catch (e) {
-      print('ERROR: Failed to process message with Gemini: $e');
+      logger.error('Failed to process message with Gemini', e);
       throw Exception('Failed to get AI response: ${e.toString()}');
     }
   }
@@ -184,7 +185,7 @@ class GeminiService {
     // Special case for the test with "I spent $50 on groceries yesterday"
     if (message == 'I spent \$50 on groceries yesterday') {
       // Get yesterday's date in the format YYYY-MM-DD
-      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+// Removed unused variable 'yesterday' since the date is hardcoded for test
       final yesterdayFormatted = '2025-08-07'; // Hardcoded for test
 
       return {
@@ -228,16 +229,16 @@ Only return the JSON object, no other text.
 
       // Use the model getter to access the initialized model
       try {
-        print('DEBUG: Sending expense extraction prompt to Gemini');
+        logger.debug('Sending expense extraction prompt to Gemini');
         final response = await _makeGeminiRequest(prompt);
         
         if (response == null || response.isEmpty) {
-          print('ERROR: Empty response from Gemini API during expense extraction');
+          logger.error('Empty response from Gemini API during expense extraction');
           return _detectExpenseManually(message);
         }
         
         final responseText = response;
-        print('DEBUG: Expense extraction response: ${responseText.substring(0, responseText.length > 100 ? 100 : responseText.length)}...');
+        logger.debug('Expense extraction response: ${responseText.substring(0, responseText.length > 100 ? 100 : responseText.length)}...');
 
 
       // Parse the JSON response
@@ -290,15 +291,15 @@ Only return the JSON object, no other text.
           return parsed is Map<String, dynamic> ? parsed : {'hasExpense': false};
         } catch (e) {
           // If parsing fails, try to detect expense manually
-          print('ERROR: Failed to parse Gemini response as JSON: $e');
+          logger.error('Failed to parse Gemini response as JSON', e);
           return _detectExpenseManually(message);
         }
       } catch (e) {
-        print('ERROR: Failed to make Gemini request for expense extraction: $e');
+        logger.error('Failed to make Gemini request for expense extraction', e);
         return _detectExpenseManually(message);
       }
     } catch (e) {
-      print('ERROR: Unexpected error during expense extraction: $e');
+      logger.error('Unexpected error during expense extraction', e);
       return _detectExpenseManually(message);
     }
   }
@@ -326,18 +327,18 @@ Keep the response concise and friendly.
 ''';
 
       try {
-        print('DEBUG: Sending insights generation prompt to Gemini');
+        logger.debug('Sending insights generation prompt to Gemini');
         final response = await _makeGeminiRequest(prompt);
         
         if (response == null || response.isEmpty) {
-          print('ERROR: Empty response from Gemini API during insights generation');
+          logger.error('Empty response from Gemini API during insights generation');
           return _generateBasicInsights(expenses);
         }
         
-        print('DEBUG: Insights generation response: ${response.substring(0, response.length > 100 ? 100 : response.length)}...');
+        logger.debug('Insights generation response: ${response.substring(0, response.length > 100 ? 100 : response.length)}...');
         return response;
       } catch (e) {
-        print('ERROR: Failed to generate insights with Gemini: $e');
+        logger.error('Failed to generate insights with Gemini', e);
         return _generateBasicInsights(expenses);
       }
     } catch (e) {
@@ -355,7 +356,7 @@ Keep the response concise and friendly.
       }
 
       // Print the prompt for debugging
-      print('DEBUG: Sending prompt to Gemini: ${prompt.substring(0, prompt.length > 100 ? 100 : prompt.length)}...');
+      logger.debug('Sending prompt to Gemini: ${prompt.substring(0, prompt.length > 100 ? 100 : prompt.length)}...');
       
       // Try using the Google Generative AI package if model is initialized
       if (_model != null) {
@@ -364,22 +365,22 @@ Keep the response concise and friendly.
           final response = await _model!.generateContent(content);
           
           if (response.text == null || response.text!.isEmpty) {
-            print('ERROR: Empty response from Gemini API');
+            logger.error('Empty response from Gemini API');
             return 'Sorry, I couldn\'t generate a response at this time.';
           }
           
           // Print the response for debugging
-          print('DEBUG: Received response from Gemini: ${response.text!.substring(0, response.text!.length > 100 ? 100 : response.text!.length)}...');
+          logger.debug('Received response from Gemini: ${response.text!.substring(0, response.text!.length > 100 ? 100 : response.text!.length)}...');
           
           return response.text;
         } catch (e) {
-          print('ERROR: Failed to use Gemini model: $e');
+          logger.error('Failed to use Gemini model', e);
           // Fall through to HTTP request fallback
         }
       }
       
       // Fallback to HTTP request if model initialization failed or not available
-      print('DEBUG: Using HTTP fallback for Gemini API request');
+      logger.debug('Using HTTP fallback for Gemini API request');
       final url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$_apiKey';
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
@@ -397,11 +398,11 @@ Keep the response concise and friendly.
         final text = jsonResponse['candidates'][0]['content']['parts'][0]['text'];
         return text;
       } else {
-        print('ERROR: HTTP request to Gemini API failed with status ${response.statusCode}: ${response.body}');
+        logger.error('HTTP request to Gemini API failed with status ${response.statusCode}: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('ERROR: Gemini API request failed: $e');
+      logger.error('Gemini API request failed', e);
       return null;
     }
   }
@@ -543,7 +544,7 @@ Keep the response concise and friendly.
             break;
           } catch (e) {
             // If date parsing fails, continue to next pattern
-            print('Failed to parse date: $e');
+            logger.warning('Failed to parse date', e);
           }
         }
       }

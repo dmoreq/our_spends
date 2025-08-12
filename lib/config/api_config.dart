@@ -8,7 +8,7 @@ class ApiConfig {
   
   // Model configuration
   static const Map<String, String> defaultModels = {
-    'gemini': 'gemini-1.5-flash',
+    'gemini': 'gemini-2.5-flash',
   };
   
   // Rate limiting and retry configurations

@@ -7,7 +7,6 @@ import 'providers/language_provider.dart';
 import 'providers/theme_provider.dart';
 import 'theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
-import 'utils/color_extensions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

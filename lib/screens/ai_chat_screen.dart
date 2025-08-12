@@ -11,7 +11,6 @@ import '../widgets/chat_message_bubble.dart';
 import '../widgets/chat_option_button.dart';
 import '../widgets/chat_app_bar.dart';
 import '../widgets/chat_input_field.dart';
-import '../widgets/facility_card.dart';
 import '../theme/chat_theme.dart';
 import '../utils/logger.dart';
 
@@ -51,14 +50,18 @@ class _AIChatScreenState extends State<AIChatScreen> {
       // Initialize the AI service
       await _aiService.initialize();
       
-      setState(() {
-        _isInitialized = true;
-        _errorMessage = null;
-      });
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+          _errorMessage = null;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _errorMessage = AppLocalizations.of(context)!.failedToInitializeAiProvider(e.toString());
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = AppLocalizations.of(context)!.failedToInitializeAiProvider(e.toString());
+        });
+      }
     }
   }
 
@@ -76,10 +79,11 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty || _isProcessing) return;
 
+    // Capture context values before async operations
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    final languageCode = languageProvider.currentLocale.languageCode;
     final l10n = AppLocalizations.of(context)!;
+    final languageCode = languageProvider.currentLocale.languageCode;
     
     // Add user message to chat
     setState(() {
@@ -101,9 +105,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _scrollToBottom();
 
     try {
-      // Use fixed demo user ID
-      String userId = 'demo-user';
-
       // Process message using AI service
       final aiResponse = await _aiService.processMessage(
         message, 
@@ -187,8 +188,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
     // Initialize system prompt for AI context
     if (_messages.isEmpty) {
       // Create a custom system prompt that includes user's expense context
-      final systemPrompt = _buildSystemPrompt(expenseProvider.expenses, l10n);
-      
       // Add suggested options only (no welcome message)
       _addSuggestedOptions();
     }
@@ -281,70 +280,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-  
-  Widget _buildMessageBubble(ChatMessage message) {
-    final isUser = message.isUser;
-    final l10n = AppLocalizations.of(context)!;
-    
-    // If this is an option message, render it as a button
-    if (message.isOption) {
-      return ChatOptionButton(
-        text: message.text,
-        onTap: () {
-          _messageController.text = message.text;
-          _sendMessage();
-        },
-      );
-    }
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!isUser) ...[  
-            // AI avatar
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(Icons.smart_toy, color: Colors.white),
-            ),
-            const SizedBox(width: 8),
-          ],
-          
-          // Message bubble
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: isUser 
-                    ? Theme.of(context).colorScheme.primary 
-                    : (message.isError ? Colors.red[100] : Theme.of(context).colorScheme.surfaceVariant),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Text(
-                message.text,
-                style: TextStyle(
-                  color: isUser 
-                      ? Theme.of(context).colorScheme.onPrimary 
-                      : (message.isError ? Colors.red[900] : Theme.of(context).colorScheme.onSurfaceVariant),
-                ),
-              ),
-            ),
-          ),
-          
-          if (isUser) ...[  
-            // User avatar
-            const SizedBox(width: 8),
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              child: const Icon(Icons.person, color: Colors.white),
-            ),
-          ],
-        ],
       ),
     );
   }

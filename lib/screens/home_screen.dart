@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
-import '../providers/expense_provider.dart';
 import '../l10n/app_localizations.dart';
 import 'expenses_screen.dart';
 import 'add_expense_screen.dart';
@@ -58,14 +55,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
-            color: isSelected ? theme.colorScheme.primary.withOpacity(0.1) : Colors.transparent,
+            color: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
               Icon(
                 isSelected ? selectedIcon : icon,
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.7),
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 24,
               ),
               const SizedBox(width: 16),
@@ -75,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -156,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 _animationController.reverse();
                               },
                               child: Container(
-                                color: Colors.black.withOpacity(0.3 * _animation.value),
+                                color: Colors.black.withValues(alpha: 0.3 * _animation.value),
                               ),
                             ),
                           );
@@ -211,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       color: theme.colorScheme.surface,
                       boxShadow: [
                         BoxShadow(
-                          color: theme.shadowColor.withOpacity(0.2),
+                          color: theme.shadowColor.withValues(alpha: 0.2),
                           blurRadius: 15,
                           offset: const Offset(2, 0),
                         ),

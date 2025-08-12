@@ -350,6 +350,36 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @selectTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Theme'**
+  String get selectTheme;
+
+  /// No description provided for @systemTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get systemTheme;
+
+  /// No description provided for @lightTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get lightTheme;
+
+  /// No description provided for @darkTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get darkTheme;
+
   /// No description provided for @reports.
   ///
   /// In en, this message translates to:

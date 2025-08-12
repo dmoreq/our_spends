@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart';
 
 import '../l10n/app_localizations.dart';
 import 'ai_settings_screen.dart';
@@ -118,6 +119,17 @@ class SettingsScreen extends StatelessWidget {
                     title: l10n.language,
                     subtitle: languageProvider.getLanguageName(languageProvider.currentLocale.languageCode),
                     onTap: () => _showLanguageSelectionDialog(context),
+                  );
+                },
+              ),
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return _buildSettingsTile(
+                    context,
+                    icon: Icons.palette_outlined,
+                    title: l10n.theme,
+                    subtitle: themeProvider.getCurrentThemeName(),
+                    onTap: () => _showThemeSelectionDialog(context),
                   );
                 },
               ),
@@ -360,6 +372,139 @@ class SettingsScreen extends StatelessWidget {
           },
         );
       },
+    );
+  }
+  
+  void _showThemeSelectionDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, child) {
+            return Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Title
+                  Text(
+                    l10n.selectTheme,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Theme options
+                  _buildThemeOption(
+                    context,
+                    themeProvider,
+                    ThemeMode.system,
+                    l10n.systemTheme,
+                    Icons.brightness_auto,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildThemeOption(
+                    context,
+                    themeProvider,
+                    ThemeMode.light,
+                    l10n.lightTheme,
+                    Icons.light_mode,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildThemeOption(
+                    context,
+                    themeProvider,
+                    ThemeMode.dark,
+                    l10n.darkTheme,
+                    Icons.dark_mode,
+                  ),
+                  // Add bottom padding for safe area
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  
+  Widget _buildThemeOption(
+    BuildContext context,
+    ThemeProvider themeProvider,
+    ThemeMode themeMode,
+    String themeName,
+    IconData icon,
+  ) {
+    final theme = Theme.of(context);
+    final isSelected = themeProvider.themeMode == themeMode;
+    
+    return InkWell(
+      onTap: () {
+        themeProvider.changeTheme(themeMode);
+        Navigator.of(context).pop();
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? theme.colorScheme.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected 
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                themeName,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? theme.colorScheme.primary : null,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                color: theme.colorScheme.primary,
+                size: 24,
+              ),
+          ],
+        ),
+      ),
     );
   }
   

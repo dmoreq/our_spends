@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'providers/expense_provider.dart';
 import 'providers/language_provider.dart';
+import 'providers/theme_provider.dart';
 import 'theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 
@@ -20,15 +21,16 @@ class OurSpendsApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ExpenseProvider()),
       ],
-      child: Consumer<LanguageProvider>(
-        builder: (context, languageProvider, child) {
+      child: Consumer2<LanguageProvider, ThemeProvider>(
+        builder: (context, languageProvider, themeProvider, child) {
           return MaterialApp(
             title: 'Our Spends',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system,
+            themeMode: themeProvider.themeMode,
             locale: languageProvider.currentLocale,
             localizationsDelegates: const [
               AppLocalizations.delegate,

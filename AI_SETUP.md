@@ -108,6 +108,7 @@ Alternatively, you can configure the API keys directly in the code:
 
 - **Smart Chat Interface**: Natural conversation with AI about expenses
 - **Expense Detection**: AI automatically detects when you mention purchases
+- **Smart Search**: Search your expenses using natural language queries
 - **Spending Insights**: Generate personalized financial insights
 - **Context Awareness**: AI knows about your expense history
 - **Multi-Language Support**: Works in English and Vietnamese

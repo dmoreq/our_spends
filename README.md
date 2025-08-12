@@ -8,10 +8,10 @@ An AI-powered expense tracking application built with Flutter. This app helps yo
 
 ## ✨ Features
 
-- **💰 Expense Tracking**: Record and categorize all your family expenses
-- **🤖 AI-Powered Insights**: Get personalized spending analysis and recommendations
+- **💰 Expense Tracking**: Record and categorize all your expenses
+- **🤖 AI-Powered Chat**: Interact with an AI assistant to add expenses and get insights
+- **🔍 Smart Search**: Use the AI chat to search and analyze your expenses
 - **📊 Visual Reports**: View your spending patterns with intuitive charts
-- **👨‍👩‍👧‍👦 Multi-User Support**: Track expenses for the whole family
 - **🔄 Recurring Expenses**: Set up and track regular payments
 - **🌐 Multi-Language**: Supports English and Vietnamese
 - **🔌 Multiple AI Providers**: Choose between Gemini, OpenAI, Claude, or DeepSeek
@@ -75,6 +75,12 @@ The app follows a clean architecture pattern with the following components:
 - **Expense Provider**: Central state management for expense data
 - **Authentication**: Firebase authentication with Google Sign-In
 
+### Main Screens
+
+- **Expenses Screen**: Main dashboard displaying expense summaries and list
+- **Chat Screen**: AI-powered interface for adding expenses and getting insights
+- **Settings Screen**: Configure app settings and AI provider preferences
+
 ## 🔧 Configuration
 
 ### AI Providers
@@ -95,6 +101,15 @@ The app supports English and Vietnamese languages. Localization files are locate
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+## 📄 Documentation
+
+- [Architecture Documentation](./ARCHITECTURE.md)
+- [Database Design](./DATABASE_DESIGN.md)
+- [AI Setup Guide](./AI_SETUP.md)
+- [Features Overview](./FEATURES.md)
+- [Navigation Structure](./NAVIGATION.md)
+- [Search Functionality](./SEARCH.md)
 
 ## 📄 License
 

@@ -61,7 +61,8 @@ Business logic and external integrations:
 Main UI components:
 
 - **HomeScreen**: Main dashboard with expense summary
-- **ChatScreen**: AI chat interface
+- **ExpensesScreen**: Expense listing and management
+- **ChatScreen**: AI chat interface for expense management and insights
 - **SettingsScreen**: App settings
 - **AISettingsScreen**: AI provider configuration
 - **AuthWrapper**: Authentication flow management

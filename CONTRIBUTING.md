@@ -95,8 +95,17 @@ lib/
 ├── models/       # Data models
 ├── providers/    # State management
 ├── screens/      # UI screens
+│   ├── home_screen.dart       # Main navigation container
+│   ├── expenses_screen.dart   # Expense listing and management
+│   ├── chat_screen.dart       # AI chat interface
+│   ├── settings_screen.dart   # App settings
+│   └── add_expense_screen.dart # Add new expenses
 ├── services/     # Business logic and API services
+│   ├── ai_service.dart        # AI provider interface
+│   ├── database_service.dart  # Local data persistence
+│   └── expense_query_service.dart # Expense querying logic
 ├── theme/        # App theme
+├── utils/        # Utility functions
 ├── widgets/      # Reusable UI components
 └── main.dart     # App entry point
 ```

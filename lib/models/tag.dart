@@ -2,7 +2,8 @@ class Tag {
   final String id;
   final String name;
   final String? description;
-  final String? color;
+  final int color;
+  final int icon;
   final bool isActive;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -11,7 +12,8 @@ class Tag {
     required this.id,
     required this.name,
     this.description,
-    this.color,
+    this.color = 0xFF9E9E9E,
+    this.icon = 0xe5d8,
     this.isActive = true,
     this.createdAt,
     this.updatedAt,
@@ -22,7 +24,8 @@ class Tag {
       id: json['id'],
       name: json['name'],
       description: json['description'],
-      color: json['color'],
+      color: json['color'] is String ? int.parse(json['color']) : (json['color'] ?? 0xFF9E9E9E),
+      icon: json['icon'] is String ? int.parse(json['icon']) : (json['icon'] ?? 0xe5d8),
       isActive: json['is_active'] ?? true,
       createdAt: json['created_at'] != null 
           ? DateTime.parse(json['created_at']) 
@@ -49,7 +52,8 @@ class Tag {
     String? id,
     String? name,
     String? description,
-    String? color,
+    int? color,
+    int? icon,
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,

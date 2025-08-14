@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/tag.dart';
-
+import '../models/expense_tag.dart';
 import '../models/currency.dart';
 
 class DatabaseService {
@@ -192,18 +193,53 @@ class DatabaseService {
   }
 
   // Ensure default categories exist
+  Future<void> _migrateCategoriesToTags() async {
+    final categories = await _loadCategories();
+    final tags = await _loadTags();
+    final expenses = await _loadExpenses();
+    final expenseTags = await _loadExpenseTags();
+    
+    // Convert existing categories to tags if not already migrated
+    for (var category in categories) {
+      if (!tags.any((tag) => tag.id == category.id)) {
+        tags.add(Tag(
+          id: category.id,
+          name: category.name,
+          description: category.description,
+          color: category.color,
+          isActive: category.isActive,
+          createdAt: category.createdAt,
+          updatedAt: category.updatedAt,
+        ));
+      }
+    }
+    
+    // Link existing expenses with their category tags
+    for (var expense in expenses) {
+      if (!expenseTags.containsKey(expense.id)) {
+        expenseTags[expense.id] = [expense.category];
+      } else if (!expenseTags[expense.id]!.contains(expense.category)) {
+        expenseTags[expense.id]!.add(expense.category);
+      }
+    }
+    
+    await _saveTags(tags);
+    await _saveExpenseTags(expenseTags);
+  }
+
   Future<void> _ensureDefaultCategories() async {
     final categories = await _loadCategories();
+    final tags = await _loadTags();
     
-    if (categories.isEmpty) {
+    if (categories.isEmpty && tags.isEmpty) {
       final now = DateTime.now();
       final defaultCategories = <Category>[
         Category(
           id: '1',
           name: 'Food & Dining',
           description: 'Restaurants, groceries, and food delivery',
-          icon: '🍽️',
-          color: '#FF6B6B',
+          icon: Icons.restaurant.codePoint,
+          color: Colors.red.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -212,8 +248,8 @@ class DatabaseService {
           id: '2',
           name: 'Transportation',
           description: 'Gas, public transport, ride-sharing',
-          icon: '🚗',
-          color: '#4ECDC4',
+          icon: Icons.directions_car.codePoint,
+          color: Colors.teal.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -222,8 +258,8 @@ class DatabaseService {
           id: '3',
           name: 'Shopping',
           description: 'Clothing, electronics, general shopping',
-          icon: '🛍️',
-          color: '#45B7D1',
+          icon: Icons.shopping_bag.codePoint,
+          color: Colors.blue.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -232,8 +268,8 @@ class DatabaseService {
           id: '4',
           name: 'Entertainment',
           description: 'Movies, games, subscriptions',
-          icon: '🎬',
-          color: '#96CEB4',
+          icon: Icons.movie.codePoint,
+          color: Colors.green.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -242,8 +278,8 @@ class DatabaseService {
           id: '5',
           name: 'Bills & Utilities',
           description: 'Rent, electricity, internet, phone',
-          icon: '💡',
-          color: '#FFEAA7',
+          icon: Icons.lightbulb.codePoint,
+          color: Colors.amber.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -252,8 +288,8 @@ class DatabaseService {
           id: '6',
           name: 'Healthcare',
           description: 'Medical expenses, pharmacy, insurance',
-          icon: '🏥',
-          color: '#DDA0DD',
+          icon: Icons.local_hospital.codePoint,
+          color: Colors.purple.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -262,8 +298,8 @@ class DatabaseService {
           id: '7',
           name: 'Education',
           description: 'Books, courses, school fees',
-          icon: '📚',
-          color: '#98D8C8',
+          icon: Icons.school.codePoint,
+          color: Colors.cyan.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -272,8 +308,8 @@ class DatabaseService {
           id: '8',
           name: 'Other',
           description: 'Miscellaneous expenses',
-          icon: '📦',
-          color: '#A8A8A8',
+          icon: Icons.category.codePoint,
+          color: Colors.grey.value,
           isActive: true,
           createdAt: now,
           updatedAt: now,
@@ -488,7 +524,62 @@ class DatabaseService {
     return await getExpenses(searchQuery: query);
   }
 
-  // Category operations
+  // Tag and Category operations
+  Future<List<Tag>> getTags() async {
+    return await _loadTags();
+  }
+
+  Future<Tag?> getTagById(String id) async {
+    final tags = await _loadTags();
+    try {
+      return tags.firstWhere((tag) => tag.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<List<String>> getExpenseTags(String expenseId) async {
+    final expenseTags = await _loadExpenseTags();
+    return expenseTags[expenseId] ?? [];
+  }
+
+  Future<void> setExpenseTags(String expenseId, List<String> tagIds) async {
+    final expenseTags = await _loadExpenseTags();
+    expenseTags[expenseId] = tagIds;
+    await _saveExpenseTags(expenseTags);
+  }
+
+  Future<void> addTag(Tag tag) async {
+    final tags = await _loadTags();
+    tags.add(tag);
+    await _saveTags(tags);
+  }
+
+  Future<void> updateTag(Tag tag) async {
+    final tags = await _loadTags();
+    final index = tags.indexWhere((t) => t.id == tag.id);
+    if (index != -1) {
+      tags[index] = tag;
+      await _saveTags(tags);
+    }
+  }
+
+  Future<void> deleteTag(String tagId) async {
+    final tags = await _loadTags();
+    final expenseTags = await _loadExpenseTags();
+    
+    tags.removeWhere((tag) => tag.id == tagId);
+    
+    // Remove tag from all expenses
+    for (var expenseId in expenseTags.keys) {
+      expenseTags[expenseId]?.remove(tagId);
+    }
+    
+    await _saveTags(tags);
+    await _saveExpenseTags(expenseTags);
+  }
+
+  // Legacy Category operations - maintained for backward compatibility
   Future<List<Category>> getCategories() async {
     return await _loadCategories();
   }
@@ -502,19 +593,7 @@ class DatabaseService {
     }
   }
 
-  // Tag operations
-  Future<List<Tag>> getTags() async {
-    return await _loadTags();
-  }
 
-  Future<Tag?> getTagById(String id) async {
-    final tags = await _loadTags();
-    try {
-      return tags.firstWhere((tag) => tag.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
 
   // Export to CSV
   Future<String> exportToCSV({

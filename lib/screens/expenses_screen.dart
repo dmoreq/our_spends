@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/expense_provider.dart';
 import '../models/expense.dart';
 import '../models/category.dart';
+import '../models/tag.dart';
 import '../l10n/app_localizations.dart';
 import 'add_expense_screen.dart';
 
@@ -213,6 +214,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context).languageCode;
+    final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     
     // Format date based on locale - show only day/month
     final shortDate = locale == 'vi' 
@@ -229,49 +231,111 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title and short date
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.expense.item,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
+                Row(
+                  children: [
+                    // Title and short date
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.expense.item,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                          const SizedBox(width: 8),
+                          Text(
+                            shortDate,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        shortDate,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Amount
+                    FutureBuilder<String>(
+                      future: _formatCurrency(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        }
+                        return Text(
+                          snapshot.data ?? '',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                // Amount
-                FutureBuilder<String>(
-                  future: _formatCurrency(),
+                const SizedBox(height: 8),
+                // Tags
+                FutureBuilder<List<String>>(
+                  future: expenseProvider.getExpenseTags(widget.expense.id),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        height: 24,
+                        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
                       );
                     }
-                    return Text(
-                      snapshot.data ?? '',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.primary,
+                    final tagIds = snapshot.data ?? [];
+                    if (tagIds.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: tagIds.map((tagId) {
+                          return FutureBuilder<Tag?>(
+                            future: expenseProvider.getTagById(tagId),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) return const SizedBox.shrink();
+                              final tag = snapshot.data!;
+                              return Container(
+                                margin: const EdgeInsets.only(right: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Color(tag.color).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      _getCategoryIcon(tag.name),
+                                      size: 16,
+                                      color: Color(tag.color),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      tag.name,
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: Color(tag.color),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
                       ),
                     );
                   },
@@ -426,6 +490,76 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                    _buildDetailRow(context, Icons.note_outlined, l10n.notes, expense.notes!),
                  ]),
                ],
+              const SizedBox(height: 16),
+              // Tags section
+              FutureBuilder<List<String>>(
+                future: Provider.of<ExpenseProvider>(context, listen: false).getExpenseTags(expense.id),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                  }
+                  final tagIds = snapshot.data ?? [];
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tags',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      if (tagIds.isEmpty)
+                        Text(
+                          'No tags',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            fontStyle: FontStyle.italic,
+                          ),
+                        )
+                      else
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: tagIds.map((tagId) {
+                            return FutureBuilder<Tag?>(
+                              future: Provider.of<ExpenseProvider>(context, listen: false).getTagById(tagId),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const SizedBox.shrink();
+                                final tag = snapshot.data!;
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Color(tag.color).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                                        size: 18,
+                                        color: Color(tag.color),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        tag.name,
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: Color(tag.color),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
+                    ],
+                  );
+                },
+              ),
               const SizedBox(height: 32),
               // Action buttons
               Row(

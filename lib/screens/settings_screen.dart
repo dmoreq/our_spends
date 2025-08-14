@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
-
 import '../l10n/app_localizations.dart';
 import 'ai_settings_screen.dart';
+import 'tag_management_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -89,6 +89,19 @@ class SettingsScreen extends StatelessWidget {
             context,
             title: l10n.preferences,
             children: [
+              _buildSettingsTile(
+                context,
+                icon: Icons.label_outline,
+                title: 'Manage Tags',
+                subtitle: 'Organize your expenses with custom tags',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const TagManagementScreen(),
+                    ),
+                  );
+                },
+              ),
               _buildSettingsTile(
                 context,
                 icon: Icons.smart_toy_outlined,

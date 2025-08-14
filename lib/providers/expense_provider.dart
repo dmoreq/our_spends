@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/currency.dart';
+import '../models/tag.dart';
+import '../models/expense_tag.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 import '../services/expense_query_service.dart';
@@ -84,6 +86,39 @@ class ExpenseProvider extends ChangeNotifier {
     }
   }
 
+  Future<Tag?> getTagById(String tagId) async {
+    return await _databaseService.getTagById(tagId);
+  }
+
+  Future<List<Tag>> getTags() async {
+    return await _databaseService.getTags();
+  }
+
+  Future<List<String>> getExpenseTags(String expenseId) async {
+    return await _databaseService.getExpenseTags(expenseId);
+  }
+
+  Future<void> setExpenseTags(String expenseId, List<String> tagIds) async {
+    await _databaseService.setExpenseTags(expenseId, tagIds);
+    notifyListeners();
+  }
+
+  Future<void> addTag(Tag tag) async {
+    await _databaseService.addTag(tag);
+    notifyListeners();
+  }
+
+  Future<void> updateTag(Tag tag) async {
+    await _databaseService.updateTag(tag);
+    notifyListeners();
+  }
+
+  Future<void> deleteTag(String tagId) async {
+    await _databaseService.deleteTag(tagId);
+    notifyListeners();
+  }
+
+  // Legacy method for backward compatibility
   Future<Category?> getCategoryById(String categoryId) async {
     return await _databaseService.getCategoryById(categoryId);
   }

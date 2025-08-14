@@ -6,14 +6,9 @@ import '../models/category.dart';
 import '../l10n/app_localizations.dart';
 import 'add_expense_screen.dart';
 
-class ExpensesScreen extends StatefulWidget {
+class ExpensesScreen extends StatelessWidget {
   const ExpensesScreen({super.key});
 
-  @override
-  State<ExpensesScreen> createState() => _ExpensesScreenState();
-}
-
-class _ExpensesScreenState extends State<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -47,52 +42,72 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
         ],
       ),
-      body: Consumer<ExpenseProvider>(
-        builder: (context, expenseProvider, child) {
-          if (expenseProvider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
+      body: FutureBuilder<void>(
+        future: Provider.of<ExpenseProvider>(context, listen: false).initializationDone,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: theme.colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.error,
+                    style: theme.textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             );
           }
 
-          return StreamBuilder<List<Expense>>(
-            stream: expenseProvider.expensesStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting && !expenseProvider.isInitialized) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+          return RefreshIndicator(
+            onRefresh: () => Provider.of<ExpenseProvider>(context, listen: false).loadExpenses(),
+            child: Consumer<ExpenseProvider>(
+              builder: (context, expenseProvider, child) {
+                if (expenseProvider.isLoading && expenseProvider.expenses.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              if (snapshot.hasError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: theme.colorScheme.error,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.error,
-                        style: theme.textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                );
-              }
+                if (expenseProvider.errorMessage != null) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: theme.colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          expenseProvider.errorMessage!,
+                          style: theme.textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-              final expenses = snapshot.data ?? [];
+                final expenses = expenseProvider.expenses;
 
-              if (expenses.isEmpty) {
-                return _buildEmptyState(context, l10n);
-              }
+                if (expenses.isEmpty) {
+                  return _buildEmptyState(context, l10n);
+                }
 
-              return _buildExpenseList(context, expenses);
-            },
+                return _buildExpenseList(context, expenses);
+              },
+            ),
           );
         },
       ),

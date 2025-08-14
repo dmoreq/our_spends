@@ -25,62 +25,62 @@ class ExpenseProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isInitialized => _isInitialized;
+  Future<void> get initializationDone => _initFuture;
+  late Future<void> _initFuture;
 
   Stream<List<Expense>> get expensesStream => _expenseStreamController.stream;
 
   ExpenseProvider() {
     _queryService = ExpenseQueryService();
-    _initializeDatabase();
+    _initFuture = _initializeDatabase();
   }
 
   Future<void> _addTestData() async {
-    if (_expenses.isEmpty) {
-      final now = DateTime.now();
-      final testExpenses = [
-        Expense(
-          id: '${now.millisecondsSinceEpoch}_1',
-          userId: 'test_user',
-          item: 'Cơm tấm sườn',
-          amount: 45000.0,
-          currency: 'VND',
-          category: '1', // Food & Dining
-          date: now.subtract(const Duration(days: 1)),
-          description: 'Bữa trưa văn phòng',
-          location: 'Quán cơm tấm',
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Expense(
-          id: '${now.millisecondsSinceEpoch}_2',
-          userId: 'test_user',
-          item: 'Grab',
-          amount: 32000.0,
-          currency: 'VND',
-          category: '2', // Transportation
-          date: now.subtract(const Duration(days: 2)),
-          description: 'Di chuyển đến văn phòng',
-          location: 'Grab',
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Expense(
-          id: '${now.millisecondsSinceEpoch}_3',
-          userId: 'test_user',
-          item: 'Siêu thị',
-          amount: 235000.0,
-          currency: 'VND',
-          category: '1', // Food & Dining
-          date: now.subtract(const Duration(days: 3)),
-          description: 'Mua đồ ăn trong tuần',
-          location: 'VinMart',
-          createdAt: now,
-          updatedAt: now,
-        ),
-      ];
+    final now = DateTime.now();
+    final testExpenses = [
+      Expense(
+        id: '${now.millisecondsSinceEpoch}_1',
+        userId: 'test_user',
+        item: 'Cơm tấm sườn',
+        amount: 45000.0,
+        currency: 'VND',
+        category: '1', // Food & Dining
+        date: now.subtract(const Duration(days: 1)),
+        description: 'Bữa trưa văn phòng',
+        location: 'Quán cơm tấm',
+        createdAt: now,
+        updatedAt: now,
+      ),
+      Expense(
+        id: '${now.millisecondsSinceEpoch}_2',
+        userId: 'test_user',
+        item: 'Grab',
+        amount: 32000.0,
+        currency: 'VND',
+        category: '2', // Transportation
+        date: now.subtract(const Duration(days: 2)),
+        description: 'Di chuyển đến văn phòng',
+        location: 'Grab',
+        createdAt: now,
+        updatedAt: now,
+      ),
+      Expense(
+        id: '${now.millisecondsSinceEpoch}_3',
+        userId: 'test_user',
+        item: 'Siêu thị',
+        amount: 235000.0,
+        currency: 'VND',
+        category: '1', // Food & Dining
+        date: now.subtract(const Duration(days: 3)),
+        description: 'Mua đồ ăn trong tuần',
+        location: 'VinMart',
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ];
 
-      for (final expense in testExpenses) {
-        await addExpense(expense);
-      }
+    for (final expense in testExpenses) {
+      await _databaseService.insertExpense(expense);
     }
   }
 
@@ -122,11 +122,16 @@ class ExpenseProvider extends ChangeNotifier {
     try {
       await _databaseService.init();
       _userPreferredCurrency = await _databaseService.getUserPreferredCurrency();
-      await _loadExpenses();
-      if (_expenses.isEmpty) {
+
+      var expenses = await _databaseService.getExpenses();
+      if (expenses.isEmpty) {
         await _addTestData();
-        await _loadExpenses(); // Reload expenses after adding test data
+        expenses = await _databaseService.getExpenses();
       }
+      _expenses.clear();
+      _expenses.addAll(expenses);
+      _expenseStreamController.add(_expenses);
+
       _isInitialized = true;
       notifyListeners();
     } catch (e) {
@@ -134,7 +139,7 @@ class ExpenseProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _loadExpenses() async {
+  Future<void> loadExpenses() async {
     try {
       _setLoading(true);
       final expenses = await _databaseService.getExpenses();
@@ -226,7 +231,7 @@ class ExpenseProvider extends ChangeNotifier {
   
   // Expose _loadExpenses for testing
   Future<void> loadExpensesForTesting() async {
-    await _loadExpenses();
+    await loadExpenses();
   }
 
   // Add a new expense to the database and refresh the expenses list
@@ -239,7 +244,7 @@ class ExpenseProvider extends ChangeNotifier {
       await _databaseService.insertExpense(expense);
       
       // Reload expenses to update the UI
-      await _loadExpenses();
+      await loadExpenses();
       
       _setLoading(false);
       return expense.id;
@@ -260,7 +265,7 @@ class ExpenseProvider extends ChangeNotifier {
       await _databaseService.updateExpense(expense);
       
       // Reload expenses to update the UI
-      await _loadExpenses();
+      await loadExpenses();
       
       _setLoading(false);
       return expense.id;
@@ -281,7 +286,7 @@ class ExpenseProvider extends ChangeNotifier {
       await _databaseService.deleteExpense(expenseId);
       
       // Reload expenses to update the UI
-      await _loadExpenses();
+      await loadExpenses();
       
       _setLoading(false);
       return true;

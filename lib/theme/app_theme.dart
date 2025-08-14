@@ -1,10 +1,38 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // AI Chat App UI inspired color palette
-  static const Color _primaryColor = Color(0xFF8E4DFF);
-  static const Color _secondaryColor = Color(0xFFB89CFF);
-  static const Color _accentColor = Color(0xFFFF7675);
+  // Color schemes
+  static const Map<String, Map<String, Color>> colorSchemes = {
+    'purple': {
+      'primary': Color(0xFF8E4DFF),
+      'secondary': Color(0xFFB89CFF),
+      'accent': Color(0xFFFF7675),
+    },
+    'blue': {
+      'primary': Color(0xFF2196F3),
+      'secondary': Color(0xFF90CAF9),
+      'accent': Color(0xFFFF9800),
+    },
+    'green': {
+      'primary': Color(0xFF4CAF50),
+      'secondary': Color(0xFFA5D6A7),
+      'accent': Color(0xFFFFC107),
+    },
+    'orange': {
+      'primary': Color(0xFFFF9800),
+      'secondary': Color(0xFFFFCC80),
+      'accent': Color(0xFF2196F3),
+    },
+    'pink': {
+      'primary': Color(0xFFE91E63),
+      'secondary': Color(0xFFF48FB1),
+      'accent': Color(0xFF9C27B0),
+    },
+  };
+
+  static Map<String, Color> _getColorScheme(String scheme) {
+    return colorSchemes[scheme] ?? colorSchemes['purple']!;
+  }
 
   // Light Theme Colors
   static const Color _lightBackgroundColor = Color(0xFFFFFFFF);
@@ -22,14 +50,15 @@ class AppTheme {
 
   static const Color _errorColor = Color(0xFFE17055);
 
-  static ThemeData get lightTheme {
+  static ThemeData lightTheme(String colorScheme) {
+    final colors = _getColorScheme(colorScheme);
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: const ColorScheme.light(
-        primary: _primaryColor,
-        secondary: _secondaryColor,
-        tertiary: _accentColor,
+      colorScheme: ColorScheme.light(
+        primary: colors['primary']!,
+        secondary: colors['secondary']!,
+        tertiary: colors['accent']!,
         surface: _lightSurfaceColor,
         error: _errorColor,
         onPrimary: Colors.white,
@@ -49,11 +78,11 @@ class AppTheme {
       ),
 
       // FloatingActionButton theme
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: _primaryColor,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colors['primary']!,
         foregroundColor: Colors.white,
         elevation: 6,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
       ),
@@ -63,13 +92,13 @@ class AppTheme {
         backgroundColor: _darkSurfaceColor,
         elevation: 8,
         shadowColor: const Color(0x1A000000),
-        indicatorColor: _primaryColor.withValues(alpha: 0.2),
+        indicatorColor: colors['primary']!.withOpacity(0.2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const TextStyle(
+            return TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: _primaryColor,
+              color: colors['primary']!,
             );
           }
           return const TextStyle(
@@ -80,8 +109,8 @@ class AppTheme {
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(
-              color: _primaryColor,
+            return IconThemeData(
+              color: colors['primary']!,
               size: 24,
             );
           }
@@ -134,7 +163,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: _primaryColor, width: 2),
+          borderSide: BorderSide(color: colors['primary']!, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -148,10 +177,10 @@ class AppTheme {
       // Elevated button theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _primaryColor,
+          backgroundColor: colors['primary']!,
           foregroundColor: Colors.white,
           elevation: 3,
-          shadowColor: _primaryColor.withValues(alpha: 0.3),
+          shadowColor: colors['primary']!.withOpacity(0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -168,7 +197,7 @@ class AppTheme {
       // Text button theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: _primaryColor,
+          foregroundColor: colors['primary']!,
           textStyle: const TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 16,
@@ -181,8 +210,8 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: _lightSurfaceColor,
         disabledColor: Colors.grey.shade300,
-        selectedColor: _primaryColor,
-        secondarySelectedColor: _primaryColor,
+        selectedColor: colors['primary']!,
+        secondarySelectedColor: colors['primary']!,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -220,14 +249,15 @@ class AppTheme {
     );
   }
 
-  static ThemeData get darkTheme {
+  static ThemeData darkTheme(String colorScheme) {
+    final colors = _getColorScheme(colorScheme);
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(
-        primary: _primaryColor,
-        secondary: _secondaryColor,
-        tertiary: _accentColor,
+      colorScheme: ColorScheme.dark(
+        primary: colors['primary']!,
+        secondary: colors['secondary']!,
+        tertiary: colors['accent']!,
         surface: _darkSurfaceColor,
         error: _errorColor,
         onPrimary: Colors.white,
@@ -247,11 +277,11 @@ class AppTheme {
       ),
 
       // FloatingActionButton theme
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: _primaryColor,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colors['primary']!,
         foregroundColor: Colors.white,
         elevation: 6,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
       ),
@@ -261,13 +291,13 @@ class AppTheme {
         backgroundColor: _darkSurfaceColor,
         elevation: 8,
         shadowColor: const Color(0x1A000000),
-        indicatorColor: _primaryColor.withValues(alpha: 0.2),
+        indicatorColor: colors['primary']!.withOpacity(0.2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const TextStyle(
+            return TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: _primaryColor,
+              color: colors['primary']!,
             );
           }
           return const TextStyle(
@@ -278,8 +308,8 @@ class AppTheme {
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(
-              color: _primaryColor,
+            return IconThemeData(
+              color: colors['primary']!,
               size: 24,
             );
           }
@@ -332,7 +362,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: _primaryColor, width: 2),
+          borderSide: BorderSide(color: colors['primary']!, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -346,10 +376,10 @@ class AppTheme {
       // Elevated button theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _primaryColor,
+          backgroundColor: colors['primary']!,
           foregroundColor: Colors.white,
           elevation: 3,
-          shadowColor: _primaryColor.withValues(alpha: 0.3),
+          shadowColor: colors['primary']!.withOpacity(0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -366,7 +396,7 @@ class AppTheme {
       // Text button theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: _primaryColor,
+          foregroundColor: colors['primary']!,
           textStyle: const TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 16,
@@ -379,8 +409,8 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: _darkSurfaceColor,
         disabledColor: Colors.grey.shade800,
-        selectedColor: _primaryColor,
-        secondarySelectedColor: _primaryColor,
+        selectedColor: colors['primary']!,
+        secondarySelectedColor: colors['primary']!,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),

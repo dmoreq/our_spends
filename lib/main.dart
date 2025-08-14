@@ -28,8 +28,8 @@ class OurSpendsApp extends StatelessWidget {
         builder: (context, languageProvider, themeProvider, child) {
           return MaterialApp(
             title: 'Our Spends',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
+            theme: AppTheme.lightTheme(themeProvider.colorScheme),
+            darkTheme: AppTheme.darkTheme(themeProvider.colorScheme),
             themeMode: themeProvider.themeMode,
             locale: languageProvider.currentLocale,
             localizationsDelegates: const [

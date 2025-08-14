@@ -323,11 +323,13 @@ class SettingsScreen extends StatelessWidget {
                 color: theme.colorScheme.surface,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                   // Handle bar
                   Center(
                     child: Container(
@@ -366,7 +368,9 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   // Add bottom padding for safe area
                   SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
-                ],
+                    ],
+                  ),
+                ),
               ),
             );
           },
@@ -390,11 +394,13 @@ class SettingsScreen extends StatelessWidget {
                 color: theme.colorScheme.surface,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                   // Handle bar
                   Center(
                     child: Container(
@@ -415,7 +421,15 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Theme options
+                  // Theme mode options
+                  Text(
+                    'Mode',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _buildThemeOption(
                     context,
                     themeProvider,
@@ -439,9 +453,45 @@ class SettingsScreen extends StatelessWidget {
                     l10n.darkTheme,
                     Icons.dark_mode,
                   ),
+                  const SizedBox(height: 24),
+                  // Color scheme options
+                  Text(
+                    'Color',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: ThemeProvider.supportedColorSchemes.map((scheme) {
+                      return InkWell(
+                        onTap: () => themeProvider.setColorScheme(scheme['value'] as String),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: scheme['color'] as Color,
+                            borderRadius: BorderRadius.circular(12),
+                            border: themeProvider.colorScheme == scheme['value']
+                              ? Border.all(color: theme.colorScheme.onSurface, width: 2)
+                              : null,
+                          ),
+                          child: themeProvider.colorScheme == scheme['value']
+                            ? Icon(Icons.check, color: Colors.white)
+                            : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
                   // Add bottom padding for safe area
                   SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
-                ],
+                    ],
+                  ),
+                ),
               ),
             );
           },

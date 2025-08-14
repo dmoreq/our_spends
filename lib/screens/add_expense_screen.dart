@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/expense.dart';
+import '../models/tag.dart';
 import '../providers/expense_provider.dart';
-
 import '../l10n/app_localizations.dart';
+import 'tag_management_screen.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   final Expense? expenseToEdit;
@@ -21,32 +22,27 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _notesController = TextEditingController();
   
   DateTime _selectedDate = DateTime.now();
-  String _selectedCategory = 'Ăn uống';
-  String _selectedPaymentMethod = 'Tiền mặt';
+  String _selectedPaymentMethod = 'Cash';
   String? _location;
-  
+  List<String> _selectedTagIds = [];
   bool _isLoading = false;
   
-  final List<String> _categories = [
-    'Ăn uống',
-    'Đi lại',
-    'Mua sắm',
-    'Giải trí',
-    'Tiện ích sinh hoạt',
-    'Y tế',
-    'Du lịch',
-    'Giáo dục',
-    'Chi phí khác',
-  ];
-  
-
-  
   final List<String> _paymentMethods = [
-    'Tiền mặt',
-    'Thẻ ngân hàng',
-    'Chuyển khoản',
-    'Ví điện tử',
+    'Cash',
+    'Bank Card',
+    'Bank Transfer',
+    'E-Wallet',
   ];
+
+  Future<void> _loadExpenseTags() async {
+    if (widget.expenseToEdit != null) {
+      final tagIds = await Provider.of<ExpenseProvider>(context, listen: false)
+          .getExpenseTags(widget.expenseToEdit!.id);
+      setState(() {
+        _selectedTagIds = tagIds;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -56,9 +52,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       _amountController.text = widget.expenseToEdit!.amount.toString();
       _notesController.text = widget.expenseToEdit!.notes ?? '';
       _selectedDate = widget.expenseToEdit!.date;
-      _selectedCategory = widget.expenseToEdit!.category;
-      _selectedPaymentMethod = widget.expenseToEdit!.paymentMethod ?? 'Tiền mặt';
+      _selectedPaymentMethod = widget.expenseToEdit!.paymentMethod ?? 'Cash';
       _location = widget.expenseToEdit!.location;
+      _loadExpenseTags();
     }
   }
 
@@ -72,7 +68,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   Widget _buildInputCard({required Widget child}) {
     return Container(
-      height: 80, // Standardized height for all input fields
+      constraints: const BoxConstraints(minHeight: 72),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -80,7 +77,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
-      child: Center(child: child), // Center alignment for consistent look
+      child: child,
     );
   }
 
@@ -119,71 +116,73 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title field
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildInputCard(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, MediaQuery.of(context).viewInsets.bottom + 32.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title field
+                _buildInputCard(
                   child: TextFormField(
-                    controller: _titleController,
-                    decoration: InputDecoration(
-                      labelText: l10n.expenseTitleLabel,
-                      hintText: l10n.expenseTitlePlaceholder,
-                      prefixIcon: const Icon(Icons.receipt_long_outlined),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(20),
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    labelText: l10n.expenseTitleLabel,
+                    labelStyle: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return l10n.fieldRequired;
-                      }
-                      return null;
-                    },
+                    hintText: l10n.expenseTitlePlaceholder,
+                    prefixIcon: const Icon(Icons.receipt_long_outlined, size: 24),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(20),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.fieldRequired;
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: 16),
-              
-              // Amount field
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildInputCard(
+                ),
+                const SizedBox(height: 20),
+                
+                // Amount field
+                _buildInputCard(
                   child: TextFormField(
-                    controller: _amountController,
-                    decoration: InputDecoration(
-                      labelText: l10n.expenseAmountLabel,
-                      hintText: l10n.expenseAmountPlaceholder,
-                      prefixIcon: const Icon(Icons.attach_money_outlined),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(20),
-                      suffixText: 'VND',
+                  controller: _amountController,
+                  decoration: InputDecoration(
+                    labelText: l10n.expenseAmountLabel,
+                    labelStyle: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        // Remove any non-numeric characters except decimal point
-                        final cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
-                        // Ensure only one decimal point
-                        final parts = cleanValue.split('.');
-                        String formattedValue = parts[0];
-                        if (parts.length > 1) {
-                          formattedValue += '.' + parts[1];
-                        }
-                        if (formattedValue != value) {
-                          _amountController.value = TextEditingValue(
-                            text: formattedValue,
-                            selection: TextSelection.collapsed(offset: formattedValue.length),
-                          );
+                    hintText: l10n.expenseAmountPlaceholder,
+                    prefixIcon: const Icon(Icons.attach_money_outlined, size: 24),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(20),
+                    suffixText: 'VND',
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (value) {
+                    if (value.isNotEmpty) {
+                      // Remove any non-numeric characters except decimal point
+                      final cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
+                      // Ensure only one decimal point
+                      final parts = cleanValue.split('.');
+                      String formattedValue = parts[0];
+                      if (parts.length > 1) {
+                        formattedValue += '.' + parts[1];
+                      }
+                      if (formattedValue != value) {
+                        _amountController.value = TextEditingValue(
+                          text: formattedValue,
+                          selection: TextSelection.collapsed(offset: formattedValue.length),
+                        );
                         }
                       }
                     },
-                    validator: (value) {
+                  validator: (value) {
                       if (value == null || value.isEmpty) {
                         return l10n.fieldRequired;
                       }
@@ -198,23 +197,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     },
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 20),
               
-              // Date picker
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildInputCard(
+                // Date picker
+                _buildInputCard(
                   child: InkWell(
-                    onTap: () => _selectDate(context),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      child: Row(
-                        children: [
+                  onTap: () => _selectDate(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
                           Icon(
                             Icons.calendar_today_outlined,
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            size: 24,
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -223,7 +220,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                               children: [
                                 Text(
                                   l10n.expenseDateLabel,
-                                  style: theme.textTheme.bodySmall?.copyWith(
+                                  style: theme.textTheme.labelMedium?.copyWith(
                                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                                   ),
                                 ),
@@ -239,43 +236,123 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           ),
                           Icon(
                             Icons.arrow_forward_ios,
-                            size: 16,
+                            size: 18,
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-                    
-              // Category dropdown
-              _buildInputCard(
-                child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  decoration: InputDecoration(
-                    labelText: l10n.expenseCategoryLabel,
-                    prefixIcon: const Icon(Icons.category_outlined),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.all(20),
+                ),
+                const SizedBox(height: 20),
+              
+                // Tags selection
+                Container(
+                constraints: const BoxConstraints(minHeight: 72),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                   ),
-                  items: _categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(_getCategoryTranslation(category, l10n)),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedCategory = value;
-                      });
+                ),
+                child: FutureBuilder<List<Tag>>(
+                  future: Provider.of<ExpenseProvider>(context, listen: false).getTags(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
                     }
+                    if (!snapshot.hasData) {
+                      return const Center(child: Text('No tags available'));
+                    }
+                    final tags = snapshot.data!;
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.local_offer_outlined,
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    l10n.expenseCategoryLabel,
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add_circle_outline),
+                                onPressed: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const TagManagementScreen(),
+                                    ),
+                                  );
+                                  // Force rebuild of the FutureBuilder when returning from tag management
+                                  setState(() {});
+                                },
+                                tooltip: 'Add new tag',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width - 64, // Account for padding and margins
+                            ),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: tags.map((tag) {
+                                final isSelected = _selectedTagIds.contains(tag.id);
+                                return FilterChip(
+                                label: Text(tag.name),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    if (selected) {
+                                      _selectedTagIds.add(tag.id);
+                                    } else {
+                                      _selectedTagIds.remove(tag.id);
+                                    }
+                                  });
+                                },
+                                avatar: Icon(
+                                  IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                                  size: 18,
+                                ),
+                                backgroundColor: Color(tag.color).withOpacity(0.1),
+                                selectedColor: Color(tag.color).withOpacity(0.2),
+                                checkmarkColor: Color(tag.color),
+                                labelStyle: TextStyle(
+                                  color: isSelected
+                                      ? Color(tag.color)
+                                      : theme.colorScheme.onSurface,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 20),
               
               // Payment method dropdown
               _buildInputCard(
@@ -283,6 +360,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   value: _selectedPaymentMethod,
                   decoration: InputDecoration(
                     labelText: l10n.paymentMethod,
+                    labelStyle: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                     prefixIcon: const Icon(Icons.payment_outlined),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.all(20),
@@ -302,13 +382,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               
               // Location field
               _buildInputCard(
                 child: TextFormField(
                   decoration: InputDecoration(
                     labelText: l10n.location,
+                    labelStyle: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                     hintText: l10n.locationPlaceholder,
                     prefixIcon: const Icon(Icons.location_on_outlined),
                     border: InputBorder.none,
@@ -321,35 +404,43 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               
-              // Notes field
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                // Notes field
+                Container(
+                  constraints: const BoxConstraints(minHeight: 72),
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: TextFormField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: l10n.expenseNotesLabel,
+                      labelStyle: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      hintText: l10n.expenseNotesPlaceholder,
+                      prefixIcon: const Icon(Icons.notes_outlined),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(20),
+                    ),
+                    maxLines: 3,
+                    minLines: 1,
+                    textAlignVertical: TextAlignVertical.top,
                   ),
                 ),
-                child: TextFormField(
-                  controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: l10n.expenseNotesLabel,
-                    hintText: l10n.expenseNotesPlaceholder,
-                    prefixIcon: const Icon(Icons.notes_outlined),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.all(20),
-                  ),
-                  maxLines: 3,
-                ),
-              ),
-              const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
-    );
+                const SizedBox(height: 32),
+            ],
+          ),
+        ),
+      ),
+    ));
+
   }
   
   Future<void> _selectDate(BuildContext context) async {
@@ -374,11 +465,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return '${date.month}/${date.day}/${date.year}';
   }
   
-  String _getCategoryTranslation(String category, AppLocalizations l10n) {
-    // Không cần dịch vì danh mục đã được Việt hóa
-    return category;
-  }
-  
+
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -397,7 +484,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           date: _selectedDate,
           amount: double.parse(_amountController.text),
           currency: widget.expenseToEdit?.currency ?? 'VND',
-          category: _selectedCategory,
+          category: _selectedTagIds.isNotEmpty ? _selectedTagIds.first : 'Other', // For backward compatibility
           item: _titleController.text,
           paymentMethod: _selectedPaymentMethod,
           location: _location,
@@ -411,6 +498,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           : await expenseProvider.addExpense(expense);
         
         if (expenseId != null) {
+          await expenseProvider.setExpenseTags(expense.id, _selectedTagIds);
+          
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(widget.expenseToEdit != null

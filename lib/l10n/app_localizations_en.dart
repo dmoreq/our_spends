@@ -133,6 +133,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseAddedError => 'Error adding expense';
 
   @override
+  String get editExpense => 'Edit Expense';
+
+  @override
+  String get expenseUpdatedSuccess => 'Expense updated successfully';
+
+  @override
+  String get expenseUpdatedError => 'Error updating expense';
+
+  @override
+  String get deleteExpenseConfirmation => 'Delete Expense?';
+
+  @override
+  String get deleteExpenseMessage =>
+      'Are you sure you want to delete this expense? This action cannot be undone.';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
   String get language => 'Language';
 
   @override

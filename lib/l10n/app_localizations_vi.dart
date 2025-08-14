@@ -134,6 +134,31 @@ class AppLocalizationsVi extends AppLocalizations {
   String get expenseAddedError => 'Lỗi khi thêm chi phí';
 
   @override
+  String get editExpense => 'Sửa chi phí';
+
+  @override
+  String get expenseUpdatedSuccess => 'Cập nhật chi phí thành công';
+
+  @override
+  String get expenseUpdatedError => 'Lỗi khi cập nhật chi phí';
+
+  @override
+  String get deleteExpenseConfirmation => 'Xóa chi phí?';
+
+  @override
+  String get deleteExpenseMessage =>
+      'Bạn có chắc chắn muốn xóa chi phí này? Hành động này không thể hoàn tác.';
+
+  @override
+  String get delete => 'Xóa';
+
+  @override
+  String get cancel => 'Hủy';
+
+  @override
+  String get edit => 'Sửa';
+
+  @override
   String get language => 'Ngôn ngữ';
 
   @override

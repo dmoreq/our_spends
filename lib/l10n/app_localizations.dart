@@ -344,6 +344,54 @@ abstract class AppLocalizations {
   /// **'Error adding expense'**
   String get expenseAddedError;
 
+  /// No description provided for @editExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Expense'**
+  String get editExpense;
+
+  /// No description provided for @expenseUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense updated successfully'**
+  String get expenseUpdatedSuccess;
+
+  /// No description provided for @expenseUpdatedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating expense'**
+  String get expenseUpdatedError;
+
+  /// No description provided for @deleteExpenseConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Expense?'**
+  String get deleteExpenseConfirmation;
+
+  /// No description provided for @deleteExpenseMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this expense? This action cannot be undone.'**
+  String get deleteExpenseMessage;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:

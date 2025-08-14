@@ -4,21 +4,38 @@ import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/tag.dart';
 
+import '../models/currency.dart';
+
 class DatabaseService {
   static const String _expensesKey = 'expenses_data';
   static const String _categoriesKey = 'categories_data';
   static const String _tagsKey = 'tags_data';
   static const String _expenseTagsKey = 'expense_tags_data';
+  static const String _currenciesKey = 'currencies_data';
+  static const String _userPreferredCurrencyKey = 'user_preferred_currency';
 
   // In-memory cache for better performance
   List<Expense>? _expensesCache;
   List<Category>? _categoriesCache;
   List<Tag>? _tagsCache;
   Map<String, List<String>>? _expenseTagsCache;
+  List<Currency>? _currenciesCache;
+  Currency? _userPreferredCurrencyCache;
 
-  // Initialize database (create default categories)
+  DatabaseService() {
+    init();
+  }
+
+  // Initialize database (create default categories and currencies)
   Future<void> init() async {
+    await _loadExpenses();
+    await _loadCategories();
+    await _loadTags();
+    await _loadExpenseTags();
+    await _loadCurrencies();
     await _ensureDefaultCategories();
+    await _ensureDefaultCurrencies();
+    await _ensureDefaultPreferredCurrency();
   }
 
   // Load data from SharedPreferences
@@ -115,12 +132,72 @@ class DatabaseService {
     _expenseTagsCache = expenseTags;
   }
 
+  Future<List<Currency>> _loadCurrencies() async {
+    if (_currenciesCache != null) return _currenciesCache!;
+    
+    final prefs = await SharedPreferences.getInstance();
+    final currenciesJson = prefs.getString(_currenciesKey);
+    
+    if (currenciesJson == null) {
+      _currenciesCache = [];
+      return _currenciesCache!;
+    }
+    
+    final List<dynamic> currenciesList = json.decode(currenciesJson);
+    _currenciesCache = currenciesList.map((json) => Currency.fromJson(json)).toList();
+    return _currenciesCache!;
+  }
+
+  Future<void> _saveCurrencies(List<Currency> currencies) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currenciesJson = json.encode(currencies.map((c) => c.toJson()).toList());
+    await prefs.setString(_currenciesKey, currenciesJson);
+    _currenciesCache = currencies;
+  }
+
+  Future<Currency> getUserPreferredCurrency() async {
+    if (_userPreferredCurrencyCache != null) return _userPreferredCurrencyCache!;
+    
+    final prefs = await SharedPreferences.getInstance();
+    final currencyJson = prefs.getString(_userPreferredCurrencyKey);
+    
+    if (currencyJson == null) {
+      _userPreferredCurrencyCache = Currency.vnd;
+      return _userPreferredCurrencyCache!;
+    }
+    
+    _userPreferredCurrencyCache = Currency.fromJson(json.decode(currencyJson));
+    return _userPreferredCurrencyCache!;
+  }
+
+  Future<void> setUserPreferredCurrency(Currency currency) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userPreferredCurrencyKey, json.encode(currency.toJson()));
+    _userPreferredCurrencyCache = currency;
+  }
+
+  Future<void> _ensureDefaultCurrencies() async {
+    final currencies = await _loadCurrencies();
+    
+    if (currencies.isEmpty) {
+      await _saveCurrencies([Currency.vnd, Currency.usd]);
+    }
+  }
+
+  Future<void> _ensureDefaultPreferredCurrency() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_userPreferredCurrencyKey)) {
+      await setUserPreferredCurrency(Currency.vnd);
+    }
+  }
+
   // Ensure default categories exist
   Future<void> _ensureDefaultCategories() async {
     final categories = await _loadCategories();
     
     if (categories.isEmpty) {
-      final defaultCategories = [
+      final now = DateTime.now();
+      final defaultCategories = <Category>[
         Category(
           id: '1',
           name: 'Food & Dining',
@@ -128,8 +205,8 @@ class DatabaseService {
           icon: '🍽️',
           color: '#FF6B6B',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
         Category(
           id: '2',
@@ -138,8 +215,8 @@ class DatabaseService {
           icon: '🚗',
           color: '#4ECDC4',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
         Category(
           id: '3',
@@ -148,8 +225,8 @@ class DatabaseService {
           icon: '🛍️',
           color: '#45B7D1',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
         Category(
           id: '4',
@@ -158,8 +235,8 @@ class DatabaseService {
           icon: '🎬',
           color: '#96CEB4',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
         Category(
           id: '5',
@@ -168,8 +245,8 @@ class DatabaseService {
           icon: '💡',
           color: '#FFEAA7',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
         Category(
           id: '6',
@@ -178,8 +255,8 @@ class DatabaseService {
           icon: '🏥',
           color: '#DDA0DD',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
         Category(
           id: '7',
@@ -188,8 +265,8 @@ class DatabaseService {
           icon: '📚',
           color: '#98D8C8',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
         Category(
           id: '8',
@@ -198,14 +275,30 @@ class DatabaseService {
           icon: '📦',
           color: '#A8A8A8',
           isActive: true,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: now,
+          updatedAt: now,
         ),
       ];
-      
       await _saveCategories(defaultCategories);
     }
   }
+
+
+
+  Future<void> addExpense(Expense expense) async {
+    final expenses = await _loadExpenses();
+    expenses.add(expense);
+    await _saveExpenses(expenses);
+  }
+
+
+
+
+
+
+
+
+
 
   // CRUD Operations for Expenses
   Future<List<Expense>> getExpenses({
@@ -466,11 +559,18 @@ class DatabaseService {
     await prefs.remove(_categoriesKey);
     await prefs.remove(_tagsKey);
     await prefs.remove(_expenseTagsKey);
+    await prefs.remove(_currenciesKey);
+    await prefs.remove(_userPreferredCurrencyKey);
     
     _expensesCache = null;
     _categoriesCache = null;
     _tagsCache = null;
     _expenseTagsCache = null;
+    _currenciesCache = null;
+    _userPreferredCurrencyCache = null;
+    
+    // Reinitialize default data
+    await init();
   }
 
   // Close/cleanup (for compatibility)

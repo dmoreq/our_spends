@@ -9,14 +9,31 @@ class ExpenseQueryService {
     // Parse natural language query and convert to database parameters
     final queryParams = _parseQuery(query);
     
-    return await _databaseService.getExpenses(
-      categoryId: queryParams['category'],
-      startDate: queryParams['startDate'],
-      endDate: queryParams['endDate'],
-      minAmount: queryParams['minAmount'],
-      maxAmount: queryParams['maxAmount'],
-      limit: queryParams['limit'],
-    );
+    final allExpenses = await _databaseService.getExpenses();
+    
+    return allExpenses.where((expense) {
+      if (queryParams['category'] != null && expense.category != queryParams['category']) {
+        return false;
+      }
+      
+      if (queryParams['startDate'] != null && expense.date.isBefore(queryParams['startDate'])) {
+        return false;
+      }
+      
+      if (queryParams['endDate'] != null && expense.date.isAfter(queryParams['endDate'])) {
+        return false;
+      }
+      
+      if (queryParams['minAmount'] != null && expense.amount < queryParams['minAmount']) {
+        return false;
+      }
+      
+      if (queryParams['maxAmount'] != null && expense.amount > queryParams['maxAmount']) {
+        return false;
+      }
+      
+      return true;
+    }).toList();
   }
 
   // Get expense analytics
@@ -28,25 +45,41 @@ class ExpenseQueryService {
   }
 
   // Get spending by category
-  Future<List<Map<String, dynamic>>> getSpendingByCategory(String userId, {
+  Future<Map<String, double>> getSpendingByCategory(String userId, {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    return await _databaseService.getExpensesByCategory(
-      startDate: startDate,
-      endDate: endDate,
-    );
+    final categories = await _databaseService.getCategories();
+    final expenses = await _databaseService.getExpenses();
+    
+    final spendingByCategory = <String, double>{};
+    
+    for (final category in categories) {
+      final categoryExpenses = expenses.where((expense) {
+        final isInCategory = expense.category == category.id;
+        final isInDateRange = (startDate == null || !expense.date.isBefore(startDate)) &&
+                             (endDate == null || !expense.date.isAfter(endDate));
+        return isInCategory && isInDateRange;
+      });
+      
+      spendingByCategory[category.name] = categoryExpenses.fold(
+        0.0,
+        (sum, expense) => sum + expense.amount
+      );
+    }
+    
+    return spendingByCategory;
   }
 
   // Get monthly spending trend
-  Future<List<Map<String, dynamic>>> getMonthlySpendingTrend(String userId, {
+  Future<Map<String, double>> getMonthlySpendingTrend(String userId, {
     int months = 12,
   }) async {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month - months, 1);
-    return await _databaseService.getSpendingTrends(
-      startDate: startDate,
-      endDate: now,
+    final trends = await _databaseService.getSpendingTrends(startDate: startDate, endDate: now);
+    return Map.fromEntries(
+      trends.map((trend) => MapEntry(trend['month'] as String, trend['totalAmount'] as double))
     );
   }
 

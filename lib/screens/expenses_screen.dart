@@ -1,19 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/expense.dart';
 import '../providers/expense_provider.dart';
+import '../models/expense.dart';
+import '../models/category.dart';
 import '../l10n/app_localizations.dart';
 import 'add_expense_screen.dart';
 
-class ExpensesScreen extends StatelessWidget {
+class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
 
+  @override
+  State<ExpensesScreen> createState() => _ExpensesScreenState();
+}
+
+class _ExpensesScreenState extends State<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddExpenseScreen(),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
       appBar: AppBar(
         title: Text(
           l10n.expenses,
@@ -30,43 +47,53 @@ class ExpensesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder<List<Expense>>(
-        stream: Provider.of<ExpenseProvider>(context).expensesStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: Consumer<ExpenseProvider>(
+        builder: (context, expenseProvider, child) {
+          if (expenseProvider.isLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: theme.colorScheme.error,
+          return StreamBuilder<List<Expense>>(
+            stream: expenseProvider.expensesStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting && !expenseProvider.isInitialized) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: theme.colorScheme.error,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.error,
+                        style: theme.textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.error,
-                    style: theme.textTheme.bodyLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
+                );
+              }
 
-          final expenses = snapshot.data ?? [];
+              final expenses = snapshot.data ?? [];
 
-          if (expenses.isEmpty) {
-            return _buildEmptyState(context, l10n);
-          }
+              if (expenses.isEmpty) {
+                return _buildEmptyState(context, l10n);
+              }
 
-          return _buildExpenseList(context, expenses);
+              return _buildExpenseList(context, expenses);
+            },
+          );
         },
       ),
     );
@@ -139,114 +166,100 @@ class ExpensesScreen extends StatelessWidget {
   }
 }
 
-class ExpenseListItem extends StatelessWidget {
+class ExpenseListItem extends StatefulWidget {
   final Expense expense;
+  final Function(Expense)? onDelete;
   
-  const ExpenseListItem({super.key, required this.expense});
+  const ExpenseListItem({super.key, required this.expense, this.onDelete});
+
+  @override
+  State<ExpenseListItem> createState() => _ExpenseListItemState();
+}
+
+class _ExpenseListItemState extends State<ExpenseListItem> {
+  String? _formattedAmount;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFormattedAmount();
+  }
+
+  Future<void> _initializeFormattedAmount() async {
+    final formattedAmount = await _formatCurrency();
+    if (mounted) {
+      setState(() {
+        _formattedAmount = formattedAmount;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context).languageCode;
     
-    // Format date based on locale
-    final formattedDate = _formatDate(expense.date, locale);
-    
-    // Format currency based on locale and currency code
-    final formattedAmount = _formatCurrency(expense.amount, expense.currency, locale);
+    // Format date based on locale - show only day/month
+    final shortDate = locale == 'vi' 
+        ? '${widget.expense.date.day}/${widget.expense.date.month}'
+        : '${widget.expense.date.month}/${widget.expense.date.day}';
     
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Card(
         child: InkWell(
           onTap: () {
-            _showExpenseDetails(context, expense);
+            _showExpenseDetails(context, widget.expense);
           },
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                // Category icon
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    _getCategoryIcon(expense.category),
-                    color: theme.colorScheme.primary,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Expense details
+                // Title and short date
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        expense.item,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                      Expanded(
+                        child: Text(
+                          widget.expense.item,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.category_outlined,
-                            size: 14,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            expense.category,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            size: 14,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            formattedDate,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // Amount
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      formattedAmount,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    if (expense.paymentMethod != null)
+                      const SizedBox(width: 8),
                       Text(
-                        expense.paymentMethod!,
+                        shortDate,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
-                  ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Amount
+                FutureBuilder<String>(
+                  future: _formatCurrency(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      );
+                    }
+                    return Text(
+                      snapshot.data ?? '',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.primary,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -297,14 +310,9 @@ class ExpenseListItem extends StatelessWidget {
     return '${date.month}/${date.day}/${date.year}';
   }
   
-  String _formatCurrency(double amount, String currency, String locale) {
-    // Simple currency formatting based on locale and currency
-    if (locale == 'vi' && currency == 'VND') {
-      return '${amount.toStringAsFixed(0)}đ';
-    } else if (currency == 'USD') {
-      return '\$${amount.toStringAsFixed(2)}';
-    }
-    return '$amount $currency';
+  Future<String> _formatCurrency() async {
+    return await Provider.of<ExpenseProvider>(context, listen: false)
+        .formatCurrency(widget.expense.amount, widget.expense.currency);
   }
   
   void _showExpenseDetails(BuildContext context, Expense expense) {
@@ -367,12 +375,20 @@ class ExpenseListItem extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          _formatCurrency(expense.amount, expense.currency, locale),
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        FutureBuilder<String>(
+                          future: _formatCurrency(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CircularProgressIndicator(strokeWidth: 2);
+                            }
+                            return Text(
+                              snapshot.data ?? '',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -403,10 +419,48 @@ class ExpenseListItem extends StatelessWidget {
                     child: TextButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
-                        // TODO: Navigate to edit expense screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddExpenseScreen(expenseToEdit: expense),
+                          ),
+                        );
                       },
                       icon: const Icon(Icons.edit_outlined),
-                      label: const Text('Edit'),
+                      label: Text(l10n.edit),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(l10n.deleteExpenseConfirmation),
+                            content: Text(l10n.deleteExpenseMessage),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(l10n.cancel),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.pop(context); // Close dialog
+                                  Navigator.pop(context); // Close bottom sheet
+                                  final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+                                  await expenseProvider.deleteExpense(expense.id);
+                                },
+                                child: Text(
+                                  l10n.delete,
+                                  style: TextStyle(color: theme.colorScheme.error),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
+                      label: Text(l10n.delete, style: TextStyle(color: theme.colorScheme.error)),
                     ),
                   ),
                   const SizedBox(width: 16),

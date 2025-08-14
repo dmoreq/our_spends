@@ -6,7 +6,9 @@ import '../providers/expense_provider.dart';
 import '../l10n/app_localizations.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  final Expense? expenseToEdit;
+
+  const AddExpenseScreen({super.key, this.expenseToEdit});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -19,35 +21,46 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _notesController = TextEditingController();
   
   DateTime _selectedDate = DateTime.now();
-  String _selectedCategory = 'Food & Drinks';
-  String _selectedCurrency = 'VND';
-  String? _selectedPaymentMethod;
+  String _selectedCategory = 'Ăn uống';
+  String _selectedPaymentMethod = 'Tiền mặt';
   String? _location;
   
   bool _isLoading = false;
   
   final List<String> _categories = [
-    'Food & Drinks',
-    'Transportation',
-    'Shopping',
-    'Entertainment',
-    'Utilities',
-    'Health',
-    'Travel',
-    'Education',
-    'Other',
+    'Ăn uống',
+    'Đi lại',
+    'Mua sắm',
+    'Giải trí',
+    'Tiện ích sinh hoạt',
+    'Y tế',
+    'Du lịch',
+    'Giáo dục',
+    'Chi phí khác',
   ];
   
-  final List<String> _currencies = ['VND', 'USD', 'EUR', 'GBP', 'JPY'];
+
   
   final List<String> _paymentMethods = [
-    'Cash',
-    'Credit Card',
-    'Debit Card',
-    'Bank Transfer',
-    'Mobile Payment',
-    'Other',
+    'Tiền mặt',
+    'Thẻ ngân hàng',
+    'Chuyển khoản',
+    'Ví điện tử',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.expenseToEdit != null) {
+      _titleController.text = widget.expenseToEdit!.item;
+      _amountController.text = widget.expenseToEdit!.amount.toString();
+      _notesController.text = widget.expenseToEdit!.notes ?? '';
+      _selectedDate = widget.expenseToEdit!.date;
+      _selectedCategory = widget.expenseToEdit!.category;
+      _selectedPaymentMethod = widget.expenseToEdit!.paymentMethod ?? 'Tiền mặt';
+      _location = widget.expenseToEdit!.location;
+    }
+  }
 
   @override
   void dispose() {
@@ -59,6 +72,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   Widget _buildInputCard({required Widget child}) {
     return Container(
+      height: 80, // Standardized height for all input fields
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -66,7 +80,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
-      child: child,
+      child: Center(child: child), // Center alignment for consistent look
     );
   }
 
@@ -77,7 +91,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.addExpense),
+        title: Text(widget.expenseToEdit != null ? l10n.editExpense : l10n.addExpense),
         leading: IconButton(
           icon: const Icon(Icons.close_outlined),
           onPressed: () => Navigator.pop(context),
@@ -113,124 +127,123 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title field
-              _buildInputCard(
-                child: TextFormField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                     labelText: l10n.expenseTitleLabel,
-                     hintText: l10n.expenseTitlePlaceholder,
-                     prefixIcon: const Icon(Icons.receipt_long_outlined),
-                     border: InputBorder.none,
-                     contentPadding: const EdgeInsets.all(20),
-                   ),
-                   validator: (value) {
-                     if (value == null || value.isEmpty) {
-                       return l10n.fieldRequired;
-                     }
-                     return null;
-                   },
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildInputCard(
+                  child: TextFormField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: l10n.expenseTitleLabel,
+                      hintText: l10n.expenseTitlePlaceholder,
+                      prefixIcon: const Icon(Icons.receipt_long_outlined),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(20),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return l10n.fieldRequired;
+                      }
+                      return null;
+                    },
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               
-              // Amount and Currency row
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: _buildInputCard(
-                      child: TextFormField(
-                        controller: _amountController,
-                        decoration: InputDecoration(
-                          labelText: l10n.expenseAmountLabel,
-                          hintText: l10n.expenseAmountPlaceholder,
-                          prefixIcon: const Icon(Icons.attach_money_outlined),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(20),
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return l10n.fieldRequired;
-                          }
-                          if (double.tryParse(value) == null) {
-                            return l10n.invalidNumber;
-                          }
-                          return null;
-                        },
-                      ),
+              // Amount field
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildInputCard(
+                  child: TextFormField(
+                    controller: _amountController,
+                    decoration: InputDecoration(
+                      labelText: l10n.expenseAmountLabel,
+                      hintText: l10n.expenseAmountPlaceholder,
+                      prefixIcon: const Icon(Icons.attach_money_outlined),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(20),
+                      suffixText: 'VND',
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildInputCard(
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedCurrency,
-                        decoration: InputDecoration(
-                          labelText: l10n.currency,
-                          prefixIcon: const Icon(Icons.currency_exchange_outlined),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(20),
-                        ),
-                        items: _currencies.map((currency) {
-                          return DropdownMenuItem(
-                            value: currency,
-                            child: Text(currency),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        // Remove any non-numeric characters except decimal point
+                        final cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
+                        // Ensure only one decimal point
+                        final parts = cleanValue.split('.');
+                        String formattedValue = parts[0];
+                        if (parts.length > 1) {
+                          formattedValue += '.' + parts[1];
+                        }
+                        if (formattedValue != value) {
+                          _amountController.value = TextEditingValue(
+                            text: formattedValue,
+                            selection: TextSelection.collapsed(offset: formattedValue.length),
                           );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _selectedCurrency = value;
-                            });
-                          }
-                        },
-                      ),
-                    ),
+                        }
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return l10n.fieldRequired;
+                      }
+                      final number = double.tryParse(value);
+                      if (number == null) {
+                        return l10n.invalidNumber;
+                      }
+                      if (number <= 0) {
+                        return 'Amount must be greater than 0';
+                      }
+                      return null;
+                    },
                   ),
-                ],
+                ),
               ),
               const SizedBox(height: 16),
               
               // Date picker
-              _buildInputCard(
-                child: InkWell(
-                  onTap: () => _selectDate(context),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                        const SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.expenseDateLabel,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildInputCard(
+                  child: InkWell(
+                    onTap: () => _selectDate(context),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.expenseDateLabel,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _formatDate(_selectedDate),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _formatDate(_selectedDate),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                        ),
-                      ],
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -281,9 +294,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     );
                   }).toList(),
                   onChanged: (value) {
-                    setState(() {
-                      _selectedPaymentMethod = value;
-                    });
+                    if (value != null) {
+                      setState(() {
+                        _selectedPaymentMethod = value;
+                      });
+                    }
                   },
                 ),
               ),
@@ -309,7 +324,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               const SizedBox(height: 16),
               
               // Notes field
-              _buildInputCard(
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                ),
                 child: TextFormField(
                   controller: _notesController,
                   decoration: InputDecoration(
@@ -353,28 +375,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   }
   
   String _getCategoryTranslation(String category, AppLocalizations l10n) {
-    switch (category) {
-      case 'Food & Drinks':
-        return l10n.expenseCategoryFood;
-      case 'Transportation':
-        return l10n.expenseCategoryTransport;
-      case 'Shopping':
-        return l10n.expenseCategoryShopping;
-      case 'Entertainment':
-        return l10n.expenseCategoryEntertainment;
-      case 'Utilities':
-        return l10n.expenseCategoryUtilities;
-      case 'Health':
-        return l10n.expenseCategoryHealth;
-      case 'Travel':
-        return l10n.expenseCategoryTravel;
-      case 'Education':
-        return l10n.expenseCategoryEducation;
-      case 'Other':
-        return l10n.expenseCategoryOther;
-      default:
-        return category;
-    }
+    // Không cần dịch vì danh mục đã được Việt hóa
+    return category;
   }
   
   void _submitForm() async {
@@ -388,34 +390,41 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         
         final userId = 'demo-user';
         
+        final now = DateTime.now();
         final expense = Expense(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: widget.expenseToEdit?.id ?? now.millisecondsSinceEpoch.toString(),
           userId: userId,
           date: _selectedDate,
           amount: double.parse(_amountController.text),
-          currency: _selectedCurrency,
+          currency: widget.expenseToEdit?.currency ?? 'VND',
           category: _selectedCategory,
           item: _titleController.text,
           paymentMethod: _selectedPaymentMethod,
           location: _location,
           notes: _notesController.text.isEmpty ? null : _notesController.text,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          createdAt: widget.expenseToEdit?.createdAt ?? now,
+          updatedAt: now,
         );
         
-        final expenseId = await expenseProvider.addExpense(expense);
+        final expenseId = widget.expenseToEdit != null
+          ? await expenseProvider.updateExpense(expense)
+          : await expenseProvider.addExpense(expense);
         
         if (expenseId != null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context)!.expenseAddedSuccess)),
+              SnackBar(content: Text(widget.expenseToEdit != null
+                ? AppLocalizations.of(context)!.expenseUpdatedSuccess
+                : AppLocalizations.of(context)!.expenseAddedSuccess)),
             );
             Navigator.pop(context);
           }
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context)!.expenseAddedError)),
+              SnackBar(content: Text(widget.expenseToEdit != null
+                ? AppLocalizations.of(context)!.expenseUpdatedError
+                : AppLocalizations.of(context)!.expenseAddedError)),
             );
           }
         }

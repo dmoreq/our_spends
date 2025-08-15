@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:our_spends/providers/expense_provider.dart';
 import 'package:our_spends/providers/language_provider.dart';
-import 'package:our_spends/screens/ai_chat_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:our_spends/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 @GenerateMocks([ExpenseProvider, LanguageProvider])
-import 'chat_screen_test.mocks.dart';
 
 // Create a testable version of AIChatScreen that doesn't depend on AIService initialization
 class TestableAIChatScreen extends StatelessWidget {
@@ -28,13 +23,8 @@ class TestableAIChatScreen extends StatelessWidget {
 
 void main() {
   group('AIChatScreen Tests', () {
-    late MockExpenseProvider mockExpenseProvider;
-    late MockLanguageProvider mockLanguageProvider;
-
     setUp(() {
-      mockExpenseProvider = MockExpenseProvider();
-      mockLanguageProvider = MockLanguageProvider();
-      when(mockLanguageProvider.currentLocale).thenReturn(const Locale('en'));
+      // Setup code if needed
     });
 
     testWidgets('should display initial message', (WidgetTester tester) async {
@@ -48,7 +38,7 @@ void main() {
         ),
       );
       
-      // Verify the initial message is displayed
+      // Verify that the widget renders
       expect(find.text('How can I help you today?'), findsOneWidget);
     });
   });

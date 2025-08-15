@@ -10,6 +10,7 @@ class SharedPreferencesStorage implements StorageService {
   bool _initialized = false;
   
   /// Initializes the SharedPreferences instance.
+  @override
   Future<void> init() async {
     if (!_initialized) {
       _prefs = await SharedPreferences.getInstance();

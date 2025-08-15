@@ -1,5 +1,3 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../repositories/currency_repository.dart';
 import '../repositories/expense_repository.dart';
 import '../repositories/implementations/shared_preferences_currency_repository.dart';
@@ -44,10 +42,8 @@ class ServiceProvider {
     _tagRepository = SharedPreferencesTagRepository(_storageService!);
     _currencyRepository = SharedPreferencesCurrencyRepository(_storageService!);
     
-    // Initialize repositories
-    await _expenseRepository!.init();
-    await _tagRepository!.init();
-    await _currencyRepository!.init();
+    // Ensure default currencies exist
+    await _currencyRepository!.ensureDefaultCurrencies();
     
     // Initialize expense service
     _expenseService = ExpenseService(

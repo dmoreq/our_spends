@@ -1,7 +1,6 @@
 import '../models/expense.dart';
 import '../repositories/expense_repository.dart';
 import '../repositories/tag_repository.dart';
-import '../services/service_provider.dart';
 
 class ExpenseQueryService {
   final ExpenseRepository _expenseRepository;
@@ -19,7 +18,7 @@ class ExpenseQueryService {
     // Parse natural language query and convert to database parameters
     final queryParams = _parseQuery(query);
     
-    final allExpenses = await _expenseRepository.getAll();
+    final allExpenses = await _expenseRepository.getExpenses();
     
     return allExpenses.where((expense) {
       if (queryParams['startDate'] != null && expense.date.isBefore(queryParams['startDate'])) {
@@ -48,11 +47,11 @@ class ExpenseQueryService {
     DateTime? endDate,
   }) async {
     // Using available methods in the repository to build stats
-    final expenses = await _expenseRepository.getAll(
+    final expenses = await _expenseRepository.getExpenses(
       startDate: startDate,
       endDate: endDate,
     );
-    final tags = await _tagRepository.getAll();
+    final tags = await _tagRepository.getTags();
     
     final totalExpenses = expenses.length;
     final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
@@ -79,7 +78,7 @@ class ExpenseQueryService {
   }) async {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month - months, 1);
-    final expenses = await _expenseRepository.getAll(
+    final expenses = await _expenseRepository.getExpenses(
       startDate: startDate,
       endDate: now,
     );
@@ -96,7 +95,7 @@ class ExpenseQueryService {
 
   // Search expenses by text
   Future<List<Expense>> searchExpenses(String userId, String searchText) async {
-    final allExpenses = await _expenseRepository.getAll();
+    final allExpenses = await _expenseRepository.getExpenses();
     return allExpenses.where((expense) =>
       expense.item.toLowerCase().contains(searchText.toLowerCase())
     ).toList();

@@ -1,73 +1,113 @@
-import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:our_spends/models/expense.dart';
-import 'package:our_spends/services/database_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:our_spends/repositories/implementations/shared_preferences_expense_repository.dart';
+import 'package:our_spends/services/storage/storage_service.dart';
+
+class MockStorageService implements StorageService {
+  Map<String, String> storage = {};
+  
+  @override
+  Future<void> init() async {}
+  
+  @override
+  Future<String?> getString(String key) async => storage[key];
+  
+  @override
+  Future<bool> setString(String key, String value) async {
+    storage[key] = value;
+    return true;
+  }
+
+  @override
+  Future<bool> clear() async {
+    storage.clear();
+    return true;
+  }
+
+  @override
+  Future<bool> containsKey(String key) async {
+    return storage.containsKey(key);
+  }
+
+  @override
+  Future<bool> remove(String key) async {
+    storage.remove(key);
+    return true;
+  }
+}
 
 void main() {
-  group('Simple Database Persistence Tests', () {
-    late DatabaseService databaseService;
+  group('SharedPreferencesExpenseRepository', () {
+    late SharedPreferencesExpenseRepository repository;
+    late MockStorageService storageService;
     
     setUp(() {
-      databaseService = DatabaseService();
+      storageService = MockStorageService();
+      repository = SharedPreferencesExpenseRepository(storageService);
+    });
+    
+    test('should persist expense insertion', () async {
+      final expense = Expense(
+        id: '1',
+        userId: 'user1',
+        date: DateTime(2024, 1, 1),
+        amount: 100.0,
+        currency: 'USD',
+        item: 'Test Item',
+      );
+      
+      await repository.insertExpense(expense);
+      final expenses = await repository.getExpenses();
+      
+      expect(expenses.length, 1);
+      expect(expenses.first.item, 'Test Item');
     });
     
     test('should persist expense deletion', () async {
-      // Setup SharedPreferences mock with empty initial values
-      SharedPreferences.setMockInitialValues({});
-      
-      // Initialize database
-      await databaseService.init();
-      
-      // Create and insert a test expense
-      final testExpense = Expense(
-        id: '',
-        userId: 'test-user',
-        date: DateTime(2023, 5, 15),
-        amount: 50.0,
+      final expense = Expense(
+        id: '1',
+        userId: 'user1',
+        date: DateTime(2024, 1, 1),
+        amount: 100.0,
         currency: 'USD',
-        category: 'Food & Dining',
-        item: 'Test Expense',
+        item: 'Test Item',
       );
       
-      // Insert expense
-      final expenseId = await databaseService.insertExpense(testExpense);
+      await repository.insertExpense(expense);
+      await repository.deleteExpense('1');
+      final expenses = await repository.getExpenses();
       
-      // Verify expense was saved
-      var expenses = await databaseService.getExpenses();
-      expect(expenses.length, 1, reason: 'Should have one expense after insertion');
+      expect(expenses.isEmpty, true);
+    });
+    
+    test('should persist multiple expenses', () async {
+      final storageService = MockStorageService();
+      final repository = SharedPreferencesExpenseRepository(storageService);
       
-      // Get the SharedPreferences instance to verify data was actually saved
-      var prefs = await SharedPreferences.getInstance();
-      var expensesJson = prefs.getString('expenses_data');
-      expect(expensesJson, isNotNull, reason: 'Expenses data should be saved in SharedPreferences');
+      final expenses = await repository.getExpenses();
+      expect(expenses.isEmpty, true);
       
-      // Verify the saved JSON contains one expense
-      var savedExpenses = json.decode(expensesJson!);
-      expect(savedExpenses.length, 1, reason: 'Should have one expense in SharedPreferences');
+      await repository.insertExpense(Expense(
+        id: '1',
+        userId: 'user1',
+        date: DateTime(2024, 1, 1),
+        amount: 100.0,
+        currency: 'USD',
+        item: 'Item 1',
+      ));
       
-      // Delete the expense
-      await databaseService.deleteExpense(expenseId);
+      await repository.insertExpense(Expense(
+        id: '2',
+        userId: 'user1',
+        date: DateTime(2024, 1, 2),
+        amount: 200.0,
+        currency: 'USD',
+        item: 'Item 2',
+      ));
       
-      // Verify expense was deleted from memory
-      expenses = await databaseService.getExpenses();
-      expect(expenses.length, 0, reason: 'Should have no expenses after deletion');
-      
-      // Verify expense was deleted from SharedPreferences
-      prefs = await SharedPreferences.getInstance();
-      expensesJson = prefs.getString('expenses_data');
-      expect(expensesJson, isNotNull, reason: 'Expenses data should still exist in SharedPreferences');
-      
-      savedExpenses = json.decode(expensesJson!);
-      expect(savedExpenses.length, 0, reason: 'Should have no expenses in SharedPreferences after deletion');
-      
-      // Create a new database service to simulate app restart
-      final newDatabaseService = DatabaseService();
-      await newDatabaseService.init();
-      
-      // Verify expense is still deleted after "restart"
-      final persistedExpenses = await newDatabaseService.getExpenses();
-      expect(persistedExpenses.length, 0, reason: 'Should have no expenses after app restart');
+      final savedExpenses = await repository.getExpenses();
+      expect(savedExpenses.length, 2);
+      expect(savedExpenses.map((e) => e.item).toList(), ['Item 1', 'Item 2']);
     });
   });
 }

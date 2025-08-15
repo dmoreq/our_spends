@@ -4,7 +4,6 @@ import '../../models/tag.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/service_provider.dart';
 import '../../services/expense_service.dart';
-import '../add_expense_screen.dart';
 import 'add_expense_screen.dart';
 import '../../widgets/expense_list_item.dart';
 
@@ -93,7 +92,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AddExpenseScreen(),
+        builder: (context) => const AddExpenseScreen(initialTagIds: []),
       ),
     ).then((_) => _loadExpenses());
   }
@@ -191,7 +190,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withAlpha(25),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -211,7 +210,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Text(
             'Start tracking your expenses by adding your first one',
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withAlpha(153),
             ),
             textAlign: TextAlign.center,
           ),
@@ -236,52 +235,57 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       itemCount: _expenses.length,
       itemBuilder: (context, index) {
         final expense = _expenses[index];
-        // Find tags for this expense
-        final expenseTags = _tags.where((tag) {
-          return _expenseService.getExpenseTags(expense.id).then(
-            (tagIds) => tagIds.contains(tag.id),
-          );
-        }).toList();
         
-        return Dismissible(
-          key: Key(expense.id),
-          background: Container(
-            color: Colors.red,
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 16),
-            child: const Icon(Icons.delete, color: Colors.white),
-          ),
-          direction: DismissDirection.endToStart,
-          confirmDismiss: (direction) async {
-            return await showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Delete Expense'),
-                content: const Text('Are you sure you want to delete this expense?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('Cancel'),
+        return FutureBuilder<List<String>>(
+          future: _expenseService.getExpenseTags(expense.id),
+          builder: (context, snapshot) {
+            // Default empty list if data isn't loaded yet
+            final tagIds = snapshot.data ?? [];
+            final expenseTags = _tags.where((tag) => tagIds.contains(tag.id)).toList();
+            
+            return Dismissible(
+              key: Key(expense.id),
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(right: 16),
+                child: const Icon(Icons.delete, color: Colors.white),
+              ),
+              direction: DismissDirection.endToStart,
+              confirmDismiss: (direction) async {
+                return await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Delete Expense'),
+                    content: const Text('Are you sure you want to delete this expense?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Delete'),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text('Delete'),
-                  ),
-                ],
+                );
+              },
+              onDismissed: (direction) {
+                _deleteExpense(expense.id);
+              },
+              child: ExpenseListItem(
+                expense: expense,
+                tags: expenseTags,
+                onTap: () async {
+                  final tagIds = await _expenseService.getExpenseTags(expense.id);
+                  if (mounted) {
+                    _navigateToEditExpense(expense, tagIds);
+                  }
+                },
               ),
             );
           },
-          onDismissed: (direction) {
-            _deleteExpense(expense.id);
-          },
-          child: ExpenseListItem(
-            expense: expense,
-            tags: expenseTags,
-            onTap: () async {
-              final tagIds = await _expenseService.getExpenseTags(expense.id);
-              _navigateToEditExpense(expense, tagIds);
-            },
-          ),
         );
       },
     );

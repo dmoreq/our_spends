@@ -138,4 +138,9 @@ class ExpenseService {
     
     return result;
   }
+  
+  /// Gets the tag IDs associated with an expense.
+  Future<List<String>> getExpenseTags(String expenseId) async {
+    return await _tagRepository.getExpenseTags(expenseId);
+  }
 }

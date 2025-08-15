@@ -179,7 +179,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       final parts = cleanValue.split('.');
                       String formattedValue = parts[0];
                       if (parts.length > 1) {
-                        formattedValue += '.' + parts[1];
+                        formattedValue = '${parts[0]}.${parts[1]}';
                       }
                       if (formattedValue != value) {
                         _amountController.value = TextEditingValue(
@@ -414,10 +414,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       setState(() {
         _isLoading = true;
       });
-      
+      final l10n = AppLocalizations.of(context)!;
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      final tagProvider = Provider.of<TagProvider>(context, listen: false);
       try {
-        final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-        
         final userId = 'demo-user';
         
         final now = DateTime.now();
@@ -442,31 +442,28 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         if (result != null) {
           // Save the selected tags for this expense
           final expenseId = expense.id; // Use the expense ID directly
-          await Provider.of<TagProvider>(context, listen: false).setExpenseTags(expenseId, _selectedTagIds);
+          await tagProvider.setExpenseTags(expenseId, _selectedTagIds);
           
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(widget.expenseToEdit != null
-                ? AppLocalizations.of(context)!.expenseUpdatedSuccess
-                : AppLocalizations.of(context)!.expenseAddedSuccess)),
-            );
-            Navigator.pop(context);
-          }
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(widget.expenseToEdit != null
-                ? AppLocalizations.of(context)!.expenseUpdatedError
-                : AppLocalizations.of(context)!.expenseAddedError)),
-            );
-          }
-        }
-      } catch (e) {
-        if (mounted) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${AppLocalizations.of(context)!.error}: $e')),
+            SnackBar(content: Text(widget.expenseToEdit != null
+                ? l10n.expenseUpdatedSuccess
+                : l10n.expenseAddedSuccess)),
+          );
+          Navigator.pop(context);
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(widget.expenseToEdit != null
+              ? l10n.expenseUpdatedError
+              : l10n.expenseAddedError)),
           );
         }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.error}: $e')),
+        );
       } finally {
         if (mounted) {
           setState(() {
@@ -487,7 +484,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         child: Text(
           AppLocalizations.of(context)!.noTagsSelected,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withAlpha(128),
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -507,11 +504,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             return Chip(
               label: Text(tag.name),
               avatar: Icon(
-                IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                IconData(tag.iconCodePoint, fontFamily: 'MaterialIcons'),
                 size: 18,
                 color: Color(tag.color),
               ),
-              backgroundColor: Color(tag.color).withOpacity(0.1),
+              backgroundColor: Color(tag.color).withAlpha(25),
               labelStyle: TextStyle(color: Color(tag.color)),
               deleteIconColor: Color(tag.color),
               onDeleted: () {
@@ -624,7 +621,7 @@ class _TagSelectionDialogState extends State<TagSelectionDialog> {
                           Icon(
                             Icons.label_off_outlined,
                             size: 48,
-                            color: theme.colorScheme.onSurface.withOpacity(0.4),
+                            color: theme.colorScheme.onSurface.withAlpha(102),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -671,7 +668,7 @@ class _TagSelectionDialogState extends State<TagSelectionDialog> {
                       return CheckboxListTile(
                         title: Text(tag.name),
                         secondary: Icon(
-                          IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                          IconData(tag.iconCodePoint, fontFamily: 'MaterialIcons'),
                           color: Color(tag.color),
                         ),
                         value: isSelected,

@@ -18,23 +18,24 @@ void main() async {
   final serviceProvider = ServiceProvider();
   await serviceProvider.initialize();
   
-  runApp(const OurSpendsApp());
+  runApp(OurSpendsApp(serviceProvider: serviceProvider));
 }
 
 class OurSpendsApp extends StatelessWidget {
-  const OurSpendsApp({super.key});
+  final ServiceProvider serviceProvider;
+  const OurSpendsApp({super.key, required this.serviceProvider});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider.value(value: ServiceProvider()),
+        Provider.value(value: serviceProvider),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         // Providers organized by domain/feature
-        ChangeNotifierProvider(create: (_) => ExpenseProvider()),
-        ChangeNotifierProvider(create: (_) => TagProvider()),
-        ChangeNotifierProvider(create: (_) => CurrencyProvider()),
+        ChangeNotifierProvider(create: (_) => ExpenseProvider(expenseService: serviceProvider.expenseService)),
+        ChangeNotifierProvider(create: (_) => TagProvider(tagRepository: serviceProvider.tagRepository)),
+        ChangeNotifierProvider(create: (_) => CurrencyProvider(currencyRepository: serviceProvider.currencyRepository)),
       ],
       child: Consumer2<LanguageProvider, ThemeProvider>(
         builder: (context, languageProvider, themeProvider, child) {

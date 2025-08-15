@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/api_config.dart';
 
 class AISettingsScreen extends StatefulWidget {
   const AISettingsScreen({super.key});

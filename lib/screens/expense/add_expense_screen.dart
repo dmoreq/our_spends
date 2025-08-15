@@ -17,10 +17,10 @@ class AddExpenseScreen extends StatefulWidget {
   final List<String> initialTagIds;
   
   const AddExpenseScreen({
-    Key? key,
+    super.key,
     this.expense,
     this.initialTagIds = const [],
-  }) : super(key: key);
+  });
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -96,7 +96,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           ),
           if (_isSubmitting)
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withAlpha(77),
               child: const Center(
                 child: CircularProgressIndicator(),
               ),

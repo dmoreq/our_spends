@@ -8,7 +8,6 @@ import '../models/expense.dart';
 import '../models/chat_message.dart';
 import '../services/ai_service.dart';
 import '../widgets/chat_message_bubble.dart';
-import '../widgets/chat_option_button.dart';
 import '../widgets/chat_app_bar.dart';
 import '../widgets/chat_input_field.dart';
 import '../theme/chat_theme.dart';
@@ -35,9 +34,16 @@ class _AIChatScreenState extends State<AIChatScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeProvider();
   }
-  
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      _initializeProvider();
+    }
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
@@ -46,10 +52,11 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   Future<void> _initializeProvider() async {
+    if (!mounted) return;
     try {
       // Initialize the AI service
       await _aiService.initialize();
-      
+
       if (mounted) {
         setState(() {
           _isInitialized = true;
@@ -58,8 +65,10 @@ class _AIChatScreenState extends State<AIChatScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         setState(() {
-          _errorMessage = AppLocalizations.of(context)!.failedToInitializeAiProvider(e.toString());
+          _errorMessage =
+              l10n.failedToInitializeAiProvider(e.toString());
         });
       }
     }
@@ -82,7 +91,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
     // Capture context values before async operations
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    final l10n = AppLocalizations.of(context)!;
     final languageCode = languageProvider.currentLocale.languageCode;
     
     // Add user message to chat
@@ -107,7 +115,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     try {
       // Process message using AI service
       final aiResponse = await _aiService.processMessage(
-        message, 
+        message,
         expenseProvider.expenses,
         conversationHistory: _conversationHistory,
         languageCode: languageCode,
@@ -132,8 +140,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
       _scrollToBottom();
 
       // Process message for expense extraction
-      await _processMessageForExpenses(message, aiResponse, expenseProvider, languageCode);
+      if (mounted) {
+        await _processMessageForExpenses(
+            message, aiResponse, expenseProvider, languageCode);
+      }
     } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       // Handle error
       setState(() {
         _messages.add(ChatMessage(
@@ -151,8 +164,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
   @override
   Widget build(BuildContext context) {
     final expenseProvider = Provider.of<ExpenseProvider>(context);
-    final languageProvider = Provider.of<LanguageProvider>(context);
-    final languageCode = languageProvider.currentLocale.languageCode;
     final l10n = AppLocalizations.of(context)!;
     
     // Show loading indicator while initializing
@@ -262,7 +273,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
               title: Text(l10n.generateInsights),
               onTap: () {
                 Navigator.pop(context);
-                _generateInsights(context, expenseProvider, l10n);
+                _generateInsights(expenseProvider);
               },
             ),
             ListTile(
@@ -284,56 +295,26 @@ class _AIChatScreenState extends State<AIChatScreen> {
     );
   }
 
-  // Build a system prompt that includes context about the user's expenses
-  String _buildSystemPrompt(List<dynamic> expenses, AppLocalizations l10n) {
-    // Base system prompt
-    String prompt = l10n.systemPrompt;
-  
-    // Add expense context if available
-    if (expenses.isNotEmpty) {
-      prompt += l10n.systemPromptWithContext;
-  
-      // Add up to 10 most recent expenses
-      final recentExpenses = expenses.take(10).toList();
-      for (var i = 0; i < recentExpenses.length; i++) {
-        final expense = recentExpenses[i];
-        prompt += l10n.expenseInfo(
-          (i + 1).toString(),
-          expense.item,
-          expense.amount.toString(),
-          expense.currency,
-          expense.category,
-          expense.date.toString().split(' ')[0],
-        );
-      }
-    }
-  
-    // Add instructions for expense extraction
-    prompt += l10n.extractionInstruction;
-  
-    return prompt;
-  }
-
   // Process messages to extract expense information
-  Future<void> _processMessageForExpenses(String message, String response, ExpenseProvider expenseProvider, String languageCode) async {
+  Future<void> _processMessageForExpenses(String message, String response,
+      ExpenseProvider expenseProvider, String languageCode) async {
     try {
       // Use fixed demo user ID
-      String userId = 'demo-user';
-      final l10n = AppLocalizations.of(context)!;
-      
-      // Use the existing API service to extract expense information
-      final apiResponse = await expenseProvider.sendMessage(message, userId, languageCode: languageCode);
-      
+      const userId = 'demo-user';
+
+      // Use the AI service to extract expense information
+      final expenseInfo = await _aiService.extractExpenseInfo(message);
+
       // Check if expense information was extracted
-      if (apiResponse['expense_info'] != null && apiResponse['expense_info']['hasExpense'] == true) {
-        // Extract expense information
-        final expenseInfo = apiResponse['expense_info'];
-        
+      if (expenseInfo != null &&
+          expenseInfo.isNotEmpty &&
+          (expenseInfo['hasExpense'] as bool? ?? false)) {
         // Save expense to database using the existing method
         await _saveExpenseToDatabase(expenseInfo, userId, expenseProvider);
-        
+
         // Show a snackbar to notify the user
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.expenseSavedToYourTracker),
@@ -348,7 +329,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   // Save expense to database
-  Future<void> _saveExpenseToDatabase(Map<String, dynamic> expenseInfo, String userId, ExpenseProvider expenseProvider) async {
+  Future<void> _saveExpenseToDatabase(Map<String, dynamic> expenseInfo,
+      String userId, ExpenseProvider expenseProvider) async {
     try {
       // Create a new expense object
       final expense = Expense(
@@ -357,8 +339,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
         date: DateTime.now(),
         amount: expenseInfo['amount'] ?? 0.0,
         currency: expenseInfo['currency'] ?? 'USD',
-
-        subcategory: expenseInfo['subcategory'],
         item: expenseInfo['description'] ?? expenseInfo['item'] ?? 'Expense',
         description: expenseInfo['description'],
         location: expenseInfo['location'],
@@ -371,9 +351,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
         updatedAt: DateTime.now(),
         syncStatus: 0,
       );
-      
+
       // Add the expense to the database
-      await expenseProvider.addExpense(expense);
+      await expenseProvider.addExpense(expense, []);
     } catch (e) {
       logger.error('Error saving expense to database', e);
       rethrow;
@@ -381,12 +361,11 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   // Generate insights using the existing provider
-  Future<void> _generateInsights(BuildContext context, ExpenseProvider expenseProvider, AppLocalizations l10n) async {
+  Future<void> _generateInsights(ExpenseProvider expenseProvider) async {
     try {
-      // Use fixed demo user ID
-      String userId = 'demo-user';
-      
       // Show loading dialog
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -401,28 +380,33 @@ class _AIChatScreenState extends State<AIChatScreen> {
           ),
         ),
       );
-      
+
       // Generate insights
-      final response = await expenseProvider.generateInsights(userId);
-      
+      final insights = await expenseProvider.generateInsights();
+
       // Close loading dialog
       if (mounted) {
         Navigator.of(context).pop();
       }
-      
+
       // Show insights dialog
       if (mounted) {
+        final languageProvider =
+            Provider.of<LanguageProvider>(context, listen: false);
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: Text(l10n.spendingInsights),
             content: SingleChildScrollView(
-              child: Text(response['data'] ?? l10n.couldNotGenerateInsights),
+              child: Text(insights),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi' ? 'Đóng' : 'Close'),
+                child: Text(
+                    languageProvider.currentLocale.languageCode == 'vi'
+                        ? 'Đóng'
+                        : 'Close'),
               ),
             ],
           ),
@@ -433,22 +417,29 @@ class _AIChatScreenState extends State<AIChatScreen> {
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
-      
+
       // Show error dialog
       if (mounted) {
+        final languageProvider =
+            Provider.of<LanguageProvider>(context, listen: false);
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text(Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi' ? 'Lỗi' : 'Error'),
+            title: Text(languageProvider.currentLocale.languageCode == 'vi'
+                ? 'Lỗi'
+                : 'Error'),
             content: Text(
-              Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi'
+              languageProvider.currentLocale.languageCode == 'vi'
                   ? 'Không thể tạo phân tích: ${e.toString()}'
                   : 'Failed to generate insights: ${e.toString()}',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(Provider.of<LanguageProvider>(context).currentLocale.languageCode == 'vi' ? 'Đóng' : 'Close'),
+                child: Text(languageProvider.currentLocale.languageCode ==
+                        'vi'
+                    ? 'Đóng'
+                    : 'Close'),
               ),
             ],
           ),

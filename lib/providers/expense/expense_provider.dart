@@ -1,38 +1,47 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../models/chat_message.dart';
 import '../../models/expense.dart';
+import '../../services/ai_service.dart';
 import '../../services/expense_service.dart';
 import '../../services/service_provider.dart';
 
 /// A provider that manages expense data and operations.
-/// 
+///
 /// This class follows the separation of concerns principle by delegating
 /// business logic to the ExpenseService and focusing on UI state management.
 class ExpenseProvider extends ChangeNotifier {
   final ExpenseService _expenseService;
-  
+  final AIService _aiService;
+
   List<Expense> _expenses = [];
   List<Map<String, dynamic>> _expensesWithTags = [];
   bool _isLoading = false;
   String? _errorMessage;
   bool _isInitialized = false;
 
-  final _expenseStreamController = StreamController<List<Map<String, dynamic>>>.broadcast();
+  final _expenseStreamController =
+      StreamController<List<Map<String, dynamic>>>.broadcast();
 
   List<Expense> get expenses => List.unmodifiable(_expenses);
-  List<Map<String, dynamic>> get expensesWithTags => List.unmodifiable(_expensesWithTags);
+  List<Map<String, dynamic>> get expensesWithTags =>
+      List.unmodifiable(_expensesWithTags);
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isInitialized => _isInitialized;
   Future<void> get initializationDone => _initFuture;
   late Future<void> _initFuture;
 
-  Stream<List<Map<String, dynamic>>> get expensesStream => _expenseStreamController.stream;
+  Stream<List<Map<String, dynamic>>> get expensesStream =>
+      _expenseStreamController.stream;
 
   ExpenseProvider({
     ExpenseService? expenseService,
-  }) : _expenseService = expenseService ?? ServiceProvider.instance.expenseService {
+    AIService? aiService,
+  })  : _expenseService =
+            expenseService ?? ServiceProvider.instance.expenseService,
+        _aiService = aiService ?? ServiceProvider.instance.aiService {
     _initFuture = _initializeData();
   }
 
@@ -99,9 +108,10 @@ class ExpenseProvider extends ChangeNotifier {
         await _addTestData();
         expensesWithTags = await _expenseService.getAllExpensesWithTags();
       }
-      
+
       _expensesWithTags = expensesWithTags;
-      _expenses = expensesWithTags.map((e) => e['expense'] as Expense).toList();
+      _expenses =
+          expensesWithTags.map((e) => e['expense'] as Expense).toList();
       _expenseStreamController.add(_expensesWithTags);
 
       _isInitialized = true;
@@ -115,11 +125,12 @@ class ExpenseProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       final expensesWithTags = await _expenseService.getAllExpensesWithTags();
-      
+
       _expensesWithTags = expensesWithTags;
-      _expenses = expensesWithTags.map((e) => e['expense'] as Expense).toList();
+      _expenses =
+          expensesWithTags.map((e) => e['expense'] as Expense).toList();
       _expenseStreamController.add(_expensesWithTags);
-      
+
       _setLoading(false);
       notifyListeners();
     } catch (e) {
@@ -143,7 +154,7 @@ class ExpenseProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
-  
+
   // Public methods for testing
   void setLoading(bool loading) {
     _setLoading(loading);
@@ -156,7 +167,7 @@ class ExpenseProvider extends ChangeNotifier {
   void clearError() {
     _clearError();
   }
-  
+
   // Expose _loadExpenses for testing
   Future<void> loadExpensesForTesting() async {
     await loadExpenses();
@@ -167,13 +178,13 @@ class ExpenseProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       _clearError();
-      
+
       // Create the expense using the service
       final expenseId = await _expenseService.createExpense(expense, tagIds);
-      
+
       // Reload expenses to update the UI
       await loadExpenses();
-      
+
       _setLoading(false);
       return expenseId;
     } catch (e) {
@@ -182,19 +193,19 @@ class ExpenseProvider extends ChangeNotifier {
       return null;
     }
   }
-  
+
   // Update an existing expense in the database and refresh the expenses list
   Future<bool> updateExpense(Expense expense, List<String> tagIds) async {
     try {
       _setLoading(true);
       _clearError();
-      
+
       // Update the expense using the service
       await _expenseService.updateExpense(expense, tagIds);
-      
+
       // Reload expenses to update the UI
       await loadExpenses();
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -209,13 +220,13 @@ class ExpenseProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       _clearError();
-      
+
       // Delete the expense using the service
       await _expenseService.deleteExpense(expenseId);
-      
+
       // Reload expenses to update the UI
       await loadExpenses();
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -233,12 +244,12 @@ class ExpenseProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       _clearError();
-      
+
       final result = await _expenseService.getExpensesGroupedByTag(
         startDate: startDate,
         endDate: endDate,
       );
-      
+
       _setLoading(false);
       return result;
     } catch (e) {
@@ -253,15 +264,56 @@ class ExpenseProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       _clearError();
-      
+
       final result = await _expenseService.getExpenseWithTags(expenseId);
-      
+
       _setLoading(false);
       return result;
     } catch (e) {
       _setError('Failed to get expense with tags: ${e.toString()}');
       _setLoading(false);
       return null;
+    }
+  }
+
+  Future<String> sendMessage(
+    String message, {
+    List<ChatMessage>? conversationHistory,
+    String? languageCode,
+  }) async {
+    try {
+      _setLoading(true);
+      final history = conversationHistory
+          ?.map((m) => {
+                'role': m.isUser ? 'user' : 'model',
+                'content': m.text,
+              })
+          .toList();
+      final response = await _aiService.processMessage(
+        message,
+        _expenses,
+        conversationHistory: history,
+        languageCode: languageCode,
+      );
+      _setLoading(false);
+      return response;
+    } catch (e) {
+      _setError('Failed to send message: ${e.toString()}');
+      _setLoading(false);
+      rethrow;
+    }
+  }
+
+  Future<String> generateInsights() async {
+    try {
+      _setLoading(true);
+      final insights = await _aiService.generateSpendingInsights(_expenses);
+      _setLoading(false);
+      return insights;
+    } catch (e) {
+      _setError('Failed to generate insights: ${e.toString()}');
+      _setLoading(false);
+      rethrow;
     }
   }
 }

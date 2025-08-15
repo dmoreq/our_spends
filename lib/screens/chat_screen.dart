@@ -18,12 +18,10 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   final List<Map<String, String>> _conversationHistory = [];
   final AIService _aiService = AIService();
   bool _isTyping = false;
-  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -34,9 +32,6 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _initializeAIService() async {
     try {
       await _aiService.initialize();
-      setState(() {
-        _isInitialized = true;
-      });
     } catch (e) {
       logger.error('Failed to initialize AI service', e);
     }
@@ -45,7 +40,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _messageController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -71,7 +65,6 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     _messageController.clear();
-    _scrollToBottom();
 
     await _processChatMessage(message, demoUserId, expenseProvider);
   }
@@ -112,7 +105,6 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _isTyping = false;
     });
-    _scrollToBottom();
   }
 
   void _addMessage(String text, {required bool isUser}) {
@@ -127,33 +119,6 @@ class _ChatScreenState extends State<ChatScreen> {
       'role': isUser ? 'user' : 'assistant',
       'content': text,
     });
-  }
-
-  void _generateInsights() async {
-    final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
-    final languageCode = languageProvider.currentLocale.languageCode;
-
-    setState(() {
-      _isTyping = true;
-    });
-
-    try {
-      final insights = await _aiService.generateSpendingInsights(expenseProvider.expenses);
-      _addMessage("📊 Here are your spending insights:", isUser: false);
-      _addMessage(insights, isUser: false);
-    } catch (e) {
-      final errorMessage = languageCode == 'vi'
-          ? "Xin lỗi, tôi không thể tạo phân tích chi tiêu ngay bây giờ. Vui lòng thử lại sau."
-          : "Sorry, I couldn't generate insights right now. Please try again.";
-      _addMessage(errorMessage, isUser: false);
-      logger.error('Error generating insights', e);
-    }
-
-    setState(() {
-      _isTyping = false;
-    });
-    _scrollToBottom();
   }
 
   Future<void> _saveExpenseToDatabase(Map<String, dynamic> expenseInfo, String userId) async {
@@ -182,16 +147,6 @@ class _ChatScreenState extends State<ChatScreen> {
       logger.error('Failed to save expense to database', e);
       // We don't want to show an error message to the user if this fails
       // The conversation will continue normally
-    }
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
     }
   }
 
@@ -300,7 +255,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildMessageList(ThemeData theme) {
     return ListView.builder(
-      controller: _scrollController,
       padding: const EdgeInsets.all(16.0),
       itemCount: _messages.length,
       itemBuilder: (context, index) {

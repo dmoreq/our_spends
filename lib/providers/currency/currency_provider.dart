@@ -104,8 +104,4 @@ class CurrencyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _clearError() {
-    _errorMessage = null;
-    notifyListeners();
-  }
 }

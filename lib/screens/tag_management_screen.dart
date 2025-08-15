@@ -189,8 +189,9 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
         description: _descriptionController.text,
-        color: _selectedColor.value,
-        icon: _selectedIcon.codePoint,
+        color: _selectedColor.toARGB32(),
+        iconCodePoint: _selectedIcon.codePoint,
+        iconFontFamily: 'MaterialIcons',
         isActive: true,
       );
 
@@ -212,7 +213,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
     _descriptionController.text = tag.description ?? '';
     setState(() {
       _selectedColor = Color(tag.color);
-      _selectedIcon = IconData(tag.icon, fontFamily: 'MaterialIcons', fontPackage: 'flutter');
+      _selectedIcon = IconData(tag.iconCodePoint, fontFamily: tag.iconFontFamily, fontPackage: 'flutter');
     });
 
     showDialog(
@@ -284,8 +285,9 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                 final updatedTag = tag.copyWith(
                   name: _nameController.text,
                   description: _descriptionController.text,
-                  color: _selectedColor.value,
-                  icon: _selectedIcon.codePoint,
+                  color: _selectedColor.toARGB32(),
+                  iconCodePoint: _selectedIcon.codePoint,
+                  iconFontFamily: 'MaterialIcons',
                 );
 
                 Provider.of<TagProvider>(context, listen: false).updateTag(updatedTag);
@@ -391,7 +393,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.primary.withAlpha(26),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -411,7 +413,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                   Text(
                     'Create tags to organize your expenses',
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withAlpha(153),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -442,11 +444,11 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Color(tag.color).withOpacity(0.1),
+                      color: Color(tag.color).withAlpha(26),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                      IconData(tag.iconCodePoint, fontFamily: tag.iconFontFamily),
                       color: Color(tag.color),
                     ),
                   ),

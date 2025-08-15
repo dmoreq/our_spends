@@ -195,8 +195,6 @@ class ExpenseListItem extends StatefulWidget {
 }
 
 class _ExpenseListItemState extends State<ExpenseListItem> {
-  String? _formattedAmount;
-
   @override
   void initState() {
     super.initState();
@@ -204,19 +202,16 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
   }
 
   Future<void> _initializeFormattedAmount() async {
-    final formattedAmount = await _formatCurrency();
-    if (mounted) {
-      setState(() {
-        _formattedAmount = formattedAmount;
-      });
-    }
+    // Format currency is handled directly in the build method
+    // This method is kept for future implementation
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context).languageCode;
-    final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+    // Access provider when needed
+    // final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
     
     // Format date based on locale - show only day/month
     final shortDate = locale == 'vi' 
@@ -313,14 +308,14 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                                 margin: const EdgeInsets.only(right: 8),
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Color(tag.color).withOpacity(0.1),
+                                  color: Color(tag.color).withAlpha(26),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                                      IconData(tag.iconCodePoint, fontFamily: tag.iconFontFamily),
                                       size: 16,
                                       color: Color(tag.color),
                                     ),
@@ -481,7 +476,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                       Text(
                         'Tags',
                         style: theme.textTheme.titleSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withAlpha(153),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -489,7 +484,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                         Text(
                           'No tags',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withAlpha(153),
                             fontStyle: FontStyle.italic,
                           ),
                         )
@@ -506,14 +501,14 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                                 return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: Color(tag.color).withOpacity(0.1),
+                                    color: Color(tag.color).withAlpha(26),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                                        IconData(tag.iconCodePoint, fontFamily: tag.iconFontFamily),
                                         size: 18,
                                         color: Color(tag.color),
                                       ),

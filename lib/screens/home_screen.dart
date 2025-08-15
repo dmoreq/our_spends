@@ -55,14 +55,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
-            color: isSelected ? theme.colorScheme.primary.withOpacity(0.1) : Colors.transparent,
+            color: isSelected ? theme.colorScheme.primary.withAlpha(26) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
               Icon(
                 isSelected ? selectedIcon : icon,
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.7),
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withAlpha(179),
                 size: 24,
               ),
               const SizedBox(width: 16),
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withAlpha(179),
                   ),
                 ),
               ),
@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         _animationController.reverse();
                       },
                       child: Container(
-                        color: Colors.black.withOpacity(0.3 * _animation.value),
+                        color: Colors.black.withAlpha((0.3 * _animation.value * 255).round()),
                       ),
                     );
                   },
@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           color: theme.colorScheme.surface,
                           boxShadow: [
                             BoxShadow(
-                              color: theme.shadowColor.withOpacity(0.2),
+                              color: theme.shadowColor.withAlpha(51),
                               blurRadius: 15,
                               offset: const Offset(2, 0),
                             ),

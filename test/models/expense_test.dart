@@ -11,7 +11,6 @@ void main() {
         date: DateTime(2023, 5, 15),
         amount: 50.0,
         currency: 'USD',
-        category: 'Food & Dining',
         item: 'Lunch',
       );
 
@@ -20,7 +19,6 @@ void main() {
       expect(expense.date, DateTime(2023, 5, 15));
       expect(expense.amount, 50.0);
       expect(expense.currency, 'USD');
-      expect(expense.category, 'Food & Dining');
       expect(expense.item, 'Lunch');
       expect(expense.isRecurring, false); // Default value
     });
@@ -33,7 +31,6 @@ void main() {
         'date': '2023-05-15T00:00:00.000',
         'amount': 50.0,
         'currency': 'USD',
-        'category': 'Food & Dining',
         'item': 'Lunch',
         'description': 'Business lunch',
         'is_recurring': true,
@@ -47,7 +44,6 @@ void main() {
       expect(expense.date, DateTime(2023, 5, 15));
       expect(expense.amount, 50.0);
       expect(expense.currency, 'USD');
-      expect(expense.category, 'Food & Dining');
       expect(expense.item, 'Lunch');
       expect(expense.description, 'Business lunch');
       expect(expense.isRecurring, true);
@@ -62,7 +58,6 @@ void main() {
         date: DateTime(2023, 5, 15),
         amount: 50.0,
         currency: 'USD',
-        category: 'Food & Dining',
         item: 'Lunch',
         description: 'Business lunch',
         isRecurring: true,
@@ -76,7 +71,6 @@ void main() {
       expect(json['date'], '2023-05-15T00:00:00.000');
       expect(json['amount'], 50.0);
       expect(json['currency'], 'USD');
-      expect(json['category'], 'Food & Dining');
       expect(json['item'], 'Lunch');
       expect(json['description'], 'Business lunch');
       expect(json['is_recurring'], true);
@@ -91,7 +85,6 @@ void main() {
         date: DateTime(2023, 5, 15),
         amount: 50.0,
         currency: 'USD',
-        category: 'Food & Dining',
         item: 'Lunch',
       );
 
@@ -109,7 +102,6 @@ void main() {
       expect(updatedExpense.userId, 'user1');
       expect(updatedExpense.date, DateTime(2023, 5, 15));
       expect(updatedExpense.currency, 'USD');
-      expect(updatedExpense.category, 'Food & Dining');
       expect(updatedExpense.item, 'Lunch');
     });
   });

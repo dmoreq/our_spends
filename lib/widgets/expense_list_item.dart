@@ -13,11 +13,11 @@ class ExpenseListItem extends StatelessWidget {
   final VoidCallback? onTap;
   
   const ExpenseListItem({
-    Key? key,
+    super.key,
     required this.expense,
     this.tags = const [],
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class ExpenseListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          expense.title,
+                          expense.item,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -58,7 +58,7 @@ class ExpenseListItem extends StatelessWidget {
                           Text(
                             expense.description!,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface.withAlpha(179),
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -84,7 +84,7 @@ class ExpenseListItem extends StatelessWidget {
                   Text(
                     dateFormat.format(expense.date),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withAlpha(153),
                     ),
                   ),
                   if (expense.updatedAt != expense.createdAt)
@@ -92,7 +92,7 @@ class ExpenseListItem extends StatelessWidget {
                       'Edited',
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontStyle: FontStyle.italic,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withAlpha(153),
                       ),
                     ),
                 ],
@@ -116,7 +116,7 @@ class ExpenseListItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Color(tag.color).withOpacity(0.2),
+        color: Color(tag.color).withAlpha(51),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(

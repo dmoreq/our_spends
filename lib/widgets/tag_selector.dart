@@ -17,11 +17,11 @@ class TagSelector extends StatefulWidget {
   final Future<List<Tag>> Function() fetchTags;
   
   const TagSelector({
-    Key? key,
+    super.key,
     required this.selectedTagIds,
     required this.onTagsChanged,
     required this.fetchTags,
-  }) : super(key: key);
+  });
 
   @override
   State<TagSelector> createState() => _TagSelectorState();
@@ -46,7 +46,10 @@ class _TagSelectorState extends State<TagSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) {
+      return const SizedBox(); // Return empty widget if localizations are not available
+    }
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,8 +86,8 @@ class _TagSelectorState extends State<TagSelector> {
                   label: Text(tag.name),
                   selected: isSelected,
                   avatar: Icon(IconData(
-                    tag.icon,
-                    fontFamily: 'MaterialIcons',
+                    tag.iconCodePoint,
+                    fontFamily: tag.iconFontFamily,
                   )),
                   onSelected: (selected) {
                     setState(() {

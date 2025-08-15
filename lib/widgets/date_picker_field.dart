@@ -17,15 +17,14 @@ class DatePickerField extends StatelessWidget {
   final String? label;
   
   const DatePickerField({
-    Key? key,
+    super.key,
     required this.selectedDate,
     required this.onDateChanged,
     this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final dateFormat = DateFormat.yMMMd();
     
     return Column(
@@ -54,13 +53,12 @@ class DatePickerField extends StatelessWidget {
   }
   
   Future<void> _selectDate(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime.now().add(const Duration(days: 1)),
-      helpText: l10n.selectDate,
+      helpText: AppLocalizations.of(context)?.expenseDateLabel ?? 'Date',
     );
     
     if (picked != null && picked != selectedDate) {

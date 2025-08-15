@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
 import '../models/tag.dart';
+import '../models/currency.dart';
 import '../services/service_provider.dart';
 import 'amount_input_field.dart';
 import 'date_picker_field.dart';
@@ -21,11 +22,11 @@ class ExpenseForm extends StatefulWidget {
   final VoidCallback? onCancel;
   
   const ExpenseForm({
-    Key? key,
+    super.key,
     this.expense,
     required this.onSubmit,
     this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   State<ExpenseForm> createState() => _ExpenseFormState();
@@ -41,9 +42,8 @@ class _ExpenseFormState extends State<ExpenseForm> {
   final _amountController = TextEditingController();
   
   DateTime _selectedDate = DateTime.now();
-  double _amount = 0.0;
   Currency _selectedCurrency = Currency.usd;
-  List<Currency> _availableCurrencies = [Currency.usd, Currency.eur];
+  final List<Currency> _availableCurrencies = [Currency.usd, Currency.eur];
   List<String> _selectedTagIds = [];
   List<Tag> _availableTags = [];
   bool _isLoading = false;
@@ -74,10 +74,9 @@ class _ExpenseFormState extends State<ExpenseForm> {
     
     try {
       final serviceProvider = ServiceProvider.instance;
-      final databaseService = serviceProvider.databaseService;
       
       // Load available tags
-      final tags = await databaseService.getAllTags();
+      final tags = await serviceProvider.tagRepository.getTags();
       
       // If editing an existing expense, populate form fields
       if (widget.expense != null) {
@@ -97,7 +96,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
         );
         
         // Load selected tags for this expense
-        final tagIds = await databaseService.getExpenseTags(expense.id);
+        final tagIds = await serviceProvider.tagRepository.getExpenseTags(expense.id);
         setState(() {
           _selectedTagIds = tagIds;
           _availableTags = tags;
@@ -105,11 +104,11 @@ class _ExpenseFormState extends State<ExpenseForm> {
         });
       } else {
         // Get default currency for new expenses
-        final defaultCurrencyCode = await databaseService.getPreferredCurrency();
+        final preferredCurrency = await serviceProvider.currencyRepository.getUserPreferredCurrency();
         
         // Find matching currency or default to USD
         final defaultCurrency = _availableCurrencies.firstWhere(
-          (c) => c.code == defaultCurrencyCode,
+          (c) => c.code == preferredCurrency.code,
           orElse: () => Currency.usd
         );
         

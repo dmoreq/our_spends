@@ -24,13 +24,13 @@ class AmountInputField extends StatelessWidget {
   final String? Function(String?)? validator;
   
   const AmountInputField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.selectedCurrency,
     required this.availableCurrencies,
     required this.onCurrencyChanged,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class AmountInputField extends StatelessWidget {
           child: DropdownButtonFormField<String>(
             value: selectedCurrency.code,
             decoration: InputDecoration(
-              labelText: l10n.currency,
+              labelText: l10n?.currency ?? 'Currency',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -74,7 +74,7 @@ class AmountInputField extends StatelessWidget {
           child: TextFormField(
             controller: controller,
             decoration: InputDecoration(
-              labelText: l10n.amount,
+              labelText: l10n?.expenseAmountLabel ?? 'Amount',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -86,15 +86,15 @@ class AmountInputField extends StatelessWidget {
             ],
             validator: validator ?? (value) {
               if (value == null || value.isEmpty) {
-                return l10n.pleaseEnterAmount;
+                return l10n?.fieldRequired ?? 'Please enter an amount';
               }
               try {
                 final amount = double.parse(value.replaceAll(',', '.'));
                 if (amount <= 0) {
-                  return l10n.amountMustBePositive;
+                  return l10n?.invalidNumber ?? 'Amount must be positive';
                 }
               } catch (e) {
-                return l10n.pleaseEnterValidAmount;
+                return l10n?.invalidNumber ?? 'Please enter a valid amount';
               }
               return null;
             },

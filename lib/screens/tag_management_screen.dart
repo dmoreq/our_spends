@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/expense_provider.dart';
+import '../providers/tag/tag_provider.dart';
 import '../models/tag.dart';
 
 class TagManagementScreen extends StatefulWidget {
@@ -194,7 +194,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
         isActive: true,
       );
 
-      Provider.of<ExpenseProvider>(context, listen: false).addTag(tag);
+      Provider.of<TagProvider>(context, listen: false).addTag(tag);
 
       _nameController.clear();
       _descriptionController.clear();
@@ -288,7 +288,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                   icon: _selectedIcon.codePoint,
                 );
 
-                Provider.of<ExpenseProvider>(context, listen: false).updateTag(updatedTag);
+                Provider.of<TagProvider>(context, listen: false).updateTag(updatedTag);
 
                 _nameController.clear();
                 _descriptionController.clear();
@@ -320,7 +320,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
           ),
           TextButton(
             onPressed: () {
-              Provider.of<ExpenseProvider>(context, listen: false).deleteTag(tag.id);
+              Provider.of<TagProvider>(context, listen: false).deleteTag(tag.id);
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(
@@ -355,7 +355,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
         ],
       ),
       body: FutureBuilder<List<Tag>>(
-        future: Provider.of<ExpenseProvider>(context, listen: false).getTags(),
+        future: Provider.of<TagProvider>(context, listen: false).getTags(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

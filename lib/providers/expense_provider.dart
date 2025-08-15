@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
-import '../models/category.dart';
 import '../models/currency.dart';
 import '../models/tag.dart';
 import '../models/expense_tag.dart';
@@ -46,7 +45,6 @@ class ExpenseProvider extends ChangeNotifier {
         item: 'Cơm tấm sườn',
         amount: 45000.0,
         currency: 'VND',
-        category: '1', // Food & Dining
         date: now.subtract(const Duration(days: 1)),
         description: 'Bữa trưa văn phòng',
         location: 'Quán cơm tấm',
@@ -59,7 +57,6 @@ class ExpenseProvider extends ChangeNotifier {
         item: 'Grab',
         amount: 32000.0,
         currency: 'VND',
-        category: '2', // Transportation
         date: now.subtract(const Duration(days: 2)),
         description: 'Di chuyển đến văn phòng',
         location: 'Grab',
@@ -72,7 +69,6 @@ class ExpenseProvider extends ChangeNotifier {
         item: 'Siêu thị',
         amount: 235000.0,
         currency: 'VND',
-        category: '1', // Food & Dining
         date: now.subtract(const Duration(days: 3)),
         description: 'Mua đồ ăn trong tuần',
         location: 'VinMart',
@@ -118,10 +114,7 @@ class ExpenseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Legacy method for backward compatibility
-  Future<Category?> getCategoryById(String categoryId) async {
-    return await _databaseService.getCategoryById(categoryId);
-  }
+
 
   Future<String> formatCurrency(double amount, String currencyCode) async {
     final currency = await _databaseService.getUserPreferredCurrency();

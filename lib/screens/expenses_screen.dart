@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/expense_provider.dart';
 import '../models/expense.dart';
-import '../models/category.dart';
 import '../models/tag.dart';
 import '../l10n/app_localizations.dart';
 import 'add_expense_screen.dart';
@@ -318,7 +317,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      _getCategoryIcon(tag.name),
+                                      IconData(tag.icon, fontFamily: 'MaterialIcons'),
                                       size: 16,
                                       color: Color(tag.color),
                                     ),
@@ -348,38 +347,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
     );
   }
   
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'food':
-      case 'restaurant':
-      case 'dining':
-        return Icons.restaurant;
-      case 'transport':
-      case 'transportation':
-      case 'travel':
-        return Icons.directions_car;
-      case 'shopping':
-      case 'retail':
-        return Icons.shopping_bag;
-      case 'entertainment':
-      case 'fun':
-        return Icons.movie;
-      case 'health':
-      case 'medical':
-        return Icons.local_hospital;
-      case 'education':
-      case 'learning':
-        return Icons.school;
-      case 'utilities':
-      case 'bills':
-        return Icons.receipt;
-      case 'groceries':
-      case 'grocery':
-        return Icons.local_grocery_store;
-      default:
-        return Icons.attach_money;
-    }
-  }
+
   
   String _formatDate(DateTime date, String locale) {
     // Simple date formatting based on locale
@@ -437,7 +405,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Icon(
-                      _getCategoryIcon(expense.category),
+                      Icons.receipt_outlined,
                       color: theme.colorScheme.primary,
                       size: 28,
                     ),
@@ -477,7 +445,6 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
               const SizedBox(height: 32),
               // Details section
                _buildDetailCard(context, [
-                 _buildDetailRow(context, Icons.category_outlined, l10n.category, expense.category),
                  _buildDetailRow(context, Icons.calendar_today_outlined, l10n.date, _formatDate(expense.date, locale)),
                  if (expense.location != null)
                    _buildDetailRow(context, Icons.location_on_outlined, l10n.location, expense.location!),

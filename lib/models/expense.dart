@@ -4,8 +4,7 @@ class Expense {
   final DateTime date;
   final double amount;
   final String currency;
-  final String category;
-  final String? subcategory;
+
   final String item;
   final String? description;
   final String? location;
@@ -24,8 +23,7 @@ class Expense {
     required this.date,
     required this.amount,
     required this.currency,
-    required this.category,
-    this.subcategory,
+
     required this.item,
     this.description,
     this.location,
@@ -46,8 +44,7 @@ class Expense {
       date: DateTime.parse(json['date']),
       amount: (json['amount'] as num).toDouble(),
       currency: json['currency'] ?? 'VND',
-      category: json['category'] ?? '',
-      subcategory: json['subcategory'],
+
       item: json['item'] ?? '',
       description: json['description'],
       location: json['location'],
@@ -73,8 +70,7 @@ class Expense {
       'date': date.toIso8601String(),
       'amount': amount,
       'currency': currency,
-      'category': category,
-      'subcategory': subcategory,
+
       'item': item,
       'description': description,
       'location': location,
@@ -95,8 +91,7 @@ class Expense {
     DateTime? date,
     double? amount,
     String? currency,
-    String? category,
-    String? subcategory,
+
     String? item,
     String? description,
     String? location,
@@ -115,8 +110,7 @@ class Expense {
       date: date ?? this.date,
       amount: amount ?? this.amount,
       currency: currency ?? this.currency,
-      category: category ?? this.category,
-      subcategory: subcategory ?? this.subcategory,
+
       item: item ?? this.item,
       description: description ?? this.description,
       location: location ?? this.location,

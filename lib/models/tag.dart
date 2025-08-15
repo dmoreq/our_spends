@@ -42,6 +42,7 @@ class Tag {
       'name': name,
       'description': description,
       'color': color,
+      'icon': icon,  // Add the icon field
       'is_active': isActive,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
@@ -63,6 +64,7 @@ class Tag {
       name: name ?? this.name,
       description: description ?? this.description,
       color: color ?? this.color,
+      icon: icon ?? this.icon,  // Add the icon field
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

@@ -164,12 +164,6 @@ abstract class AppLocalizations {
   /// **'Add Expense'**
   String get addExpense;
 
-  /// No description provided for @category.
-  ///
-  /// In en, this message translates to:
-  /// **'Category'**
-  String get category;
-
   /// No description provided for @date.
   ///
   /// In en, this message translates to:
@@ -254,12 +248,6 @@ abstract class AppLocalizations {
   /// **'Date'**
   String get expenseDateLabel;
 
-  /// No description provided for @expenseCategoryLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Category'**
-  String get expenseCategoryLabel;
-
   /// No description provided for @locationPlaceholder.
   ///
   /// In en, this message translates to:
@@ -277,60 +265,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'e.g., Discussed project milestones'**
   String get expenseNotesPlaceholder;
-
-  /// No description provided for @expenseCategoryFood.
-  ///
-  /// In en, this message translates to:
-  /// **'Food'**
-  String get expenseCategoryFood;
-
-  /// No description provided for @expenseCategoryTransport.
-  ///
-  /// In en, this message translates to:
-  /// **'Transport'**
-  String get expenseCategoryTransport;
-
-  /// No description provided for @expenseCategoryShopping.
-  ///
-  /// In en, this message translates to:
-  /// **'Shopping'**
-  String get expenseCategoryShopping;
-
-  /// No description provided for @expenseCategoryEntertainment.
-  ///
-  /// In en, this message translates to:
-  /// **'Entertainment'**
-  String get expenseCategoryEntertainment;
-
-  /// No description provided for @expenseCategoryUtilities.
-  ///
-  /// In en, this message translates to:
-  /// **'Utilities'**
-  String get expenseCategoryUtilities;
-
-  /// No description provided for @expenseCategoryHealth.
-  ///
-  /// In en, this message translates to:
-  /// **'Health'**
-  String get expenseCategoryHealth;
-
-  /// No description provided for @expenseCategoryTravel.
-  ///
-  /// In en, this message translates to:
-  /// **'Travel'**
-  String get expenseCategoryTravel;
-
-  /// No description provided for @expenseCategoryEducation.
-  ///
-  /// In en, this message translates to:
-  /// **'Education'**
-  String get expenseCategoryEducation;
-
-  /// No description provided for @expenseCategoryOther.
-  ///
-  /// In en, this message translates to:
-  /// **'Other'**
-  String get expenseCategoryOther;
 
   /// No description provided for @expenseAddedSuccess.
   ///
@@ -722,6 +656,66 @@ abstract class AppLocalizations {
   /// **'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.'**
   String get systemPrompt;
 
+  /// No description provided for @tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tags;
+
+  /// No description provided for @addTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tag'**
+  String get addTag;
+
+  /// No description provided for @noTagsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags selected'**
+  String get noTagsSelected;
+
+  /// No description provided for @selectTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Tags'**
+  String get selectTags;
+
+  /// No description provided for @searchTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tags'**
+  String get searchTags;
+
+  /// No description provided for @noTagsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags available'**
+  String get noTagsAvailable;
+
+  /// No description provided for @createTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Tag'**
+  String get createTag;
+
+  /// No description provided for @noTagsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags found'**
+  String get noTagsFound;
+
+  /// No description provided for @createNewTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Tag'**
+  String get createNewTag;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
   /// No description provided for @systemPromptWithContext.
   ///
   /// In en, this message translates to:
@@ -731,10 +725,9 @@ abstract class AppLocalizations {
   /// No description provided for @expenseInfo.
   ///
   /// In en, this message translates to:
-  /// **'\n{index}. Item: {item}, Amount: {amount} {currency}, Category: {category}, Date: {date}'**
+  /// **'\n{index}. Item: {item}, Amount: {amount} {currency}, Date: {date}'**
   String expenseInfo(
     Object amount,
-    Object category,
     Object currency,
     Object date,
     Object index,

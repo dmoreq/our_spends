@@ -12,10 +12,6 @@ class ExpenseQueryService {
     final allExpenses = await _databaseService.getExpenses();
     
     return allExpenses.where((expense) {
-      if (queryParams['category'] != null && expense.category != queryParams['category']) {
-        return false;
-      }
-      
       if (queryParams['startDate'] != null && expense.date.isBefore(queryParams['startDate'])) {
         return false;
       }
@@ -44,32 +40,7 @@ class ExpenseQueryService {
     return await _databaseService.getDatabaseStats();
   }
 
-  // Get spending by category
-  Future<Map<String, double>> getSpendingByCategory(String userId, {
-    DateTime? startDate,
-    DateTime? endDate,
-  }) async {
-    final categories = await _databaseService.getCategories();
-    final expenses = await _databaseService.getExpenses();
-    
-    final spendingByCategory = <String, double>{};
-    
-    for (final category in categories) {
-      final categoryExpenses = expenses.where((expense) {
-        final isInCategory = expense.category == category.id;
-        final isInDateRange = (startDate == null || !expense.date.isBefore(startDate)) &&
-                             (endDate == null || !expense.date.isAfter(endDate));
-        return isInCategory && isInDateRange;
-      });
-      
-      spendingByCategory[category.name] = categoryExpenses.fold(
-        0.0,
-        (sum, expense) => sum + expense.amount
-      );
-    }
-    
-    return spendingByCategory;
-  }
+
 
   // Get monthly spending trend
   Future<Map<String, double>> getMonthlySpendingTrend(String userId, {
@@ -93,18 +64,7 @@ class ExpenseQueryService {
     final Map<String, dynamic> params = {};
     final queryLower = query.toLowerCase();
 
-    // Parse categories
-    final categories = [
-      'food', 'transport', 'shopping', 'entertainment', 'bills',
-      'healthcare', 'education', 'travel', 'family', 'other'
-    ];
-    
-    for (final category in categories) {
-      if (queryLower.contains(category)) {
-        params['category'] = category;
-        break;
-      }
-    }
+    // Parse tags will be handled by tag-based filtering instead
 
     // Parse time periods
     if (queryLower.contains('today')) {
@@ -174,19 +134,9 @@ class ExpenseQueryService {
     }
 
     final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
-    final categories = expenses.map((e) => e.category).toSet();
     final dateRange = _getDateRange(expenses);
 
     String summary = "Found ${expenses.length} expense(s) ";
-    
-    if (categories.length == 1) {
-      summary += "in ${categories.first} category ";
-    } else if (categories.length <= 3) {
-      summary += "across ${categories.join(', ')} categories ";
-    } else {
-      summary += "across ${categories.length} different categories ";
-    }
-
     summary += "totaling ${totalAmount.toStringAsFixed(0)} VND";
     
     if (dateRange.isNotEmpty) {

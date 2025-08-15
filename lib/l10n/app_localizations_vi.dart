@@ -43,9 +43,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get addExpense => 'Thêm chi tiêu';
 
   @override
-  String get category => 'Danh mục';
-
-  @override
   String get date => 'Ngày';
 
   @override
@@ -88,9 +85,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get expenseDateLabel => 'Ngày';
 
   @override
-  String get expenseCategoryLabel => 'Danh mục';
-
-  @override
   String get locationPlaceholder => 'ví dụ: Cafe Central';
 
   @override
@@ -99,33 +93,6 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get expenseNotesPlaceholder =>
       'ví dụ: Đã thảo luận về các mốc quan trọng của dự án';
-
-  @override
-  String get expenseCategoryFood => 'Đồ ăn';
-
-  @override
-  String get expenseCategoryTransport => 'Đi lại';
-
-  @override
-  String get expenseCategoryShopping => 'Mua sắm';
-
-  @override
-  String get expenseCategoryEntertainment => 'Giải trí';
-
-  @override
-  String get expenseCategoryUtilities => 'Tiện ích';
-
-  @override
-  String get expenseCategoryHealth => 'Sức khỏe';
-
-  @override
-  String get expenseCategoryTravel => 'Du lịch';
-
-  @override
-  String get expenseCategoryEducation => 'Giáo dục';
-
-  @override
-  String get expenseCategoryOther => 'Khác';
 
   @override
   String get expenseAddedSuccess => 'Thêm chi phí thành công';
@@ -336,19 +303,48 @@ class AppLocalizationsVi extends AppLocalizations {
       'Bạn là một trợ lý AI hữu ích cho một ứng dụng theo dõi chi tiêu gia đình. Giúp người dùng theo dõi chi tiêu, trả lời các câu hỏi về chi tiêu của họ và cung cấp thông tin chi tiết về tài chính.';
 
   @override
+  String get tags => 'Thẻ';
+
+  @override
+  String get addTag => 'Thêm thẻ';
+
+  @override
+  String get noTagsSelected => 'Chưa chọn thẻ nào';
+
+  @override
+  String get selectTags => 'Chọn thẻ';
+
+  @override
+  String get searchTags => 'Tìm kiếm thẻ';
+
+  @override
+  String get noTagsAvailable => 'Không có thẻ nào';
+
+  @override
+  String get createTag => 'Tạo thẻ';
+
+  @override
+  String get noTagsFound => 'Không tìm thấy thẻ nào';
+
+  @override
+  String get createNewTag => 'Tạo thẻ mới';
+
+  @override
+  String get apply => 'Áp dụng';
+
+  @override
   String get systemPromptWithContext =>
       'Bạn là một trợ lý AI hữu ích cho một ứng dụng theo dõi chi tiêu gia đình. Giúp người dùng theo dõi chi tiêu, trả lời các câu hỏi về chi tiêu của họ và cung cấp thông tin chi tiết về tài chính.\n\nĐây là thông tin về các khoản chi tiêu gần đây của người dùng:';
 
   @override
   String expenseInfo(
     Object amount,
-    Object category,
     Object currency,
     Object date,
     Object index,
     Object item,
   ) {
-    return '\n$index. Khoản chi: $item, Số tiền: $amount $currency, Danh mục: $category, Ngày: $date';
+    return '\n$index. Khoản chi: $item, Số tiền: $amount $currency, Ngày: $date';
   }
 
   @override

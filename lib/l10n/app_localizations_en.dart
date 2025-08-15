@@ -43,9 +43,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addExpense => 'Add Expense';
 
   @override
-  String get category => 'Category';
-
-  @override
   String get date => 'Date';
 
   @override
@@ -88,9 +85,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseDateLabel => 'Date';
 
   @override
-  String get expenseCategoryLabel => 'Category';
-
-  @override
   String get locationPlaceholder => 'e.g., Cafe Central';
 
   @override
@@ -98,33 +92,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expenseNotesPlaceholder => 'e.g., Discussed project milestones';
-
-  @override
-  String get expenseCategoryFood => 'Food';
-
-  @override
-  String get expenseCategoryTransport => 'Transport';
-
-  @override
-  String get expenseCategoryShopping => 'Shopping';
-
-  @override
-  String get expenseCategoryEntertainment => 'Entertainment';
-
-  @override
-  String get expenseCategoryUtilities => 'Utilities';
-
-  @override
-  String get expenseCategoryHealth => 'Health';
-
-  @override
-  String get expenseCategoryTravel => 'Travel';
-
-  @override
-  String get expenseCategoryEducation => 'Education';
-
-  @override
-  String get expenseCategoryOther => 'Other';
 
   @override
   String get expenseAddedSuccess => 'Expense added successfully';
@@ -336,19 +303,48 @@ class AppLocalizationsEn extends AppLocalizations {
       'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.';
 
   @override
+  String get tags => 'Tags';
+
+  @override
+  String get addTag => 'Add Tag';
+
+  @override
+  String get noTagsSelected => 'No tags selected';
+
+  @override
+  String get selectTags => 'Select Tags';
+
+  @override
+  String get searchTags => 'Search tags';
+
+  @override
+  String get noTagsAvailable => 'No tags available';
+
+  @override
+  String get createTag => 'Create Tag';
+
+  @override
+  String get noTagsFound => 'No tags found';
+
+  @override
+  String get createNewTag => 'Create New Tag';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
   String get systemPromptWithContext =>
       'You are a helpful AI assistant for a family expense tracking app. Help users track expenses, answer questions about their spending, and provide financial insights.\n\nHere is information about the user\'s recent expenses:';
 
   @override
   String expenseInfo(
     Object amount,
-    Object category,
     Object currency,
     Object date,
     Object index,
     Object item,
   ) {
-    return '\n$index. Item: $item, Amount: $amount $currency, Category: $category, Date: $date';
+    return '\n$index. Item: $item, Amount: $amount $currency, Date: $date';
   }
 
   @override

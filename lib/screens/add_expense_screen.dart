@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/expense.dart';
 import '../models/tag.dart';
+
 import '../providers/expense_provider.dart';
 import '../l10n/app_localizations.dart';
-import 'tag_management_screen.dart';
+
 
 class AddExpenseScreen extends StatefulWidget {
   final Expense? expenseToEdit;
@@ -25,6 +26,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   String _selectedPaymentMethod = 'Cash';
   String? _location;
   List<String> _selectedTagIds = [];
+
   bool _isLoading = false;
   
   final List<String> _paymentMethods = [
@@ -34,15 +36,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     'E-Wallet',
   ];
 
-  Future<void> _loadExpenseTags() async {
-    if (widget.expenseToEdit != null) {
-      final tagIds = await Provider.of<ExpenseProvider>(context, listen: false)
-          .getExpenseTags(widget.expenseToEdit!.id);
-      setState(() {
-        _selectedTagIds = tagIds;
-      });
-    }
-  }
+
 
   @override
   void initState() {
@@ -54,7 +48,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       _selectedDate = widget.expenseToEdit!.date;
       _selectedPaymentMethod = widget.expenseToEdit!.paymentMethod ?? 'Cash';
       _location = widget.expenseToEdit!.location;
+      
+      // Load existing tags for this expense
       _loadExpenseTags();
+    }
+  }
+  
+  Future<void> _loadExpenseTags() async {
+    if (widget.expenseToEdit != null) {
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      final tagIds = await expenseProvider.getExpenseTags(widget.expenseToEdit!.id);
+      setState(() {
+        _selectedTagIds = tagIds;
+      });
     }
   }
 
@@ -246,113 +252,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
                 const SizedBox(height: 20),
               
-                // Tags selection
-                Container(
-                constraints: const BoxConstraints(minHeight: 72),
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: FutureBuilder<List<Tag>>(
-                  future: Provider.of<ExpenseProvider>(context, listen: false).getTags(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData) {
-                      return const Center(child: Text('No tags available'));
-                    }
-                    final tags = snapshot.data!;
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.local_offer_outlined,
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                    size: 24,
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    l10n.expenseCategoryLabel,
-                                    style: theme.textTheme.labelMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.add_circle_outline),
-                                onPressed: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const TagManagementScreen(),
-                                    ),
-                                  );
-                                  // Force rebuild of the FutureBuilder when returning from tag management
-                                  setState(() {});
-                                },
-                                tooltip: 'Add new tag',
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width - 64, // Account for padding and margins
-                            ),
-                            child: Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: tags.map((tag) {
-                                final isSelected = _selectedTagIds.contains(tag.id);
-                                return FilterChip(
-                                label: Text(tag.name),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  setState(() {
-                                    if (selected) {
-                                      _selectedTagIds.add(tag.id);
-                                    } else {
-                                      _selectedTagIds.remove(tag.id);
-                                    }
-                                  });
-                                },
-                                avatar: Icon(
-                                  IconData(tag.icon, fontFamily: 'MaterialIcons'),
-                                  size: 18,
-                                ),
-                                backgroundColor: Color(tag.color).withOpacity(0.1),
-                                selectedColor: Color(tag.color).withOpacity(0.2),
-                                checkmarkColor: Color(tag.color),
-                                labelStyle: TextStyle(
-                                  color: isSelected
-                                      ? Color(tag.color)
-                                      : theme.colorScheme.onSurface,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                  },
-                ),
-              ),
-                const SizedBox(height: 20),
+
               
               // Payment method dropdown
               _buildInputCard(
@@ -405,6 +305,48 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
               ),
               const SizedBox(height: 20),
+              
+                // Tags selection
+                _buildInputCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.local_offer_outlined,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              size: 24,
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              l10n.tags,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            const Spacer(),
+                            TextButton.icon(
+                              icon: const Icon(Icons.add, size: 18),
+                              label: Text(l10n.addTag),
+                              onPressed: _showTagSelectionDialog,
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        _buildSelectedTagsSection(),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
               
                 // Notes field
                 Container(
@@ -484,7 +426,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           date: _selectedDate,
           amount: double.parse(_amountController.text),
           currency: widget.expenseToEdit?.currency ?? 'VND',
-          category: _selectedTagIds.isNotEmpty ? _selectedTagIds.first : 'Other', // For backward compatibility
           item: _titleController.text,
           paymentMethod: _selectedPaymentMethod,
           location: _location,
@@ -498,7 +439,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           : await expenseProvider.addExpense(expense);
         
         if (expenseId != null) {
-          await expenseProvider.setExpenseTags(expense.id, _selectedTagIds);
+          // Save the selected tags for this expense
+          await expenseProvider.setExpenseTags(expenseId, _selectedTagIds);
           
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -531,5 +473,258 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         }
       }
     }
+  }
+  
+  // Build the section showing selected tags
+  Widget _buildSelectedTagsSection() {
+    final theme = Theme.of(context);
+    
+    if (_selectedTagIds.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Text(
+          AppLocalizations.of(context)!.noTagsSelected,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
+    
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _selectedTagIds.map((tagId) {
+        return FutureBuilder<Tag?>(
+          future: Provider.of<ExpenseProvider>(context, listen: false).getTagById(tagId),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox.shrink();
+            final tag = snapshot.data!;
+            
+            return Chip(
+              label: Text(tag.name),
+              avatar: Icon(
+                IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                size: 18,
+                color: Color(tag.color),
+              ),
+              backgroundColor: Color(tag.color).withOpacity(0.1),
+              labelStyle: TextStyle(color: Color(tag.color)),
+              deleteIconColor: Color(tag.color),
+              onDeleted: () {
+                setState(() {
+                  _selectedTagIds.remove(tagId);
+                });
+              },
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+  
+  // Show dialog to select tags
+  void _showTagSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => TagSelectionDialog(
+        selectedTagIds: _selectedTagIds,
+        onTagsSelected: (selectedIds) {
+          setState(() {
+            _selectedTagIds = selectedIds;
+          });
+        },
+      ),
+    );
+  }
+}
+
+// Tag Selection Dialog
+class TagSelectionDialog extends StatefulWidget {
+  final List<String> selectedTagIds;
+  final Function(List<String>) onTagsSelected;
+  
+  const TagSelectionDialog({
+    super.key,
+    required this.selectedTagIds,
+    required this.onTagsSelected,
+  });
+  
+  @override
+  State<TagSelectionDialog> createState() => _TagSelectionDialogState();
+}
+
+class _TagSelectionDialogState extends State<TagSelectionDialog> {
+  late List<String> _selectedIds;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  
+  @override
+  void initState() {
+    super.initState();
+    _selectedIds = List.from(widget.selectedTagIds);
+  }
+  
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    
+    return AlertDialog(
+      title: Text(l10n.selectTags),
+      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Search field
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: l10n.searchTags,
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            
+            // Tags list
+            Flexible(
+              child: FutureBuilder<List<Tag>>(
+                future: Provider.of<ExpenseProvider>(context, listen: false).getTags(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.label_off_outlined,
+                            size: 48,
+                            color: theme.colorScheme.onSurface.withOpacity(0.4),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.noTagsAvailable,
+                            style: theme.textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              // Navigate to tag management screen
+                              Navigator.pushNamed(context, '/tags');
+                            },
+                            icon: const Icon(Icons.add),
+                            label: Text(l10n.createTag),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  final filteredTags = snapshot.data!
+                      .where((tag) => _searchQuery.isEmpty || 
+                          tag.name.toLowerCase().contains(_searchQuery))
+                      .toList();
+                  
+                  if (filteredTags.isEmpty) {
+                    return Center(
+                      child: Text(
+                        l10n.noTagsFound,
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    );
+                  }
+                  
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: filteredTags.length,
+                    itemBuilder: (context, index) {
+                      final tag = filteredTags[index];
+                      final isSelected = _selectedIds.contains(tag.id);
+                      
+                      return CheckboxListTile(
+                        title: Text(tag.name),
+                        secondary: Icon(
+                          IconData(tag.icon, fontFamily: 'MaterialIcons'),
+                          color: Color(tag.color),
+                        ),
+                        value: isSelected,
+                        onChanged: (selected) {
+                          setState(() {
+                            if (selected == true) {
+                              if (!_selectedIds.contains(tag.id)) {
+                                _selectedIds.add(tag.id);
+                              }
+                            } else {
+                              _selectedIds.remove(tag.id);
+                            }
+                          });
+                        },
+                        activeColor: theme.colorScheme.primary,
+                        checkColor: theme.colorScheme.onPrimary,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            
+            // Create new tag button
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to tag creation screen or show tag creation dialog
+                  Navigator.pushNamed(context, '/tags');
+                },
+                icon: const Icon(Icons.add),
+                label: Text(l10n.createNewTag),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            widget.onTagsSelected(_selectedIds);
+            Navigator.pop(context);
+          },
+          child: Text(l10n.apply),
+        ),
+      ],
+    );
   }
 }

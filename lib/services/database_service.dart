@@ -2,14 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/expense.dart';
-import '../models/category.dart';
+
 import '../models/tag.dart';
 import '../models/expense_tag.dart';
 import '../models/currency.dart';
 
 class DatabaseService {
   static const String _expensesKey = 'expenses_data';
-  static const String _categoriesKey = 'categories_data';
   static const String _tagsKey = 'tags_data';
   static const String _expenseTagsKey = 'expense_tags_data';
   static const String _currenciesKey = 'currencies_data';
@@ -17,7 +16,6 @@ class DatabaseService {
 
   // In-memory cache for better performance
   List<Expense>? _expensesCache;
-  List<Category>? _categoriesCache;
   List<Tag>? _tagsCache;
   Map<String, List<String>>? _expenseTagsCache;
   List<Currency>? _currenciesCache;
@@ -27,14 +25,12 @@ class DatabaseService {
     init();
   }
 
-  // Initialize database (create default categories and currencies)
+  // Initialize database (create default currencies)
   Future<void> init() async {
     await _loadExpenses();
-    await _loadCategories();
     await _loadTags();
     await _loadExpenseTags();
     await _loadCurrencies();
-    await _ensureDefaultCategories();
     await _ensureDefaultCurrencies();
     await _ensureDefaultPreferredCurrency();
   }
@@ -63,28 +59,7 @@ class DatabaseService {
     _expensesCache = expenses;
   }
 
-  Future<List<Category>> _loadCategories() async {
-    if (_categoriesCache != null) return _categoriesCache!;
-    
-    final prefs = await SharedPreferences.getInstance();
-    final categoriesJson = prefs.getString(_categoriesKey);
-    
-    if (categoriesJson == null) {
-      _categoriesCache = [];
-      return _categoriesCache!;
-    }
-    
-    final List<dynamic> categoriesList = json.decode(categoriesJson);
-    _categoriesCache = categoriesList.map((json) => Category.fromJson(json)).toList();
-    return _categoriesCache!;
-  }
 
-  Future<void> _saveCategories(List<Category> categories) async {
-    final prefs = await SharedPreferences.getInstance();
-    final categoriesJson = json.encode(categories.map((c) => c.toJson()).toList());
-    await prefs.setString(_categoriesKey, categoriesJson);
-    _categoriesCache = categories;
-  }
 
   Future<List<Tag>> _loadTags() async {
     if (_tagsCache != null) return _tagsCache!;
@@ -192,132 +167,19 @@ class DatabaseService {
     }
   }
 
-  // Ensure default categories exist
+  // Migration method (no longer needed but kept for reference)
   Future<void> _migrateCategoriesToTags() async {
-    final categories = await _loadCategories();
     final tags = await _loadTags();
     final expenses = await _loadExpenses();
     final expenseTags = await _loadExpenseTags();
     
-    // Convert existing categories to tags if not already migrated
-    for (var category in categories) {
-      if (!tags.any((tag) => tag.id == category.id)) {
-        tags.add(Tag(
-          id: category.id,
-          name: category.name,
-          description: category.description,
-          color: category.color,
-          isActive: category.isActive,
-          createdAt: category.createdAt,
-          updatedAt: category.updatedAt,
-        ));
-      }
-    }
-    
-    // Link existing expenses with their category tags
-    for (var expense in expenses) {
-      if (!expenseTags.containsKey(expense.id)) {
-        expenseTags[expense.id] = [expense.category];
-      } else if (!expenseTags[expense.id]!.contains(expense.category)) {
-        expenseTags[expense.id]!.add(expense.category);
-      }
-    }
+    // Migration code removed as categories have been fully migrated to tags
     
     await _saveTags(tags);
     await _saveExpenseTags(expenseTags);
   }
 
-  Future<void> _ensureDefaultCategories() async {
-    final categories = await _loadCategories();
-    final tags = await _loadTags();
-    
-    if (categories.isEmpty && tags.isEmpty) {
-      final now = DateTime.now();
-      final defaultCategories = <Category>[
-        Category(
-          id: '1',
-          name: 'Food & Dining',
-          description: 'Restaurants, groceries, and food delivery',
-          icon: Icons.restaurant.codePoint,
-          color: Colors.red.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Category(
-          id: '2',
-          name: 'Transportation',
-          description: 'Gas, public transport, ride-sharing',
-          icon: Icons.directions_car.codePoint,
-          color: Colors.teal.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Category(
-          id: '3',
-          name: 'Shopping',
-          description: 'Clothing, electronics, general shopping',
-          icon: Icons.shopping_bag.codePoint,
-          color: Colors.blue.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Category(
-          id: '4',
-          name: 'Entertainment',
-          description: 'Movies, games, subscriptions',
-          icon: Icons.movie.codePoint,
-          color: Colors.green.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Category(
-          id: '5',
-          name: 'Bills & Utilities',
-          description: 'Rent, electricity, internet, phone',
-          icon: Icons.lightbulb.codePoint,
-          color: Colors.amber.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Category(
-          id: '6',
-          name: 'Healthcare',
-          description: 'Medical expenses, pharmacy, insurance',
-          icon: Icons.local_hospital.codePoint,
-          color: Colors.purple.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Category(
-          id: '7',
-          name: 'Education',
-          description: 'Books, courses, school fees',
-          icon: Icons.school.codePoint,
-          color: Colors.cyan.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        Category(
-          id: '8',
-          name: 'Other',
-          description: 'Miscellaneous expenses',
-          icon: Icons.category.codePoint,
-          color: Colors.grey.value,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        ),
-      ];
-      await _saveCategories(defaultCategories);
-    }
-  }
+
 
 
 
@@ -350,7 +212,7 @@ class DatabaseService {
     final expenses = await _loadExpenses();
     
     var filteredExpenses = expenses.where((expense) {
-      if (categoryId != null && expense.category != categoryId) return false;
+  
       if (startDate != null && expense.date.isBefore(startDate)) return false;
       if (endDate != null && expense.date.isAfter(endDate)) return false;
       if (minAmount != null && expense.amount < minAmount) return false;
@@ -424,7 +286,6 @@ class DatabaseService {
   // Analytics methods
   Future<Map<String, dynamic>> getDatabaseStats() async {
     final expenses = await _loadExpenses();
-    final categories = await _loadCategories();
     final tags = await _loadTags();
     
     final totalExpenses = expenses.length;
@@ -442,48 +303,11 @@ class DatabaseService {
       'averageAmount': avgAmount,
       'thisMonthTotal': thisMonthTotal,
       'thisMonthCount': thisMonth.length,
-      'categoriesCount': categories.length,
       'tagsCount': tags.length,
     };
   }
 
-  Future<List<Map<String, dynamic>>> getExpensesByCategory({
-    DateTime? startDate,
-    DateTime? endDate,
-  }) async {
-    final expenses = await _loadExpenses();
-    final categories = await _loadCategories();
-    
-    var filteredExpenses = expenses.where((expense) {
-      if (startDate != null && expense.date.isBefore(startDate)) return false;
-      if (endDate != null && expense.date.isAfter(endDate)) return false;
-      return true;
-    }).toList();
 
-    final categoryMap = <String, double>{};
-    final categoryNames = <String, String>{};
-    
-    for (final category in categories) {
-      categoryNames[category.id] = category.name;
-      categoryMap[category.id] = 0.0;
-    }
-
-    for (final expense in filteredExpenses) {
-      categoryMap[expense.category] = 
-          (categoryMap[expense.category] ?? 0.0) + expense.amount;
-    }
-
-    return categoryMap.entries
-        .where((entry) => entry.value > 0)
-        .map((entry) => {
-          'categoryId': entry.key,
-          'categoryName': categoryNames[entry.key] ?? 'Unknown',
-          'totalAmount': entry.value,
-          'count': filteredExpenses.where((e) => e.category == entry.key).length,
-        })
-        .toList()
-      ..sort((a, b) => (b['totalAmount'] as double).compareTo(a['totalAmount'] as double));
-  }
 
   Future<List<Map<String, dynamic>>> getSpendingTrends({
     DateTime? startDate,
@@ -579,19 +403,7 @@ class DatabaseService {
     await _saveExpenseTags(expenseTags);
   }
 
-  // Legacy Category operations - maintained for backward compatibility
-  Future<List<Category>> getCategories() async {
-    return await _loadCategories();
-  }
 
-  Future<Category?> getCategoryById(String id) async {
-    final categories = await _loadCategories();
-    try {
-      return categories.firstWhere((category) => category.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
 
 
 
@@ -601,19 +413,17 @@ class DatabaseService {
     DateTime? endDate,
   }) async {
     final expenses = await getExpenses(startDate: startDate, endDate: endDate);
-    final categories = await _loadCategories();
-    final categoryMap = {for (var cat in categories) cat.id: cat.name};
+
 
     final csvData = StringBuffer();
-    csvData.writeln('Date,Amount,Category,Subcategory,Description,Location,Payment Method,Notes');
+    csvData.writeln('Date,Amount,Description,Location,Payment Method,Notes');
 
     for (final expense in expenses) {
-      final categoryName = categoryMap[expense.category] ?? 'Unknown';
+
       csvData.writeln([
         expense.date.toIso8601String().split('T')[0],
         expense.amount.toString(),
-        _escapeCsvField(categoryName),
-        _escapeCsvField(expense.subcategory ?? ''),
+
         _escapeCsvField(expense.description ?? ''),
         _escapeCsvField(expense.location ?? ''),
         _escapeCsvField(expense.paymentMethod ?? ''),
@@ -635,14 +445,12 @@ class DatabaseService {
   Future<void> clearAllData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_expensesKey);
-    await prefs.remove(_categoriesKey);
     await prefs.remove(_tagsKey);
     await prefs.remove(_expenseTagsKey);
     await prefs.remove(_currenciesKey);
     await prefs.remove(_userPreferredCurrencyKey);
     
     _expensesCache = null;
-    _categoriesCache = null;
     _tagsCache = null;
     _expenseTagsCache = null;
     _currenciesCache = null;

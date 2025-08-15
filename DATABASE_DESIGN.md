@@ -17,8 +17,8 @@ CREATE TABLE expenses (
   date TEXT NOT NULL,
   amount REAL NOT NULL,
   currency TEXT NOT NULL DEFAULT 'VND',
-  category TEXT NOT NULL,
-  subcategory TEXT,
+  
+  
   item TEXT NOT NULL,
   description TEXT,
   location TEXT,
@@ -39,8 +39,7 @@ CREATE TABLE expenses (
 - `date`: Date when expense occurred
 - `amount`: Expense amount (numeric)
 - `currency`: Currency code (default: VND)
-- `category`: Main expense category
-- `subcategory`: Optional subcategory for detailed classification
+
 - `item`: Brief description of what was purchased
 - `description`: Detailed description
 - `location`: Where the expense occurred
@@ -115,7 +114,7 @@ For optimal query performance:
 ```sql
 CREATE INDEX idx_expenses_user_id ON expenses (user_id);
 CREATE INDEX idx_expenses_date ON expenses (date);
-CREATE INDEX idx_expenses_category ON expenses (category);
+
 CREATE INDEX idx_expenses_amount ON expenses (amount);
 ```
 
@@ -130,7 +129,7 @@ Core database operations:
 - `getExpenses(String userId, {...filters})`: Retrieve expenses with filters
 - `updateExpense(Expense expense)`: Update existing expense
 - `deleteExpense(String id)`: Remove expense
-- `getExpensesByCategory(String userId)`: Category-wise spending
+
 - `getSpendingTrends(String userId)`: Spending trends over time
 - `searchExpenses(String userId, String query)`: Text search
 - `exportToCSV(String userId)`: Export data to CSV
@@ -138,7 +137,7 @@ Core database operations:
 
 **Filtering Options:**
 - Date range (startDate, endDate)
-- Category filtering
+
 - Amount range (minAmount, maxAmount)
 - Pagination (limit, offset)
 
@@ -149,7 +148,7 @@ Natural language query interface for the chatbot:
 **Key Methods:**
 - `queryExpenses(String userId, String query)`: Parse natural language queries
 - `getExpenseAnalytics(String userId)`: Get spending analytics
-- `getSpendingByCategory(String userId)`: Category breakdown
+
 - `getMonthlySpendingTrend(String userId)`: Monthly trends
 - `searchExpenses(String userId, String searchText)`: Text search
 - `generateSummary(List<Expense> expenses, String originalQuery)`: Generate human-readable summaries
@@ -172,8 +171,7 @@ class Expense {
   final DateTime date;
   final double amount;
   final String currency;
-  final String category;
-  final String? subcategory;
+  
   final String item;
   final String? description;
   final String? location;
@@ -201,7 +199,7 @@ The AI chatbot can extract expense information from natural language:
   "hasExpense": true,
   "amount": 50000,
   "description": "coffee",
-  "category": "food",
+  
   "location": "Starbucks",
   "confidence": 0.9
 }
@@ -213,7 +211,7 @@ The chatbot can answer questions about expenses:
 
 **Examples:**
 - "How much did I spend on food this month?"
-- "What's my biggest expense category?"
+
 - "Show me all expenses from last week"
 - "Find my coffee purchases"
 
@@ -221,7 +219,7 @@ The chatbot can answer questions about expenses:
 
 The AI provides insights based on spending patterns:
 - Spending trends
-- Category analysis
+
 - Budget recommendations
 - Saving suggestions
 
@@ -232,7 +230,7 @@ The AI provides insights based on spending patterns:
 Expenses can be exported to CSV format:
 
 ```csv
-Date,Amount,Currency,Category,Item,Description,Location,Payment Method,Notes
+Date,Amount,Currency,Item,Description,Location,Payment Method,Notes
 2024-01-15,50000,VND,food,coffee,Morning coffee,Starbucks,card,
 2024-01-15,200000,VND,transport,taxi,Ride to office,District 1,cash,
 ```
@@ -292,7 +290,7 @@ CSV files are saved to the device's documents directory with timestamps:
 
 1. **Cloud Sync**: Firebase/Firestore integration
 2. **Receipt OCR**: Automatic receipt scanning
-3. **Budget Tracking**: Monthly/category budgets
+3. **Budget Tracking**: Monthly budgets
 4. **Recurring Expenses**: Automatic recurring expense handling
 5. **Multi-Currency**: Better currency conversion support
 6. **Data Visualization**: Charts and graphs

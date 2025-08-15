@@ -145,7 +145,6 @@ class _ChatScreenState extends State<ChatScreen> {
         item: expenseInfo['item'] ?? 'Unknown Item',
         amount: (expenseInfo['amount'] as num?)?.toDouble() ?? 0.0,
         date: expenseDate,
-        category: expenseInfo['category'] ?? 'Other',
         notes: expenseInfo['notes'] ?? '',
         location: expenseInfo['location'] ?? '',
         paymentMethod: expenseInfo['payment_method'] ?? '',

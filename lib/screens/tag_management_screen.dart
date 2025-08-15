@@ -73,17 +73,6 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Text('Icon: '),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: _showIconPicker,
-                    icon: Icon(_selectedIcon),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -223,7 +212,7 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
     _descriptionController.text = tag.description ?? '';
     setState(() {
       _selectedColor = Color(tag.color);
-      _selectedIcon = IconData(tag.icon, fontFamily: 'MaterialIcons');
+      _selectedIcon = IconData(tag.icon, fontFamily: 'MaterialIcons', fontPackage: 'flutter');
     });
 
     showDialog(
@@ -267,6 +256,17 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                         border: Border.all(color: Colors.grey.shade300),
                       ),
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Text('Icon: '),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: _showIconPicker,
+                    icon: Icon(_selectedIcon),
                   ),
                 ],
               ),

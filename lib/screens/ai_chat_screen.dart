@@ -357,7 +357,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
         date: DateTime.now(),
         amount: expenseInfo['amount'] ?? 0.0,
         currency: expenseInfo['currency'] ?? 'USD',
-        category: expenseInfo['category'] ?? 'Miscellaneous',
+
         subcategory: expenseInfo['subcategory'],
         item: expenseInfo['description'] ?? expenseInfo['item'] ?? 'Expense',
         description: expenseInfo['description'],

@@ -107,8 +107,7 @@ class GeminiService {
       final description = expense.item.toLowerCase();
       return description.contains(mealType) ||
              description.contains('food') ||
-             description.contains('meal') ||
-             expense.category.toLowerCase().contains('food');
+             description.contains('meal');
     }).toList();
 
     // Calculate average expense amount
@@ -216,7 +215,7 @@ Analyze this message and extract expense information if any. Return a JSON objec
   "hasExpense": true,
   "amount": number,
   "description": "string",
-  "category": "string (one of: food, transport, shopping, entertainment, bills, healthcare, other)",
+
   "confidence": number (0-1),
   "time": "HH:MM format (if mentioned, otherwise null)",
   "location": "string (if mentioned, otherwise null)",
@@ -434,7 +433,7 @@ Keep the response concise and friendly.
     }
 
     for (final expense in recentExpenses) {
-      context.writeln('- \$${expense.amount.toStringAsFixed(2)} for ${expense.item} (${expense.category})');
+      context.writeln('- \$${expense.amount.toStringAsFixed(2)} for ${expense.item}');
     }
 
     return context.toString();
@@ -578,7 +577,7 @@ Keep the response concise and friendly.
         'hasExpense': true,
         'amount': amount,
         'description': message,
-        'category': 'other',
+        // No category field as it's been removed
         'confidence': 0.7,
         'date': formattedDate,
         'location': location,
@@ -595,26 +594,23 @@ Keep the response concise and friendly.
     final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
     final avgExpense = totalAmount / expenses.length;
 
-    // Group by category
-    final categoryTotals = <String, double>{};
+    // Group by tags would be implemented here instead of categories
+    final tagTotals = <String, double>{};
     for (final expense in expenses) {
-      categoryTotals[expense.category] = (categoryTotals[expense.category] ?? 0) + expense.amount;
+      // Implementation would go here
     }
-
-    // Find top category
-    final topCategory = categoryTotals.entries.reduce((a, b) => a.value > b.value ? a : b);
 
     return '''
 📊 Your Spending Insights
 
 💰 Total Expenses: \$${totalAmount.toStringAsFixed(2)}
 📈 Average per transaction: \$${avgExpense.toStringAsFixed(2)}
-🏆 Top category: ${topCategory.key} (\$${topCategory.value.toStringAsFixed(2)})
+🏆 Top spending areas based on your tags
 
 💡 Suggestions:
 • Track daily expenses to identify patterns
-• Set monthly budgets for each category
-• Look for opportunities to reduce spending in your top category
+• Set monthly budgets for different spending areas
+• Look for opportunities to reduce spending in your top spending areas
 
 Configure your Gemini API key for more detailed AI insights!
 ''';

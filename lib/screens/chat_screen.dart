@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/expense_provider.dart';
+import '../providers/expense/expense_provider.dart';
 import '../providers/language_provider.dart';
 import '../models/chat_message.dart';
 import '../models/expense.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/logger.dart';
+import '../services/ai_service.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -20,7 +21,26 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   final List<Map<String, String>> _conversationHistory = [];
+  final AIService _aiService = AIService();
   bool _isTyping = false;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAIService();
+  }
+
+  Future<void> _initializeAIService() async {
+    try {
+      await _aiService.initialize();
+      setState(() {
+        _isInitialized = true;
+      });
+    } catch (e) {
+      logger.error('Failed to initialize AI service', e);
+    }
+  }
 
   @override
   void dispose() {
@@ -61,31 +81,32 @@ class _ChatScreenState extends State<ChatScreen> {
     final languageCode = languageProvider.currentLocale.languageCode;
 
     try {
-      final response = await expenseProvider.sendMessage(message, userId, conversationHistory: _conversationHistory, languageCode: languageCode);
-
-      if (response['status'] == 'success') {
-        final aiResponse = response['data'] ?? "I received your message!";
-        _addMessage(aiResponse, isUser: false);
-
-        if (response['expense_info'] != null && response['expense_info']['hasExpense'] == true) {
-          final expenseInfo = response['expense_info'];
-          await _saveExpenseToDatabase(expenseInfo, userId);
-          final expenseMessage = languageCode == 'vi'
-              ? "💡 Tôi đã tự động lưu khoản chi tiêu của bạn vào trình theo dõi chi tiêu!"
-              : "💡 I've automatically saved your expense to your expense tracker!";
-          _addMessage(expenseMessage, isUser: false);
-        }
-      } else {
-        final errorMessage = response['data'] ?? (languageCode == 'vi'
-            ? "Xin lỗi, tôi không thể xử lý tin nhắn của bạn. Vui lòng thử lại."
-            : "Sorry, I couldn't process your message. Please try again.");
-        _addMessage(errorMessage, isUser: false);
+      // Process message using AI service
+      final aiResponse = await _aiService.processMessage(
+        message, 
+        expenseProvider.expenses,
+        conversationHistory: _conversationHistory,
+        languageCode: languageCode,
+      );
+      
+      _addMessage(aiResponse, isUser: false);
+      
+      // Try to extract expense information
+      final expenseInfo = await _aiService.extractExpenseInfo(message);
+      
+      if (expenseInfo != null && expenseInfo['hasExpense'] == true) {
+        await _saveExpenseToDatabase(expenseInfo, userId);
+        final expenseMessage = languageCode == 'vi'
+            ? "💡 Tôi đã tự động lưu khoản chi tiêu của bạn vào trình theo dõi chi tiêu!"
+            : "💡 I've automatically saved your expense to your expense tracker!";
+        _addMessage(expenseMessage, isUser: false);
       }
     } catch (e) {
       final errorMessage = languageCode == 'vi'
           ? "Xin lỗi, tôi gặp lỗi. Vui lòng thử lại."
           : "Sorry, I encountered an error. Please try again.";
       _addMessage(errorMessage, isUser: false);
+      logger.error('Error processing message', e);
     }
 
     setState(() {
@@ -110,19 +131,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _generateInsights() async {
     final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-    final userId = 'demo-user';
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final languageCode = languageProvider.currentLocale.languageCode;
 
     setState(() {
       _isTyping = true;
     });
 
     try {
-      final response = await expenseProvider.generateInsights(userId);
-      final insights = response['data'] ?? "Unable to generate insights at the moment.";
+      final insights = await _aiService.generateSpendingInsights(expenseProvider.expenses);
       _addMessage("📊 Here are your spending insights:", isUser: false);
       _addMessage(insights, isUser: false);
     } catch (e) {
-      _addMessage("Sorry, I couldn't generate insights right now. Please try again.", isUser: false);
+      final errorMessage = languageCode == 'vi'
+          ? "Xin lỗi, tôi không thể tạo phân tích chi tiêu ngay bây giờ. Vui lòng thử lại sau."
+          : "Sorry, I couldn't generate insights right now. Please try again.";
+      _addMessage(errorMessage, isUser: false);
+      logger.error('Error generating insights', e);
     }
 
     setState(() {
@@ -152,7 +177,7 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-      await expenseProvider.addExpense(expense);
+      await expenseProvider.addExpense(expense, []);
     } catch (e) {
       logger.error('Failed to save expense to database', e);
       // We don't want to show an error message to the user if this fails

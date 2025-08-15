@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:our_spends/providers/expense_provider.dart';
+import 'package:our_spends/providers/expense/expense_provider.dart';
 import 'package:our_spends/providers/language_provider.dart';
 import 'package:our_spends/services/database/database_service.dart';
 import 'package:our_spends/services/ai_service.dart';

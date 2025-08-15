@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:our_spends/models/expense.dart';
-import 'package:our_spends/providers/expense_provider.dart';
+import 'package:our_spends/providers/expense/expense_provider.dart';
 import 'package:our_spends/repositories/expense_repository.dart';
 import 'package:our_spends/repositories/tag_repository.dart';
 import 'package:our_spends/repositories/implementations/shared_preferences_expense_repository.dart';
 import 'package:our_spends/repositories/implementations/shared_preferences_tag_repository.dart';
+import 'package:our_spends/services/expense_service.dart';
 import 'package:our_spends/services/storage/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../mocks/mock_storage_service.dart';
@@ -25,10 +26,15 @@ void main() {
       expenseRepository = SharedPreferencesExpenseRepository(storageService);
       tagRepository = SharedPreferencesTagRepository(storageService);
       
-      // Create ExpenseProvider instance
-      expenseProvider = ExpenseProvider(
+      // Create ExpenseService instance
+      final expenseService = ExpenseService(
         expenseRepository: expenseRepository,
         tagRepository: tagRepository,
+      );
+      
+      // Create ExpenseProvider instance
+      expenseProvider = ExpenseProvider(
+        expenseService: expenseService,
       );
     });
 
@@ -68,9 +74,12 @@ void main() {
       await expenseRepository.insertExpense(testExpense2);
       
       // Create new provider instance to load the test data
-      expenseProvider = ExpenseProvider(
+      final expenseService = ExpenseService(
         expenseRepository: expenseRepository,
         tagRepository: tagRepository,
+      );
+      expenseProvider = ExpenseProvider(
+        expenseService: expenseService,
       );
       
       // Wait for initialization to complete

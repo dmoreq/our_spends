@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/expense.dart';
 import '../models/tag.dart';
 
-import '../providers/expense_provider.dart';
+import '../providers/expense/expense_provider.dart';
+import '../providers/tag/tag_provider.dart';
 import '../l10n/app_localizations.dart';
 
 
@@ -56,8 +57,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   
   Future<void> _loadExpenseTags() async {
     if (widget.expenseToEdit != null) {
-      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
-      final tagIds = await expenseProvider.getExpenseTags(widget.expenseToEdit!.id);
+      final tagProvider = Provider.of<TagProvider>(context, listen: false);
+      final tagIds = await tagProvider.getExpenseTags(widget.expenseToEdit!.id);
       setState(() {
         _selectedTagIds = tagIds;
       });
@@ -434,13 +435,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           updatedAt: now,
         );
         
-        final expenseId = widget.expenseToEdit != null
-          ? await expenseProvider.updateExpense(expense)
-          : await expenseProvider.addExpense(expense);
+        final result = widget.expenseToEdit != null
+          ? await expenseProvider.updateExpense(expense, _selectedTagIds)
+          : await expenseProvider.addExpense(expense, _selectedTagIds);
         
-        if (expenseId != null) {
+        if (result != null) {
           // Save the selected tags for this expense
-          await expenseProvider.setExpenseTags(expenseId, _selectedTagIds);
+          final expenseId = expense.id; // Use the expense ID directly
+          await Provider.of<TagProvider>(context, listen: false).setExpenseTags(expenseId, _selectedTagIds);
           
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -496,8 +498,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       spacing: 8,
       runSpacing: 8,
       children: _selectedTagIds.map((tagId) {
-        return FutureBuilder<Tag?>(
-          future: Provider.of<ExpenseProvider>(context, listen: false).getTagById(tagId),
+        return FutureBuilder<Tag?>(          
+          future: Provider.of<TagProvider>(context, listen: false).getTagById(tagId),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return const SizedBox.shrink();
             final tag = snapshot.data!;
@@ -608,7 +610,7 @@ class _TagSelectionDialogState extends State<TagSelectionDialog> {
             // Tags list
             Flexible(
               child: FutureBuilder<List<Tag>>(
-                future: Provider.of<ExpenseProvider>(context, listen: false).getTags(),
+                future: Provider.of<TagProvider>(context, listen: false).getTags(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

@@ -4,15 +4,13 @@ import 'package:flutter/material.dart';
 import '../models/expense.dart';
 import '../models/currency.dart';
 import '../models/tag.dart';
-import '../models/expense_tag.dart';
-import '../services/api_service.dart';
-import '../services/database_service.dart';
-import '../services/expense_query_service.dart';
+import '../services/database/database_service.dart';
+import '../services/service_provider.dart';
+import '../services/ai_service.dart';
 
 class ExpenseProvider extends ChangeNotifier {
-  final ApiService _apiService = ApiService();
-  final DatabaseService _databaseService = DatabaseService();
-  late final ExpenseQueryService _queryService;
+  final DatabaseService _databaseService = ServiceProvider().databaseService;
+  final AIService _aiService = AIService();
   
   List<Expense> _expenses = [];
   bool _isLoading = false;
@@ -32,7 +30,6 @@ class ExpenseProvider extends ChangeNotifier {
   Stream<List<Expense>> get expensesStream => _expenseStreamController.stream;
 
   ExpenseProvider() {
-    _queryService = ExpenseQueryService();
     _initFuture = _initializeDatabase();
   }
 
@@ -148,7 +145,7 @@ class ExpenseProvider extends ChangeNotifier {
 
   Future<void> _initializeDatabase() async {
     try {
-      await _databaseService.init();
+      await _databaseService.initialize();
       _userPreferredCurrency = await _databaseService.getUserPreferredCurrency();
 
       var expenses = await _databaseService.getExpenses();
@@ -187,16 +184,16 @@ class ExpenseProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
 
-      final response = await _apiService.processMessage(message, userId, _expenses, conversationHistory: conversationHistory, languageCode: languageCode);
+      final responseText = await _aiService.processMessage(message, _expenses, conversationHistory: conversationHistory, languageCode: languageCode);
       
-      if (response['status'] == 'success') {
-        _setLoading(false);
-        return response;
-      } else {
-        _setError(response['data'] ?? 'Unknown error occurred');
-        _setLoading(false);
-        return response;
-      }
+      final response = {
+        'status': 'success',
+        'data': responseText,
+        'error_code': null,
+      };
+      
+      _setLoading(false);
+      return response;
     } catch (e) {
       _setError('Failed to process message: ${e.toString()}');
       _setLoading(false);
@@ -213,7 +210,13 @@ class ExpenseProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
 
-      final response = await _apiService.generateInsights(_expenses, userId);
+      final insightsText = await _aiService.generateSpendingInsights(_expenses);
+      
+      final response = {
+        'status': 'success',
+        'data': insightsText,
+        'error_code': null,
+      };
       
       _setLoading(false);
       return response;

@@ -76,4 +76,14 @@ class Currency {
     spaceBetweenAmountAndSymbol: false,
     exchangeRate: null, // Should be updated with current rate
   );
+  
+  static Currency get eur => Currency(
+    code: 'EUR',
+    symbol: '€',
+    name: 'Euro',
+    decimalPlaces: 2,
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    exchangeRate: null, // Should be updated with current rate
+  );
 }

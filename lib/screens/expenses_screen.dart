@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/expense_provider.dart';
+import '../providers/expense/expense_provider.dart';
+import '../providers/tag/tag_provider.dart';
+import '../providers/currency/currency_provider.dart';
 import '../models/expense.dart';
 import '../models/tag.dart';
+import '../models/currency.dart';
 import '../l10n/app_localizations.dart';
 import 'add_expense_screen.dart';
 
@@ -285,7 +288,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                 const SizedBox(height: 8),
                 // Tags
                 FutureBuilder<List<String>>(
-                  future: expenseProvider.getExpenseTags(widget.expense.id),
+                  future: Provider.of<TagProvider>(context, listen: false).getExpenseTags(widget.expense.id),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const SizedBox(
@@ -302,7 +305,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                       child: Row(
                         children: tagIds.map((tagId) {
                           return FutureBuilder<Tag?>(
-                            future: expenseProvider.getTagById(tagId),
+                            future: Provider.of<TagProvider>(context, listen: false).getTagById(tagId),
                             builder: (context, snapshot) {
                               if (!snapshot.hasData) return const SizedBox.shrink();
                               final tag = snapshot.data!;
@@ -358,8 +361,14 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
   }
   
   Future<String> _formatCurrency() async {
-    return await Provider.of<ExpenseProvider>(context, listen: false)
-        .formatCurrency(widget.expense.amount, widget.expense.currency);
+    final currencyProvider = Provider.of<CurrencyProvider>(context, listen: false);
+    // Get the currency from the available currencies
+    final currencies = currencyProvider.getAvailableCurrencies();
+    final currency = currencies.firstWhere(
+      (c) => c.code == widget.expense.currency,
+      orElse: () => Currency.vnd
+    );
+    return currencyProvider.formatAmountWithCurrency(widget.expense.amount, currency);
   }
   
   void _showExpenseDetails(BuildContext context, Expense expense) {
@@ -460,7 +469,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
               const SizedBox(height: 16),
               // Tags section
               FutureBuilder<List<String>>(
-                future: Provider.of<ExpenseProvider>(context, listen: false).getExpenseTags(expense.id),
+                future: Provider.of<TagProvider>(context, listen: false).getExpenseTags(expense.id),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(strokeWidth: 2));
@@ -490,7 +499,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                           runSpacing: 8,
                           children: tagIds.map((tagId) {
                             return FutureBuilder<Tag?>(
-                              future: Provider.of<ExpenseProvider>(context, listen: false).getTagById(tagId),
+                              future: Provider.of<TagProvider>(context, listen: false).getTagById(tagId),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) return const SizedBox.shrink();
                                 final tag = snapshot.data!;

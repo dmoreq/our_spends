@@ -1,8 +1,9 @@
 import '../models/expense.dart';
-import '../services/database_service.dart';
+import '../services/database/database_service.dart';
+import '../services/service_provider.dart';
 
 class ExpenseQueryService {
-  final DatabaseService _databaseService = DatabaseService();
+  final DatabaseService _databaseService = ServiceProvider().databaseService;
 
   // Query expenses by natural language
   Future<List<Expense>> queryExpenses(String userId, String query) async {
@@ -37,7 +38,30 @@ class ExpenseQueryService {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    return await _databaseService.getDatabaseStats();
+    // Using available methods in the new database service to build stats
+    final expenses = await _databaseService.getExpenses(
+      startDate: startDate,
+      endDate: endDate,
+    );
+    final tags = await _databaseService.getTags();
+    
+    final totalExpenses = expenses.length;
+    final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
+    final avgAmount = totalExpenses > 0 ? totalAmount / totalExpenses : 0.0;
+    
+    final now = DateTime.now();
+    final thisMonth = expenses.where((e) => 
+        e.date.year == now.year && e.date.month == now.month).toList();
+    final thisMonthTotal = thisMonth.fold<double>(0, (sum, expense) => sum + expense.amount);
+    
+    return {
+      'totalExpenses': totalExpenses,
+      'totalAmount': totalAmount,
+      'averageAmount': avgAmount,
+      'thisMonthTotal': thisMonthTotal,
+      'thisMonthCount': thisMonth.length,
+      'tagsCount': tags.length,
+    };
   }
 
 

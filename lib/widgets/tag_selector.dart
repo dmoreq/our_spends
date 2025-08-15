@@ -46,7 +46,7 @@ class _TagSelectorState extends State<TagSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,8 +83,8 @@ class _TagSelectorState extends State<TagSelector> {
                   label: Text(tag.name),
                   selected: isSelected,
                   avatar: Icon(IconData(
-                    tag.iconCodePoint,
-                    fontFamily: tag.iconFontFamily,
+                    tag.icon,
+                    fontFamily: 'MaterialIcons',
                   )),
                   onSelected: (selected) {
                     setState(() {

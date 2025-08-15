@@ -37,11 +37,18 @@ The core data structures of the application:
 
 ### Providers
 
-State management components using the Provider pattern:
+State management components using the Provider pattern, organized by domain:
 
-- **ExpenseProvider**: Manages expense data and operations
-- **AuthProvider**: Handles user authentication state
-- **LanguageProvider**: Manages localization preferences
+- **Expense Domain**:
+  - **ExpenseProvider**: Manages expense data and operations
+- **Currency Domain**:
+  - **CurrencyProvider**: Manages currency data and preferences
+- **Tag Domain**:
+  - **TagProvider**: Manages tags for expenses
+- **Other Providers**:
+  - **AuthProvider**: Handles user authentication state
+  - **LanguageProvider**: Manages localization preferences
+  - **ThemeProvider**: Manages application theme settings
 
 ### Services
 
@@ -58,14 +65,21 @@ Business logic and external integrations:
 
 ### Screens
 
-Main UI components:
+Main UI components organized by feature domains:
 
-- **HomeScreen**: Main dashboard with expense summary
-- **ExpensesScreen**: Expense listing and management
-- **ChatScreen**: AI chat interface for expense management and insights
-- **SettingsScreen**: App settings
-- **AISettingsScreen**: AI provider configuration
-- **AuthWrapper**: Authentication flow management
+- **Expense Domain**:
+  - **ExpensesScreen**: Expense listing and management
+  - **AddExpenseScreen**: Form for adding and editing expenses
+- **Chat Domain**:
+  - **ChatScreen**: AI chat interface for expense management and insights
+  - **AIChatScreen**: Advanced AI interaction for expense analysis
+- **Settings Domain**:
+  - **SettingsScreen**: App settings
+  - **AISettingsScreen**: AI provider configuration
+- **Core Components**:
+  - **HomeScreen**: Main dashboard with expense summary
+  - **AuthWrapper**: Authentication flow management
+  - **TagManagementScreen**: Interface for managing expense tags
 
 ## Data Flow
 

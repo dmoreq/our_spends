@@ -6,7 +6,6 @@ import '../repositories/implementations/shared_preferences_currency_repository.d
 import '../repositories/implementations/shared_preferences_expense_repository.dart';
 import '../repositories/implementations/shared_preferences_tag_repository.dart';
 import '../repositories/tag_repository.dart';
-import '../services/database/database_service.dart';
 import '../services/expense_service.dart';
 import '../services/storage/shared_preferences_storage.dart';
 import '../services/storage/storage_service.dart';
@@ -32,7 +31,6 @@ class ServiceProvider {
   ExpenseRepository? _expenseRepository;
   TagRepository? _tagRepository;
   CurrencyRepository? _currencyRepository;
-  DatabaseService? _databaseService;
   ExpenseService? _expenseService;
   
   /// Initializes all services.
@@ -46,21 +44,16 @@ class ServiceProvider {
     _tagRepository = SharedPreferencesTagRepository(_storageService!);
     _currencyRepository = SharedPreferencesCurrencyRepository(_storageService!);
     
-    // Initialize database service
-    _databaseService = DatabaseService(
-      expenseRepository: _expenseRepository!,
-      tagRepository: _tagRepository!,
-      currencyRepository: _currencyRepository!,
-    );
+    // Initialize repositories
+    await _expenseRepository!.init();
+    await _tagRepository!.init();
+    await _currencyRepository!.init();
     
     // Initialize expense service
     _expenseService = ExpenseService(
       expenseRepository: _expenseRepository!,
       tagRepository: _tagRepository!,
     );
-    
-    // Initialize database
-    await _databaseService!.initialize();
   }
   
   /// Gets the storage service.
@@ -93,14 +86,6 @@ class ServiceProvider {
       throw StateError('CurrencyRepository not initialized. Call initialize() first.');
     }
     return _currencyRepository!;
-  }
-  
-  /// Gets the database service.
-  DatabaseService get databaseService {
-    if (_databaseService == null) {
-      throw StateError('DatabaseService not initialized. Call initialize() first.');
-    }
-    return _databaseService!;
   }
   
   /// Gets the expense service.

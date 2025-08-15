@@ -1,16 +1,25 @@
 import '../models/expense.dart';
-import '../services/database/database_service.dart';
+import '../repositories/expense_repository.dart';
+import '../repositories/tag_repository.dart';
 import '../services/service_provider.dart';
 
 class ExpenseQueryService {
-  final DatabaseService _databaseService = ServiceProvider().databaseService;
+  final ExpenseRepository _expenseRepository;
+  final TagRepository _tagRepository;
+
+  ExpenseQueryService({
+    required ExpenseRepository expenseRepository,
+    required TagRepository tagRepository,
+  })
+      : _expenseRepository = expenseRepository,
+        _tagRepository = tagRepository;
 
   // Query expenses by natural language
   Future<List<Expense>> queryExpenses(String userId, String query) async {
     // Parse natural language query and convert to database parameters
     final queryParams = _parseQuery(query);
     
-    final allExpenses = await _databaseService.getExpenses();
+    final allExpenses = await _expenseRepository.getAll();
     
     return allExpenses.where((expense) {
       if (queryParams['startDate'] != null && expense.date.isBefore(queryParams['startDate'])) {
@@ -38,12 +47,12 @@ class ExpenseQueryService {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    // Using available methods in the new database service to build stats
-    final expenses = await _databaseService.getExpenses(
+    // Using available methods in the repository to build stats
+    final expenses = await _expenseRepository.getAll(
       startDate: startDate,
       endDate: endDate,
     );
-    final tags = await _databaseService.getTags();
+    final tags = await _tagRepository.getAll();
     
     final totalExpenses = expenses.length;
     final totalAmount = expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
@@ -64,31 +73,39 @@ class ExpenseQueryService {
     };
   }
 
-
-
   // Get monthly spending trend
   Future<Map<String, double>> getMonthlySpendingTrend(String userId, {
     int months = 12,
   }) async {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month - months, 1);
-    final trends = await _databaseService.getSpendingTrends(startDate: startDate, endDate: now);
-    return Map.fromEntries(
-      trends.map((trend) => MapEntry(trend['month'] as String, trend['totalAmount'] as double))
+    final expenses = await _expenseRepository.getAll(
+      startDate: startDate,
+      endDate: now,
     );
+    
+    // Calculate trends from expenses
+    final trends = <String, double>{};
+    for (var expense in expenses) {
+      final monthKey = '${expense.date.year}-${expense.date.month.toString().padLeft(2, '0')}';
+      trends[monthKey] = (trends[monthKey] ?? 0) + expense.amount;
+    }
+    
+    return trends;
   }
 
   // Search expenses by text
   Future<List<Expense>> searchExpenses(String userId, String searchText) async {
-    return await _databaseService.searchExpenses(searchText);
+    final allExpenses = await _expenseRepository.getAll();
+    return allExpenses.where((expense) =>
+      expense.item.toLowerCase().contains(searchText.toLowerCase())
+    ).toList();
   }
 
   // Parse natural language query into database parameters
   Map<String, dynamic> _parseQuery(String query) {
     final Map<String, dynamic> params = {};
     final queryLower = query.toLowerCase();
-
-    // Parse tags will be handled by tag-based filtering instead
 
     // Parse time periods
     if (queryLower.contains('today')) {

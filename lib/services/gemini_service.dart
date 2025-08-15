@@ -595,10 +595,8 @@ Keep the response concise and friendly.
     final avgExpense = totalAmount / expenses.length;
 
     // Group by tags would be implemented here instead of categories
-    final tagTotals = <String, double>{};
-    for (final expense in expenses) {
-      // Implementation would go here
-    }
+    // Placeholder for future tag-based analysis
+    // Implementation would go here
 
     return '''
 📊 Your Spending Insights

@@ -1,14 +1,25 @@
-# Expense Tracking Database Design
+# Database Design
 
-## Overview
+## 1. Overview
 
-This document describes the comprehensive database design for the Our Spends application. The system uses SQLite for local storage with CSV export capabilities and provides a query interface for the AI chatbot.
+This document outlines the database architecture for the **Our Spends** application. The app utilizes a local **SQLite** database to ensure data privacy and offline functionality, with options for data export.
 
-## Database Schema
+The database is designed to be simple, efficient, and extensible, providing a solid foundation for tracking expenses, managing categories, and integrating with AI-powered features.
 
-### 1. Expenses Table (`expenses`)
+## 2. Guiding Principles
 
-The main table storing all expense records:
+- **Local-First**: All data is stored on the user's device to ensure privacy and offline access.
+- **Simplicity**: The schema is designed to be straightforward and easy to understand.
+- **Performance**: Indexed for fast queries and optimized for mobile performance.
+- **Extensibility**: Easily adaptable to support future features like cloud sync and advanced analytics.
+
+## 3. Database Schema
+
+The database consists of four main tables: `expenses`, `categories`, `tags`, and the `expense_tags` junction table.
+
+### 3.1. `expenses` Table
+
+Stores individual expense records.
 
 ```sql
 CREATE TABLE expenses (
@@ -17,8 +28,6 @@ CREATE TABLE expenses (
   date TEXT NOT NULL,
   amount REAL NOT NULL,
   currency TEXT NOT NULL DEFAULT 'VND',
-  
-  
   item TEXT NOT NULL,
   description TEXT,
   location TEXT,
@@ -30,31 +39,15 @@ CREATE TABLE expenses (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   sync_status INTEGER DEFAULT 0
-)
+);
 ```
 
-**Fields:**
-- `id`: Unique identifier for each expense
-- `user_id`: Links expense to specific user
-- `date`: Date when expense occurred
-- `amount`: Expense amount (numeric)
-- `currency`: Currency code (default: VND)
+- **Primary Key**: `id` (UUID)
+- **Indexes**: `user_id`, `date`, `amount`
 
-- `item`: Brief description of what was purchased
-- `description`: Detailed description
-- `location`: Where the expense occurred
-- `payment_method`: How payment was made (cash, card, etc.)
-- `receipt_url`: Link to receipt image/document
-- `is_recurring`: Boolean flag for recurring expenses
-- `recurring_frequency`: Frequency for recurring expenses
-- `notes`: Additional notes
-- `created_at`: Record creation timestamp
-- `updated_at`: Last modification timestamp
-- `sync_status`: Synchronization status (0=local, 1=synced)
+### 3.2. `categories` Table
 
-### 2. Categories Table (`categories`)
-
-Predefined and custom expense categories:
+Manages predefined and user-created expense categories.
 
 ```sql
 CREATE TABLE categories (
@@ -65,24 +58,12 @@ CREATE TABLE categories (
   budget_limit REAL,
   is_active INTEGER DEFAULT 1,
   created_at TEXT NOT NULL
-)
+);
 ```
 
-**Default Categories:**
-- Food & Dining 🍽️
-- Transportation 🚗
-- Shopping 🛍️
-- Entertainment 🎬
-- Bills & Utilities 💡
-- Healthcare 🏥
-- Education 📚
-- Travel ✈️
-- Family & Kids 👨‍👩‍👧‍👦
-- Other 📦
+### 3.3. `tags` Table
 
-### 3. Tags Table (`tags`)
-
-Flexible tagging system for expenses:
+Allows for flexible, user-defined tagging of expenses.
 
 ```sql
 CREATE TABLE tags (
@@ -90,12 +71,12 @@ CREATE TABLE tags (
   name TEXT NOT NULL UNIQUE,
   color TEXT,
   created_at TEXT NOT NULL
-)
+);
 ```
 
-### 4. Expense Tags Junction Table (`expense_tags`)
+### 3.4. `expense_tags` Junction Table
 
-Many-to-many relationship between expenses and tags:
+Creates a many-to-many relationship between expenses and tags.
 
 ```sql
 CREATE TABLE expense_tags (
@@ -104,206 +85,59 @@ CREATE TABLE expense_tags (
   PRIMARY KEY (expense_id, tag_id),
   FOREIGN KEY (expense_id) REFERENCES expenses (id) ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
-)
+);
 ```
 
-## Database Indexes
+## 4. Services Architecture
 
-For optimal query performance:
+### 4.1. `DatabaseService`
 
-```sql
-CREATE INDEX idx_expenses_user_id ON expenses (user_id);
-CREATE INDEX idx_expenses_date ON expenses (date);
+The `DatabaseService` is the core component for all database interactions. It abstracts the SQL queries and provides a clean, type-safe API for CRUD operations.
 
-CREATE INDEX idx_expenses_amount ON expenses (amount);
-```
+- **`insertExpense(Expense expense)`**: Adds a new expense to the database.
+- **`getExpenses(String userId, {...})`**: Retrieves a list of expenses with powerful filtering options (date, amount, etc.).
+- **`updateExpense(Expense expense)`**: Updates an existing expense record.
+- **`deleteExpense(String id)`**: Removes an expense from the database.
+- **`exportToCSV(String userId)`**: Exports user data to a CSV file.
 
-## Services Architecture
+### 4.2. `ExpenseQueryService`
 
-### 1. DatabaseService (`lib/services/database_service.dart`)
+This service provides a higher-level interface for querying expense data, specifically for the AI chatbot. It translates natural language queries into database operations.
 
-Core database operations:
+- **`queryExpenses(String userId, String query)`**: Parses natural language to fetch relevant expenses.
+- **`getExpenseAnalytics(String userId)`**: Computes and returns spending analytics.
+- **`generateSummary(List<Expense> expenses, String query)`**: Creates a human-readable summary of query results.
 
-**Key Methods:**
-- `insertExpense(Expense expense)`: Add new expense
-- `getExpenses(String userId, {...filters})`: Retrieve expenses with filters
-- `updateExpense(Expense expense)`: Update existing expense
-- `deleteExpense(String id)`: Remove expense
+## 5. AI Integration
 
-- `getSpendingTrends(String userId)`: Spending trends over time
-- `searchExpenses(String userId, String query)`: Text search
-- `exportToCSV(String userId)`: Export data to CSV
-- `getDatabaseStats(String userId)`: Database statistics
+The database is designed to seamlessly integrate with the AI chatbot for two primary functions:
 
-**Filtering Options:**
-- Date range (startDate, endDate)
+### 5.1. Expense Extraction
 
-- Amount range (minAmount, maxAmount)
-- Pagination (limit, offset)
+The AI can parse expense details from user messages (e.g., "I bought coffee for 50k"). The extracted information is then used to populate an `Expense` object and save it to the database.
 
-### 2. ExpenseQueryService (`lib/services/expense_query_service.dart`)
+### 5.2. Natural Language Queries
 
-Natural language query interface for the chatbot:
-
-**Key Methods:**
-- `queryExpenses(String userId, String query)`: Parse natural language queries
-- `getExpenseAnalytics(String userId)`: Get spending analytics
-
-- `getMonthlySpendingTrend(String userId)`: Monthly trends
-- `searchExpenses(String userId, String searchText)`: Text search
-- `generateSummary(List<Expense> expenses, String originalQuery)`: Generate human-readable summaries
-
-**Natural Language Query Examples:**
-- "Show me food expenses this month"
-- "What did I spend on transport last week?"
-- "Find expenses over 100k VND"
-- "Show my top 10 expenses"
-- "What are my recent shopping purchases?"
-
-### 3. Enhanced Expense Model (`lib/models/expense.dart`)
-
-Extended expense model with additional fields:
-
-```dart
-class Expense {
-  final String id;
-  final String userId;
-  final DateTime date;
-  final double amount;
-  final String currency;
-  
-  final String item;
-  final String? description;
-  final String? location;
-  final String? paymentMethod;
-  final String? receiptUrl;
-  final bool isRecurring;
-  final String? recurringFrequency;
-  final String? notes;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final int syncStatus;
-}
-```
-
-## AI Integration
-
-### Expense Extraction
-
-The AI chatbot can extract expense information from natural language:
-
-**Input:** "I bought coffee for 50k at Starbucks"
-**Output:**
-```json
-{
-  "hasExpense": true,
-  "amount": 50000,
-  "description": "coffee",
-  
-  "location": "Starbucks",
-  "confidence": 0.9
-}
-```
-
-### Query Processing
-
-The chatbot can answer questions about expenses:
-
-**Examples:**
+The AI uses the `ExpenseQueryService` to answer user questions about their spending, such as:
 - "How much did I spend on food this month?"
+- "Show me my top 10 expenses."
+- "What were my recent shopping purchases?"
 
-- "Show me all expenses from last week"
-- "Find my coffee purchases"
+## 6. Data Management
 
-### Analytics Generation
+### 6.1. Data Export
 
-The AI provides insights based on spending patterns:
-- Spending trends
+Users can export their expense data to a CSV file for backup or use in other applications. The file is saved to the device's local storage.
 
-- Budget recommendations
-- Saving suggestions
+### 6.2. Security and Privacy
 
-## Data Export/Import
+- **Local Storage**: All data is stored exclusively on the user's device.
+- **User Isolation**: Data is partitioned by `user_id` to ensure privacy.
+- **No Cloud Sync**: By default, no data is sent to the cloud.
 
-### CSV Export
+## 7. Future Enhancements
 
-Expenses can be exported to CSV format:
-
-```csv
-Date,Amount,Currency,Item,Description,Location,Payment Method,Notes
-2024-01-15,50000,VND,food,coffee,Morning coffee,Starbucks,card,
-2024-01-15,200000,VND,transport,taxi,Ride to office,District 1,cash,
-```
-
-### File Storage
-
-CSV files are saved to the device's documents directory with timestamps:
-- `expenses_1642234567890.csv`
-
-## Usage Examples
-
-### 1. Adding an Expense via Chat
-
-**User:** "I spent 150k on groceries at Vinmart"
-
-**System Process:**
-1. AI extracts expense info
-2. Creates Expense object
-3. Stores in database
-4. Confirms with user
-
-### 2. Querying Expenses
-
-**User:** "Show me my food expenses this month"
-
-**System Process:**
-1. Parse query parameters
-2. Query database with filters
-3. Generate summary
-4. Return results to user
-
-### 3. Getting Analytics
-
-**User:** "What are my spending insights?"
-
-**System Process:**
-1. Retrieve user's expenses
-2. Calculate analytics
-3. Generate AI insights
-4. Present to user
-
-## Performance Considerations
-
-1. **Indexing**: Proper indexes on frequently queried columns
-2. **Pagination**: Large datasets are paginated
-3. **Caching**: Recent queries can be cached
-4. **Batch Operations**: Multiple inserts use transactions
-
-## Security & Privacy
-
-1. **Local Storage**: Data stored locally on device
-2. **User Isolation**: Each user's data is separate
-3. **No Cloud Sync**: Data remains on device (configurable)
-4. **Encryption**: Consider encrypting sensitive data
-
-## Future Enhancements
-
-1. **Cloud Sync**: Firebase/Firestore integration
-2. **Receipt OCR**: Automatic receipt scanning
-3. **Budget Tracking**: Monthly budgets
-4. **Recurring Expenses**: Automatic recurring expense handling
-5. **Multi-Currency**: Better currency conversion support
-6. **Data Visualization**: Charts and graphs
-7. **Export Formats**: PDF, Excel support
-
-## Testing the Database
-
-To test the database functionality:
-
-1. **Start the app**: `flutter run -d web-server --web-port=3000`
-2. **Open browser**: Navigate to `http://localhost:3000`
-3. **Chat with AI**: Send messages like "I bought lunch for 80k"
-4. **Query data**: Ask "What did I spend today?"
-5. **Check storage**: Expenses should be saved and queryable
-
-The database system provides a robust foundation for expense tracking with AI integration, making it easy for users to manage their finances through natural conversation.
+- **Cloud Sync**: Optional synchronization with services like Firebase or a private server.
+- **Advanced Analytics**: Deeper insights, budget tracking, and predictive analysis.
+- **Receipt OCR**: Scan receipts to automatically create expenses.
+- **Multi-Currency Support**: Improved handling of different currencies.

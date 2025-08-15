@@ -1,122 +1,101 @@
-# 🏠 Our Spends
+# Our Spends: AI-Powered Expense Tracking
 
-An AI-powered expense tracking application built with Flutter. This app helps you track, analyze, and optimize your spending with intelligent insights.
+**Our Spends** is a modern, AI-powered expense tracking application built with Flutter. It provides an intuitive and conversational way to manage your finances, combining powerful expense tracking features with a multi-provider AI chatbot.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Flutter](https://img.shields.io/badge/Flutter-3.8.1-blue.svg)
-![Firebase](https://img.shields.io/badge/Firebase-3.6.0-orange.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Flutter Version](https://img.shields.io/badge/Flutter-3.x-blue.svg)](https://flutter.dev)
+[![Dart Version](https://img.shields.io/badge/Dart-3.x-blue.svg)](https://dart.dev)
 
-## ✨ Features
+---
 
-- **💰 Expense Tracking**: Record and categorize all your expenses
-- **🤖 AI-Powered Chat**: Interact with an AI assistant to add expenses and get insights
-- **🔍 Smart Search**: Use the AI chat to search and analyze your expenses
-- **📊 Visual Reports**: View your spending patterns with intuitive charts
-- **🔄 Recurring Expenses**: Set up and track regular payments
-- **🌐 Multi-Language**: Supports English and Vietnamese
-- **🔌 Multiple AI Providers**: Choose between Gemini, OpenAI, Claude, or DeepSeek
+## ✨ Key Features
 
-## 📱 Screenshots
+- **AI-Powered Chatbot**: Add expenses, search, and get spending insights using natural language. Supports **Gemini, OpenAI, Claude, and DeepSeek**.
+- **Comprehensive Expense Tracking**: Record expenses with categories, tags, dates, and descriptions.
+- **Offline-First**: Your data is stored locally on your device for privacy and offline access.
+- **Multi-Language Support**: Fully localized in **English** and **Vietnamese**.
+- **Customizable Themes**: Switch between light, dark, and system themes.
+- **Data Export**: Export your financial data to CSV.
 
-*Coming soon*
+For a complete list of features, see the [Features](./FEATURES.md) document.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Flutter SDK (^3.8.1)
-- Dart SDK (^3.8.1)
-- Firebase account (for authentication and cloud storage)
-- AI provider API key (Gemini, OpenAI, Claude, or DeepSeek)
+- **Flutter SDK**: Version 3.x or higher.
+- **Dart SDK**: Version 3.x or higher.
+- **An IDE**: Android Studio, VS Code, or your preferred editor.
+- **AI Provider API Key (Optional)**: To use the AI features, you'll need an API key from Gemini, OpenAI, Claude, or DeepSeek.
 
-### Installation
+### Installation and Setup
 
-1. **Clone the repository**
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/your-username/our-spends.git
+   cd our-spends
+   ```
 
-```bash
-git clone https://github.com/yourusername/family_expense_tracker.git
-cd family_expense_tracker
-```
+2. **Install Dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-2. **Install dependencies**
+3. **Configure AI Provider**
+   - Open the app and navigate to **Settings > AI Provider**.
+   - Select your preferred provider and enter your API key.
+   - For more details, refer to the [AI Setup Guide](./AI_SETUP.md).
 
-```bash
-flutter pub get
-```
-
-3. **Configure Firebase** (optional for full functionality)
-
-Replace the demo Firebase configuration in `main.dart` with your actual Firebase project details.
-
-4. **Configure AI Provider**
-
-Follow the instructions in [AI_SETUP.md](./AI_SETUP.md) to set up your preferred AI provider.
-
-5. **Run the app**
-
-```bash
-flutter run
-```
+4. **Run the Application**
+   ```bash
+   flutter run
+   ```
 
 ## 🏗️ Architecture
 
-The app follows a clean architecture pattern with the following components:
+The application follows a clean, scalable architecture that separates concerns into three main layers: **Presentation**, **Business Logic**, and **Data**.
 
-- **Models**: Data structures for expenses, categories, and chat messages
-- **Providers**: State management using the Provider pattern
-- **Services**: Business logic and API interactions
-- **Screens**: User interface components
-- **Widgets**: Reusable UI elements
+- **State Management**: We use the **Provider** package for efficient and reactive state management.
+- **Database**: A local **SQLite** database ensures data persistence and offline functionality.
+- **Service-Oriented**: Business logic is encapsulated in services (e.g., `DatabaseService`, `AIService`).
 
-### Key Components
+For a detailed explanation, please see the [Architecture Document](./ARCHITECTURE.md).
 
-- **AI Service**: Multi-provider system supporting Gemini, OpenAI, Claude, and DeepSeek
-- **Database Service**: Local SQLite storage with cloud sync capabilities
-- **Expense Provider**: Central state management for expense data
-- **Authentication**: Firebase authentication with Google Sign-In
+## 📂 Project Structure
 
-### Main Screens
-
-- **Expenses Screen**: Main dashboard displaying expense summaries and list
-- **Chat Screen**: AI-powered interface for adding expenses and getting insights
-- **Settings Screen**: Configure app settings and AI provider preferences
-
-## 🔧 Configuration
-
-### AI Providers
-
-The app supports multiple AI providers that can be configured in the settings:
-
-- **Gemini**: Google's generative AI model
-- **OpenAI**: ChatGPT models
-- **Claude**: Anthropic's Claude models
-- **DeepSeek**: DeepSeek AI models
-
-API keys can be configured in the app settings or directly in `lib/config/api_config.dart`.
-
-### Localization
-
-The app supports English and Vietnamese languages. Localization files are located in the `lib/l10n` directory.
+```
+lib/
+├── l10n/           # Localization files
+├── models/         # Data models (Expense, Category, etc.)
+├── providers/      # State management providers
+├── screens/        # UI screens
+├── services/       # Business logic and API services
+├── utils/          # Utility functions and constants
+├── widgets/        # Reusable UI widgets
+└── main.dart       # App entry point
+```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Whether you want to fix a bug, add a feature, or improve the documentation, we appreciate your help.
 
-## 📄 Documentation
+Please read our [Contributing Guidelines](./CONTRIBUTING.md) to get started.
 
-- [Architecture Documentation](./ARCHITECTURE.md)
+## 🗺️ Roadmap
+
+- [ ] **Cloud Sync**: Optional synchronization across multiple devices.
+- [ ] **Budgeting Tools**: Set and track spending budgets.
+- [ ] **Receipt Scanning (OCR)**: Automatically create expenses from receipts.
+- [ ] **Advanced Data Visualization**: Interactive charts and graphs.
+
+## 📚 Documentation
+
+- [Architecture](./ARCHITECTURE.md)
 - [Database Design](./DATABASE_DESIGN.md)
 - [AI Setup Guide](./AI_SETUP.md)
 - [Features Overview](./FEATURES.md)
 - [Navigation Structure](./NAVIGATION.md)
-- [Search Functionality](./SEARCH.md)
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-## 📚 Documentation
-
-- [Database Design](./DATABASE_DESIGN.md)
-- [AI Setup Guide](./AI_SETUP.md)
-# Email configuration verified
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.

@@ -1,87 +1,57 @@
-# Our Spends Navigation Structure
+# Navigation Architecture
 
-## Overview
+## 1. Overview
 
-Our Spends uses a simple and intuitive navigation structure to provide easy access to all features. The app is organized into three main screens accessible via a bottom navigation bar.
+This document outlines the navigation structure of the **Our Spends** application. The navigation is designed to be simple, intuitive, and consistent, ensuring that users can easily access all features without confusion.
 
-## Main Navigation
+The primary navigation is handled by a bottom navigation bar, which provides access to the three core sections of the app: **Expenses**, **Chat**, and **Settings**.
 
-### Bottom Navigation Bar
+## 2. Guiding Principles
 
-The bottom navigation bar provides access to the three primary screens of the application:
+- **Simplicity**: The navigation is kept minimal to avoid overwhelming the user.
+- **Accessibility**: Core features are accessible with a single tap from the main screens.
+- **Consistency**: The navigation patterns are consistent with platform conventions (iOS and Android).
+- **Scalability**: The structure is designed to accommodate future features without major refactoring.
 
-1. **Expenses** - The main dashboard showing expense summaries and listings
-2. **Chat** - AI-powered chat interface for expense management and insights
-3. **Settings** - App configuration and preferences
+## 3. Main Navigation
 
-## Screen Details
+The app's `HomeScreen` widget manages the main navigation, utilizing a `PageView` to switch between the three primary screens and a `NavigationBar` for the bottom tabs.
 
-### Expenses Screen
+### 3.1. Bottom Navigation Bar
 
-The Expenses screen serves as the main dashboard of the application and provides:
+- **Expenses Screen**: The default landing screen. It displays a summary of recent expenses, categorized lists, and a floating action button to add new entries.
+- **Chat Screen**: Provides a conversational interface for adding expenses, querying data, and receiving AI-powered insights.
+- **Settings Screen**: Contains all application-level settings, including language, theme, AI provider configuration, and data management.
 
-- A summary of recent expenses
-- Categorized expense listings
-- Filtering and sorting options
-- A floating action button to add new expenses
+## 4. Screen Flow and Hierarchy
 
-#### Sub-navigation from Expenses Screen
+The following diagram illustrates the primary navigation flow:
 
-- **Add Expense** - Accessed via the floating action button
-- **Expense Details** - Accessed by tapping on an expense item
-- **Analytics** - Accessed via the analytics icon in the app bar (future implementation)
+```mermaid
+graph TD
+    A[HomeScreen] --> B{Expenses Screen};
+    A --> C{Chat Screen};
+    A --> D{Settings Screen};
 
-### Chat Screen
-
-The Chat screen provides an AI-powered interface for:
-
-- Adding expenses through natural language
-- Searching for specific expenses
-- Getting spending insights and analysis
-- Receiving personalized financial recommendations
-
-The Chat screen combines search functionality with AI assistance, eliminating the need for a separate search screen.
-
-### Settings Screen
-
-The Settings screen provides access to:
-
-- **Language Settings** - Change the app language
-- **Theme Settings** - Toggle between light and dark mode
-- **AI Provider Settings** - Configure AI providers and API keys
-- **Export/Import** - Data management options
-- **About** - App information and version
-
-## Navigation Implementation
-
-The navigation structure is implemented in the `HomeScreen` widget, which uses:
-
-- A `PageView` to manage the three main screens
-- A `NavigationBar` for bottom navigation
-- A `FloatingActionButton` that appears only on the Expenses screen
-
-## Navigation Flow
-
-```
-┌─────────────────────────────────────────────────────┐
-│                     HomeScreen                       │
-└───────────────────────┬─────────────────────────────┘
-                        │
-            ┌───────────┼───────────────┐
-            │           │               │
-┌───────────▼───┐ ┌─────▼─────┐ ┌───────▼───────┐
-│ ExpensesScreen │ │ ChatScreen │ │ SettingsScreen │
-└───────┬───────┘ └───────────┘ └───────────────┘
-        │
-        │
-┌───────▼────────┐
-│ AddExpenseScreen │
-└──────────────────┘
+    B --> E[Add/Edit Expense Screen];
+    B --> F[Expense Details Screen];
+    D --> G[AI Provider Settings];
+    D --> H[Theme & Language Settings];
 ```
 
-## Future Navigation Enhancements
+- **HomeScreen**: The root widget that contains the bottom navigation bar and hosts the main screens.
+- **Expenses Screen**: From here, users can navigate to add a new expense or view the details of an existing one.
+- **Settings Screen**: Provides access to various configuration screens.
 
-- **Deep Linking** - Direct access to specific screens from external sources
-- **Tabbed Navigation** - Sub-navigation within the Expenses screen for different views
-- **Gesture Navigation** - Swipe gestures for navigating between screens
-- **Search Integration** - Enhanced search capabilities within the Chat screen
+## 5. Key Navigation Components
+
+- **`HomeScreen.dart`**: The stateful widget that orchestrates the primary navigation.
+- **`NavigationBar`**: The bottom navigation bar component.
+- **`FloatingActionButton`**: Conditionally displayed on the Expenses screen for quick access to add a new expense.
+- **`Navigator`**: Used for pushing and popping individual screens onto the navigation stack (e.g., opening the `Add/Edit Expense` screen).
+
+## 6. Future Enhancements
+
+- **Deep Linking**: Allow users to open specific screens within the app from external links.
+- **Tabbed Views**: Introduce tabs within the Expenses screen for different views (e.g., by month, by category).
+- **Enhanced Search**: Integrate a more powerful search experience directly within the Chat screen.

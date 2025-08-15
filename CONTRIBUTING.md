@@ -1,143 +1,87 @@
 # Contributing to Our Spends
 
-Thank you for considering contributing to the Our Spends project! This document provides guidelines and instructions for contributing.
+First off, thank you for considering contributing to Our Spends! We appreciate your time and effort. This guide will help you get started.
 
 ## Code of Conduct
 
-Please be respectful and considerate of others when contributing to this project. We aim to foster an inclusive and welcoming community.
+We have a [Code of Conduct](CODE_OF_CONDUCT.md) that we expect all contributors to adhere to. Please be respectful and considerate of others.
 
-## How Can I Contribute?
+## How to Contribute
 
 ### Reporting Bugs
 
-Bugs are tracked as GitHub issues. When you create an issue, please include:
+If you find a bug, please create a GitHub issue with the following:
 
-- A clear and descriptive title
-- Steps to reproduce the issue
-- Expected behavior vs. actual behavior
-- Screenshots if applicable
-- Any relevant logs or error messages
-- Your environment (Flutter version, device/emulator, OS)
+*   A clear, descriptive title.
+*   Steps to reproduce the issue.
+*   What you expected to happen versus what actually happened.
+*   Screenshots, if applicable.
+*   Your environment details (Flutter version, OS, device).
 
 ### Suggesting Enhancements
 
-Enhancement suggestions are also tracked as GitHub issues. When suggesting an enhancement, please include:
+Have an idea for a new feature? Create a GitHub issue with:
 
-- A clear and descriptive title
-- A detailed description of the proposed functionality
-- Any potential implementation details you can provide
-- Why this enhancement would be useful to most users
+*   A clear, descriptive title.
+*   A detailed explanation of the proposed feature.
+*   Why this enhancement would be useful.
 
-### Pull Requests
+### Submitting Pull Requests
 
-1. Fork the repository
-2. Create a new branch for your feature or bugfix (`git checkout -b feature/your-feature-name`)
-3. Make your changes
-4. Run tests and ensure they pass
-5. Commit your changes with clear, descriptive commit messages
-6. Push to your branch
-7. Submit a pull request to the main repository
+1.  **Fork the repository** and create a new branch from `main`.
+2.  **Make your changes** in your feature branch.
+3.  **Write tests** for any new functionality.
+4.  **Ensure all tests pass** by running `flutter test`.
+5.  **Follow the coding guidelines** below.
+6.  **Commit your changes** with a clear, descriptive commit message.
+7.  **Push your branch** to your fork.
+8.  **Submit a pull request** to the main repository.
 
 ## Development Setup
 
-### Prerequisites
-
-- Flutter SDK (^3.8.1)
-- Dart SDK (^3.8.1)
-- An IDE (VS Code, Android Studio, etc.)
-- Git
-
-### Setup Steps
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/yourusername/family_expense_tracker.git
-   cd family_expense_tracker
-   ```
-
-2. Install dependencies
-   ```bash
-   flutter pub get
-   ```
-
-3. Run the app
-   ```bash
-   flutter run
-   ```
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-username/our-spends.git
+    cd our-spends
+    ```
+2.  **Install dependencies**:
+    ```bash
+    flutter pub get
+    ```
+3.  **Run the app**:
+    ```bash
+    flutter run
+    ```
 
 ## Coding Guidelines
 
-### Style Guide
-
-- Follow the [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style)
-- Use meaningful variable and function names
-- Write comments for complex logic
-- Keep functions small and focused on a single task
-
-### Testing
-
-- Write unit tests for new functionality
-- Ensure all tests pass before submitting a pull request
-- Run tests with `flutter test`
-
-### Documentation
-
-- Update documentation for any changes to the API or functionality
-- Use dartdoc comments for public APIs
-- Keep the README.md up to date
+*   **Style**: Follow the [Effective Dart: Style](https://dart.dev/guides/language/effective-dart/style) guide.
+*   **Naming**: Use meaningful names for variables, functions, and classes.
+*   **Simplicity**: Keep functions small and focused on a single task.
+*   **Documentation**: Add comments for complex logic and update documentation for any new features.
 
 ## Project Structure
 
 ```
 lib/
-├── config/       # Configuration files
+├── config/       # API keys and configuration
 ├── l10n/         # Localization files
 ├── models/       # Data models
-├── providers/    # State management
+├── providers/    # State management (ChangeNotifier)
+├── repositories/ # Data access layer
 ├── screens/      # UI screens
-│   ├── home_screen.dart       # Main navigation container
-│   ├── expenses_screen.dart   # Expense listing and management
-│   ├── chat_screen.dart       # AI chat interface
-│   ├── settings_screen.dart   # App settings
-│   └── add_expense_screen.dart # Add new expenses
-├── services/     # Business logic and API services
-│   ├── ai_service.dart        # AI provider interface
-│   ├── database_service.dart  # Local data persistence
-│   └── expense_query_service.dart # Expense querying logic
-├── theme/        # App theme
+├── services/     # Business logic services
+├── theme/        # App theme and styling
 ├── utils/        # Utility functions
-├── widgets/      # Reusable UI components
-└── main.dart     # App entry point
+└── widgets/      # Reusable UI widgets
 ```
 
-## Feature Development Guidelines
+## Adding a New AI Provider
 
-### Adding a New Feature
-
-1. Create a new branch for your feature
-2. Implement the feature with appropriate tests
-3. Update documentation
-4. Submit a pull request
-
-### Adding a New AI Provider
-
-To add support for a new AI provider:
-
-1. Create a new service class in `lib/services/` (e.g., `new_provider_service.dart`)
-2. Implement the required methods (see existing providers for reference)
-3. Update `AIService` in `ai_service.dart` to include your new provider
-4. Add the provider to `supportedProviders` in `api_config.dart`
-5. Update the AI settings screen to include the new provider
-
-## Release Process
-
-1. Version numbers follow [Semantic Versioning](https://semver.org/)
-2. Update the version in `pubspec.yaml`
-3. Create a changelog entry
-4. Tag the release in git
+1.  Create a new service class in `lib/services/` that implements the `AIService` interface.
+2.  Add your new provider to the `supportedProviders` map in `lib/config/api_config.dart`.
+3.  Update the AI settings screen to include the new provider option.
 
 ## Questions?
 
-If you have any questions about contributing, please open an issue or contact the project maintainers.
-
-Thank you for contributing to Our Spends!
+If you have any questions, feel free to open an issue. We're here to help!

@@ -1,153 +1,115 @@
-# Our Spends Architecture
+# Application Architecture
 
-## Overview
+## 1. Overview
 
-The Our Spends application is built using Flutter and follows a clean architecture pattern with a focus on maintainability, testability, and scalability. This document outlines the high-level architecture and key components of the application.
+The Our Spends application is built using Flutter and follows a clean, scalable, and maintainable architecture. This document outlines the guiding principles, layers, and key components that make up the application.
 
-## Architecture Layers
+## 2. Guiding Principles
 
-The application is structured into the following layers:
+*   **Separation of Concerns**: Each part of the application has a distinct responsibility, making the codebase easier to understand, manage, and test.
+*   **Scalability**: The architecture is designed to accommodate future features and growth without requiring major refactoring.
+*   **Testability**: Components are loosely coupled, allowing for effective unit, widget, and integration testing.
+*   **Maintainability**: A clear and consistent structure ensures that new developers can quickly get up to speed.
 
-### 1. Presentation Layer
+## 3. Architecture Layers
 
-- **Screens**: UI components that represent full pages in the app
-- **Widgets**: Reusable UI components
-- **Theme**: App-wide styling and theming
+The application is divided into three primary layers:
 
-### 2. Business Logic Layer
+### 3.1. Presentation Layer
 
-- **Providers**: State management using the Provider pattern
-- **Services**: Business logic and external API interactions
+This layer is responsible for the user interface and user experience.
 
-### 3. Data Layer
+*   **Screens**: Top-level UI components that represent a full page in the app (e.g., `HomeScreen`, `ExpensesScreen`).
+*   **Widgets**: Reusable UI components that are composed to build screens (e.g., `ExpenseListItem`, `TagSelector`).
+*   **Theme**: Defines the application's visual identity, including colors, fonts, and component styles.
 
-- **Models**: Data structures representing domain entities
-- **Repositories**: Data access and persistence
+### 3.2. Business Logic Layer
 
-## Key Components
+This layer contains the core application logic and state management.
 
-### Models
+*   **Providers**: Manages the application's state using the `provider` package. Each provider is responsible for a specific domain (e.g., `ExpenseProvider`, `TagProvider`).
+*   **Services**: Encapsulates business logic and coordinates interactions between the data layer and the presentation layer (e.g., `AIService`, `ExpenseService`).
 
-The core data structures of the application:
+### 3.3. Data Layer
 
-- **Expense**: Represents a single expense record with details like amount, category, date, etc.
-- **Category**: Represents expense categories with names, icons, and colors
-- **Tag**: Flexible tagging system for expenses
-- **ChatMessage**: Represents messages in the AI chat interface
+This layer is responsible for data persistence, retrieval, and management.
 
-### Providers
+*   **Repositories**: Abstract the data source (local or remote) and provide a clean API for the business logic layer to access data.
+*   **Models**: Define the data structures for the application's domain entities (e.g., `Expense`, `Tag`).
+*   **Storage Services**: Concrete implementations for data persistence, such as `SharedPreferencesStorage` for key-value storage.
 
-State management components using the Provider pattern, organized by domain:
+## 4. Key Components
 
-- **Expense Domain**:
-  - **ExpenseProvider**: Manages expense data and operations
-- **Currency Domain**:
-  - **CurrencyProvider**: Manages currency data and preferences
-- **Tag Domain**:
-  - **TagProvider**: Manages tags for expenses
-- **Other Providers**:
-  - **AuthProvider**: Handles user authentication state
-  - **LanguageProvider**: Manages localization preferences
-  - **ThemeProvider**: Manages application theme settings
+### 4.1. Models
 
-### Services
+*   `Expense`: Represents a single expense record.
+*   `Tag`: A flexible tag for categorizing expenses.
+*   `ChatMessage`: Represents a message in the AI chat interface.
+*   `Currency`: Represents a currency and its formatting options.
 
-Business logic and external integrations:
+### 4.2. Providers
 
-- **AIService**: Multi-provider AI integration service
-  - **GeminiService**: Integration with Google's Gemini AI
-  - **OpenAIService**: Integration with OpenAI's ChatGPT
-  - **ClaudeService**: Integration with Anthropic's Claude
-  - **DeepSeekService**: Integration with DeepSeek AI
-- **ApiService**: Handles API requests and responses
-- **DatabaseService**: Local data persistence using SQLite
-- **ExpenseQueryService**: Specialized service for querying expense data
+*   `ExpenseProvider`: Manages the state of expenses, including adding, updating, and deleting them.
+*   `TagProvider`: Manages the state of tags.
+*   `CurrencyProvider`: Manages the selected currency and format.
+*   `ThemeProvider`: Manages the application's theme (light/dark mode).
+*   `LanguageProvider`: Manages the application's locale.
 
-### Screens
+### 4.3. Services
 
-Main UI components organized by feature domains:
+*   `AIService`: A multi-provider AI service that integrates with Gemini, OpenAI, Claude, and DeepSeek.
+*   `ExpenseService`: Handles business logic related to expenses, such as querying and filtering.
+*   `DatabaseService`: Provides an abstraction over the local database.
+*   `StorageService`: A generic service for key-value storage, implemented by `SharedPreferencesStorage`.
 
-- **Expense Domain**:
-  - **ExpensesScreen**: Expense listing and management
-  - **AddExpenseScreen**: Form for adding and editing expenses
-- **Chat Domain**:
-  - **ChatScreen**: AI chat interface for expense management and insights
-  - **AIChatScreen**: Advanced AI interaction for expense analysis
-- **Settings Domain**:
-  - **SettingsScreen**: App settings
-  - **AISettingsScreen**: AI provider configuration
-- **Core Components**:
-  - **HomeScreen**: Main dashboard with expense summary
-  - **AuthWrapper**: Authentication flow management
-  - **TagManagementScreen**: Interface for managing expense tags
+### 4.4. Repositories
 
-## Data Flow
+*   `ExpenseRepository`: Manages data operations for expenses.
+*   `TagRepository`: Manages data operations for tags.
+*   `CurrencyRepository`: Manages data operations for currency settings.
 
-1. **User Interaction**: User interacts with UI components in Screens/Widgets
-2. **State Management**: Providers handle state changes and business logic
-3. **Service Layer**: Services perform operations like API calls or database queries
-4. **Data Persistence**: Data is stored locally in SQLite and/or synced to Firebase
+## 5. Data Flow
 
-## AI Integration Architecture
+The data flows through the application in a unidirectional manner:
 
-The AI integration follows a provider pattern with a unified interface:
+1.  **UI Events**: The user interacts with a widget on a screen.
+2.  **Provider Action**: The widget calls a method on a provider.
+3.  **Business Logic**: The provider executes business logic, potentially calling one or more services.
+4.  **Data Access**: Services interact with repositories to fetch or persist data.
+5.  **State Update**: The provider updates its state, and the UI automatically rebuilds to reflect the changes.
+
+## 6. AI Integration
+
+The AI integration is designed to be modular and extensible.
 
 ```
-┌─────────────────┐
-│    AIService    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Provider API   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────────────────────────┐
-│                                                 │
-│  ┌──────────┐ ┌──────────┐ ┌───────┐ ┌───────┐ │
-│  │  Gemini  │ │  OpenAI  │ │Claude │ │DeepSeek│ │
-│  └──────────┘ └──────────┘ └───────┘ └───────┘ │
-│                                                 │
-└─────────────────────────────────────────────────┘
++-----------------+
+|   AIService     |
++-------+---------+
+        |
+        v
++-------+---------+
+|  Provider API   |
++-------+---------+
+        |
+        v
++---------------------------------------+
+| +-----------+ +-----------+ +-------+ |
+| |  Gemini   | |  OpenAI   | | Claude| |
+| +-----------+ +-----------+ +-------+ |
++---------------------------------------+
 ```
 
-1. **AIService**: Unified interface for all AI providers
-2. **Provider Selection**: Dynamic provider switching with persistent settings
-3. **Fallback Mechanism**: Automatic fallback to default provider if selected provider fails
-4. **Shared Functionality**: Common prompts and processing logic shared across providers
+*   **AIService**: Provides a unified interface for all AI providers.
+*   **Provider Switching**: Allows the user to dynamically switch between AI providers.
+*   **Fallback Mechanism**: Automatically falls back to a default provider if the selected one fails.
 
-## Database Architecture
+## 7. Database
 
-The application uses SQLite for local storage with the following schema:
+The application uses `shared_preferences` for local data storage. For more complex data, a database solution like `sqflite` could be integrated.
 
-- **expenses**: Main table for expense records
-- **categories**: Predefined and custom expense categories
-- **tags**: Flexible tagging system
-- **expense_tags**: Junction table for many-to-many relationship
+See [DATABASE_DESIGN.md](./DATABASE_DESIGN.md) for more details.
 
-See [DATABASE_DESIGN.md](./DATABASE_DESIGN.md) for detailed schema information.
+## 8. Internationalization
 
-## Authentication Flow
-
-The app supports both authenticated and demo modes:
-
-1. **Authenticated Mode**: Uses Firebase Authentication with Google Sign-In
-2. **Demo Mode**: Uses local storage with a generated demo user ID
-
-## Internationalization
-
-The app supports multiple languages using Flutter's built-in localization:
-
-- English (en)
-- Vietnamese (vi)
-
-Localization files are stored in the `lib/l10n` directory using the ARB format.
-
-## Future Architecture Considerations
-
-- **Offline-First Approach**: Enhanced offline capabilities with background sync
-- **Advanced Analytics**: Integration with analytics services
-- **Webhooks**: Integration with financial services and banks
-- **Machine Learning**: On-device ML for expense categorization
-- **Biometric Authentication**: Enhanced security with biometric login
+The app supports English and Vietnamese using Flutter's built-in localization. Localization files are in the `lib/l10n` directory.

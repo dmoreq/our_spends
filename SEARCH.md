@@ -1,83 +1,74 @@
-# Search Functionality in Our Spends
+# Search Functionality
 
-## Overview
+## 1. Overview
 
-In Our Spends, search functionality is integrated directly into the AI Chat interface, providing a more intuitive and powerful way to find and analyze your expenses. This approach eliminates the need for a separate search screen while enhancing the search capabilities through natural language processing.
+This document outlines the search functionality integrated into the AI Chat interface of Our Spends. By leveraging natural language processing (NLP), the application offers a powerful and intuitive way to find, analyze, and manage expenses without a traditional search screen.
 
-## How to Search Using AI Chat
+## 2. Guiding Principles
 
-### Basic Search
+- **Simplicity**: Eliminate complex search forms in favor of a conversational interface.
+- **Power**: Enable complex queries through natural language.
+- **Intelligence**: Provide contextual insights, not just data.
+- **Accessibility**: Support multiple languages to cater to a diverse user base.
 
-To search for expenses, simply type your query in the Chat screen. For example:
+## 3. How It Works
 
-- "Show me all my coffee expenses"
-- "Find expenses from last week"
-- "How much did I spend on groceries this month?"
+The search functionality is powered by an AI model that interprets user queries from the chat interface. The AI parses the natural language input to identify intent and parameters, which are then translated into a structured query for the `ExpenseQueryService`.
 
-### Advanced Search Parameters
+### Key Features
 
-You can refine your search using various parameters:
+- **Natural Language Queries**: Ask for your data in plain English or Vietnamese.
+- **Contextual Awareness**: The AI remembers the context of your conversation for follow-up questions.
+- **Summaries and Insights**: Get aggregated data and summaries directly in the chat.
+- **Multi-Parameter Search**: Combine criteria like date, category, amount, and tags in a single query.
 
-- **Date Range**: "Show expenses between March 1 and March 15"
-- **Category**: "List all transportation expenses"
-- **Amount Range**: "Find expenses over $50"
-- **Location**: "Show expenses from New York"
-- **Payment Method**: "List all expenses paid with my credit card"
-- **Tags**: "Show expenses tagged as 'business'"
+### Supported Search Parameters
 
-### Combining Search Parameters
+- **Date Range**: "from last week," "in February," "between May 1 and May 15"
+- **Category**: "groceries," "transportation," "dining"
+- **Amount**: "over $50," "less than $10," "around $20"
+- **Payment Method**: "paid with cash," "on my credit card"
+- **Tags**: "tagged as 'work'," "with the 'vacation' tag"
+- **Keywords**: "coffee," "lunch," "taxi"
 
-The AI understands complex queries that combine multiple parameters:
+## 4. Example Conversations
 
-- "Show me restaurant expenses over $30 from last month"
-- "How much did I spend on groceries and household items in February?"
-- "Find all transportation expenses paid with cash in the last two weeks"
+### Example 1: Simple Search and Refinement
 
-## Search Results
+**User**: "Show me my expenses from yesterday."
+**AI**: "Yesterday, you had 3 expenses totaling $45.50:
+- Coffee: $5.00
+- Lunch at Cafe Luna: $15.50
+- Taxi Ride: $25.00"
 
-The AI will respond with:
+**User**: "How much did I spend on food?"
+**AI**: "You spent $20.50 on food yesterday (Coffee and Lunch)."
 
-1. A list of matching expenses
-2. Summary information (total amount, count, etc.)
-3. Relevant insights about the search results
+### Example 2: Complex Search
 
-## Benefits of AI-Powered Search
+**User**: "Find all transportation expenses over $20 from last month tagged as 'work'."
+**AI**: "I found two transportation expenses matching your criteria from last month:
+- Taxi to Airport: $45.00 (March 15)
+- Client Meeting Ride: $28.00 (March 22)"
 
-- **Natural Language**: No need to learn specific search syntax
-- **Contextual Understanding**: The AI understands the intent behind your queries
-- **Conversational Flow**: You can refine your search through follow-up questions
-- **Insights**: Get analysis along with your search results
-- **Multi-Language Support**: Search in English or Vietnamese
+## 5. Technical Implementation
 
-## Example Search Conversations
+The AI-powered search is built on the following components:
 
-### Example 1: Category Search with Follow-up
+- **AI Chat Interface**: Captures user input and displays results.
+- **AI Service**: Processes natural language queries to extract intent and entities (e.g., dates, categories).
+- **`ExpenseQueryService`**: Constructs and executes database queries based on the structured data received from the AI Service.
+- **`DatabaseService`**: Interacts with the SQLite database to fetch expense records.
 
-**User**: "Show me my dining expenses from last month"
+The flow is as follows:
+1. User types a query in the chat.
+2. The AI Service processes the text.
+3. The service returns a structured query object.
+4. `ExpenseQueryService` uses this object to fetch data from the database.
+5. The results are formatted and returned to the user in a conversational response.
 
-**AI**: "I found 8 dining expenses from last month totaling $245.32. Here they are:
-1. Seafood Restaurant - $65.20 (March 5)
-2. Coffee Shop - $12.50 (March 7)
-..."
+## 6. Future Enhancements
 
-**User**: "Which one was the most expensive?"
-
-**AI**: "The most expensive dining expense last month was $65.20 at Seafood Restaurant on March 5."
-
-### Example 2: Complex Query
-
-**User**: "How much did I spend on transportation and food while I was in Chicago?"
-
-**AI**: "Based on your expenses tagged with location 'Chicago', you spent:
-- $125.40 on transportation (3 expenses)
-- $210.75 on food (5 expenses)
-Total: $336.15 across 8 expenses during your time in Chicago."
-
-## Implementation Details
-
-The search functionality is implemented through:
-
-1. Natural language processing in the AI service
-2. Integration with the ExpenseQueryService for database queries
-3. Context management to maintain conversation state
-4. Multi-language support for queries in different languages
+- **Saved Searches**: Allow users to save frequent search queries.
+- **Proactive Alerts**: Notify users of unusual spending patterns based on their search history.
+- **Voice-Activated Search**: Integrate voice commands for hands-free searching.

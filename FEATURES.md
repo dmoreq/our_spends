@@ -1,75 +1,51 @@
-# Our Spends Features
+# Features
 
-## Core Features
+## 1. Overview
 
-### Expense Tracking
+**Our Spends** is a comprehensive expense tracking application designed to provide a seamless and intelligent way to manage your finances. It combines robust manual expense entry with a powerful AI-powered chatbot, allowing you to track, query, and analyze your spending through a conversational interface.
 
-- **Add Expenses**: Record expenses with detailed information including amount, category, date, and description
-- **Categorization**: Organize expenses into predefined or custom categories
-- **Tagging**: Add flexible tags to expenses for better organization
-- **Recurring Expenses**: Set up and track regular payments
-- **Expense List**: View and filter your expenses by various criteria
+The app is built with a focus on user experience, data privacy, and performance, making it a reliable tool for personal finance management.
 
-### AI-Powered Chat
+## 2. Core Functionality
 
-- **Natural Language Interface**: Interact with your expense data using natural language
-- **Expense Detection**: Automatically extract expense details from chat messages
-- **Smart Search**: Search your expenses using natural language queries
-- **Spending Insights**: Get personalized insights about your spending habits
-- **Multi-Provider Support**: Choose between Gemini, OpenAI, Claude, or DeepSeek
+- **Expense Tracking**: Manually add, edit, and delete expenses with details like amount, category, date, description, and payment method.
+- **Categorization**: Organize expenses into predefined or custom categories, each with a unique icon and color.
+- **Tagging System**: Apply multiple tags to expenses for granular filtering and reporting.
+- **Recurring Expenses**: Schedule recurring transactions (e.g., monthly subscriptions) to be logged automatically.
+- **Data Export**: Export your expense data to CSV for backups or external analysis.
 
-### Reports and Analytics
+## 3. AI-Powered Features
 
-- **Spending Overview**: Get a quick summary of your spending
-- **Category Breakdown**: See how your spending is distributed across categories
-- **Time-Based Analysis**: Track spending trends over time
-- **Export Options**: Export your expense data for external analysis
+Our Spends integrates a multi-provider AI chatbot (supporting Gemini, OpenAI, Claude, and DeepSeek) to deliver a unique, conversational experience.
 
-## User Experience Features
+- **Natural Language Expense Entry**: Add expenses by simply chatting with the AI (e.g., "I spent 50k on coffee at Starbucks").
+- **Smart Search & Queries**: Ask complex questions about your spending (e.g., "How much did I spend on food last month?").
+- **Spending Insights**: Receive AI-generated summaries and analytics about your spending habits.
+- **Conversational UI**: Interact with your finances in a natural, intuitive way.
 
-### Multi-Language Support
+## 4. User Experience
 
-- **English**: Full support for English language
-- **Vietnamese**: Complete Vietnamese localization
-- **Extensible**: Architecture supports adding more languages
+- **Multi-Language Support**: Fully localized in English and Vietnamese, with an extensible architecture to support additional languages.
+- **Customizable Themes**: Switch between light, dark, and system-default themes for optimal viewing comfort.
+- **Intuitive Navigation**: A clean, user-friendly interface with bottom navigation and a floating action button for quick expense entry.
+- **Offline-First Design**: All core features are available offline, with data stored securely on your device.
 
-### Theme and Appearance
+## 5. Technical Excellence
 
-- **Dark Mode**: Comfortable viewing in any lighting condition
-- **Light Mode**: Clean, bright interface
-- **System Theme**: Automatically match your device's theme
+- **Local SQLite Database**: Ensures data privacy, security, and high performance.
+- **State Management**: Efficiently manages app state using the Provider pattern for a reactive and consistent UI.
+- **Clean Architecture**: A modular and scalable architecture that separates concerns (UI, business logic, data).
+- **Secure API Key Handling**: Encrypted storage of AI provider API keys.
 
-### Navigation
+## 6. Getting Started
 
-- **Bottom Navigation**: Easy access to main screens
-- **Floating Action Button**: Quick access to add new expenses
-- **Intuitive Layout**: User-friendly design for easy navigation
+1. **Download and Install**: Get the app from the official store.
+2. **Set Up AI (Optional)**: Navigate to the settings screen to configure your preferred AI provider by adding an API key.
+3. **Start Tracking**: Use the floating action button to add your first expense or simply start a conversation with the AI.
 
-## Technical Features
+## 7. Roadmap
 
-### Offline-First
-
-- **Local Storage**: All data stored locally using SQLite
-- **No Internet Required**: Core functionality works without an internet connection
-- **Sync Ready**: Architecture supports future cloud sync capabilities
-
-### Security
-
-- **Local Data**: Expense data stored securely on your device
-- **API Key Management**: Secure handling of AI provider API keys
-- **Authentication**: Optional user authentication for enhanced security
-
-### Performance
-
-- **Responsive UI**: Smooth and responsive user interface
-- **Efficient Database**: Optimized database queries for fast performance
-- **Low Resource Usage**: Minimal battery and memory consumption
-
-## Future Enhancements
-
-- **Cloud Sync**: Synchronize data across multiple devices
-- **Receipt Scanning**: OCR for automatic expense entry from receipts
-- **Budget Tracking**: Set and monitor spending budgets
-- **Advanced Analytics**: More detailed spending analysis and predictions
-- **Multi-Currency Support**: Handle expenses in different currencies
-- **Data Visualization**: Enhanced charts and graphs for better insights
+- **Cloud Sync**: Optional synchronization of your data across multiple devices.
+- **Budgeting Tools**: Set and monitor spending budgets for different categories.
+- **Receipt Scanning (OCR)**: Automatically create expenses by scanning receipts.
+- **Advanced Data Visualization**: Interactive charts and graphs for deeper financial insights.

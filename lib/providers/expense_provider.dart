@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import '../models/expense.dart';
 import '../models/currency.dart';
 import '../models/tag.dart';
-import '../services/database/database_service.dart';
+import '../repositories/expense_repository.dart';
+import '../repositories/tag_repository.dart';
 import '../services/service_provider.dart';
 import '../services/ai_service.dart';
 
 class ExpenseProvider extends ChangeNotifier {
-  final DatabaseService _databaseService = ServiceProvider().databaseService;
+  final ExpenseRepository _expenseRepository;
+  final TagRepository _tagRepository;
   final AIService _aiService = AIService();
   
   List<Expense> _expenses = [];
@@ -29,7 +31,11 @@ class ExpenseProvider extends ChangeNotifier {
 
   Stream<List<Expense>> get expensesStream => _expenseStreamController.stream;
 
-  ExpenseProvider() {
+  ExpenseProvider({
+    required ExpenseRepository expenseRepository,
+    required TagRepository tagRepository,
+  }) : _expenseRepository = expenseRepository,
+       _tagRepository = tagRepository {
     _initFuture = _initializeDatabase();
   }
 
@@ -75,64 +81,62 @@ class ExpenseProvider extends ChangeNotifier {
     ];
 
     for (final expense in testExpenses) {
-      await _databaseService.insertExpense(expense);
+      await _expenseRepository.insert(expense);
     }
   }
 
   Future<Tag?> getTagById(String tagId) async {
-    return await _databaseService.getTagById(tagId);
+    return await _tagRepository.getById(tagId);
   }
 
   Future<List<Tag>> getTags() async {
-    return await _databaseService.getTags();
+    return await _tagRepository.getAll();
   }
 
   Future<List<String>> getExpenseTags(String expenseId) async {
-    return await _databaseService.getExpenseTags(expenseId);
+    return await _tagRepository.getExpenseTags(expenseId);
   }
 
   Future<void> setExpenseTags(String expenseId, List<String> tagIds) async {
-    await _databaseService.setExpenseTags(expenseId, tagIds);
+    await _tagRepository.setExpenseTags(expenseId, tagIds);
     notifyListeners();
   }
 
   Future<void> addTag(Tag tag) async {
-    await _databaseService.addTag(tag);
+    await _tagRepository.insert(tag);
     notifyListeners();
   }
 
   Future<void> updateTag(Tag tag) async {
-    await _databaseService.updateTag(tag);
+    await _tagRepository.update(tag);
     notifyListeners();
   }
 
   Future<void> deleteTag(String tagId) async {
-    await _databaseService.deleteTag(tagId);
+    await _tagRepository.delete(tagId);
     notifyListeners();
   }
 
-
-
   Future<String> formatCurrency(double amount, String currencyCode) async {
-    final currency = await _databaseService.getUserPreferredCurrency();
+    final currency = await _expenseRepository.getUserPreferredCurrency();
     return currency.formatAmount(amount);
   }
 
   Future<double> convertCurrency(double amount, String fromCurrency, String toCurrency) async {
     final sourceCurrency = Currency.vnd; // For now, we'll use VND as the source currency
-    final targetCurrency = await _databaseService.getUserPreferredCurrency();
+    final targetCurrency = await _expenseRepository.getUserPreferredCurrency();
     return sourceCurrency.convertTo(amount, targetCurrency);
   }
 
   Future<void> setUserPreferredCurrency(Currency currency) async {
-    await _databaseService.setUserPreferredCurrency(currency);
+    await _expenseRepository.setUserPreferredCurrency(currency);
     _userPreferredCurrency = currency;
     notifyListeners();
   }
 
   Future<Currency> getUserPreferredCurrency() async {
     if (_userPreferredCurrency == null) {
-      _userPreferredCurrency = await _databaseService.getUserPreferredCurrency();
+      _userPreferredCurrency = await _expenseRepository.getUserPreferredCurrency();
     }
     return _userPreferredCurrency!;
   }
@@ -145,13 +149,13 @@ class ExpenseProvider extends ChangeNotifier {
 
   Future<void> _initializeDatabase() async {
     try {
-      await _databaseService.initialize();
-      _userPreferredCurrency = await _databaseService.getUserPreferredCurrency();
+      await _expenseRepository.init();
+      _userPreferredCurrency = await _expenseRepository.getUserPreferredCurrency();
 
-      var expenses = await _databaseService.getExpenses();
+      var expenses = await _expenseRepository.getAll();
       if (expenses.isEmpty) {
         await _addTestData();
-        expenses = await _databaseService.getExpenses();
+        expenses = await _expenseRepository.getAll();
       }
       _expenses.clear();
       _expenses.addAll(expenses);
@@ -167,7 +171,7 @@ class ExpenseProvider extends ChangeNotifier {
   Future<void> loadExpenses() async {
     try {
       _setLoading(true);
-      final expenses = await _databaseService.getExpenses();
+      final expenses = await _expenseRepository.getAll();
       _expenses.clear();
       _expenses.addAll(expenses);
       _expenseStreamController.add(_expenses);
@@ -199,39 +203,58 @@ class ExpenseProvider extends ChangeNotifier {
       _setLoading(false);
       return {
         'status': 'error',
-        'data': 'Failed to process message: ${e.toString()}',
-        'error_code': 'provider_error',
+        'data': null,
+        'error_code': 'message_processing_failed',
+        'error_message': e.toString(),
       };
     }
   }
 
-  Future<Map<String, dynamic>> generateInsights(String userId) async {
+  Future<void> addExpense(Expense expense) async {
     try {
       _setLoading(true);
       _clearError();
 
-      final insightsText = await _aiService.generateSpendingInsights(_expenses);
-      
-      final response = {
-        'status': 'success',
-        'data': insightsText,
-        'error_code': null,
-      };
-      
+      await _expenseRepository.insert(expense);
+      await loadExpenses();
+
       _setLoading(false);
-      return response;
     } catch (e) {
-      _setError('Failed to generate insights: ${e.toString()}');
+      _setError('Failed to add expense: ${e.toString()}');
       _setLoading(false);
-      return {
-        'status': 'error',
-        'data': 'Failed to generate insights: ${e.toString()}',
-        'error_code': 'insights_error',
-      };
     }
   }
 
-  // Private methods for internal use
+  Future<void> updateExpense(Expense expense) async {
+    try {
+      _setLoading(true);
+      _clearError();
+
+      await _expenseRepository.update(expense);
+      await loadExpenses();
+
+      _setLoading(false);
+    } catch (e) {
+      _setError('Failed to update expense: ${e.toString()}');
+      _setLoading(false);
+    }
+  }
+
+  Future<void> deleteExpense(String expenseId) async {
+    try {
+      _setLoading(true);
+      _clearError();
+
+      await _expenseRepository.delete(expenseId);
+      await loadExpenses();
+
+      _setLoading(false);
+    } catch (e) {
+      _setError('Failed to delete expense: ${e.toString()}');
+      _setLoading(false);
+    }
+  }
+
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -246,111 +269,19 @@ class ExpenseProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
-  
-  // Public methods for testing
-  void setLoading(bool loading) {
-    _setLoading(loading);
-  }
 
-  void setError(String error) {
-    _setError(error);
-  }
-
-  void clearError() {
-    _clearError();
-  }
-  
-  // Expose _loadExpenses for testing
-  Future<void> loadExpensesForTesting() async {
-    await loadExpenses();
-  }
-
-  // Add a new expense to the database and refresh the expenses list
-  Future<String?> addExpense(Expense expense) async {
+  Future<void> clearAllData() async {
     try {
       _setLoading(true);
       _clearError();
-      
-      // Insert the expense into the database
-      await _databaseService.insertExpense(expense);
-      
-      // Reload expenses to update the UI
+
+      await _expenseRepository.clearAll();
       await loadExpenses();
-      
-      _setLoading(false);
-      return expense.id;
-    } catch (e) {
-      _setError('Failed to add expense: ${e.toString()}');
-      _setLoading(false);
-      return null;
-    }
-  }
-  
-  // Update an existing expense in the database and refresh the expenses list
-  Future<String?> updateExpense(Expense expense) async {
-    try {
-      _setLoading(true);
-      _clearError();
-      
-      // Update the expense in the database
-      await _databaseService.updateExpense(expense);
-      
-      // Reload expenses to update the UI
-      await loadExpenses();
-      
-      _setLoading(false);
-      return expense.id;
-    } catch (e) {
-      _setError('Failed to update expense: ${e.toString()}');
-      _setLoading(false);
-      return null;
-    }
-  }
 
-  // Delete an expense from the database and refresh the expenses list
-  Future<bool> deleteExpense(String expenseId) async {
-    try {
-      _setLoading(true);
-      _clearError();
-      
-      // Delete the expense from the database
-      await _databaseService.deleteExpense(expenseId);
-      
-      // Reload expenses to update the UI
-      await loadExpenses();
-      
       _setLoading(false);
-      return true;
-    } catch (e) {
-      _setError('Failed to delete expense: ${e.toString()}');
-      _setLoading(false);
-      return false;
-    }
-  }
-
-  // Clear all data and reinitialize the database
-  Future<bool> clearAllData() async {
-    try {
-      _setLoading(true);
-      _clearError();
-      
-      // Clear all data from the database
-      await _databaseService.clearAllData();
-      
-      // Reset provider state
-      _expenses.clear();
-      _userPreferredCurrency = null;
-      _isInitialized = false;
-      
-      // Reinitialize the database and load default data
-      await _initializeDatabase();
-      
-      _setLoading(false);
-      return true;
     } catch (e) {
       _setError('Failed to clear data: ${e.toString()}');
       _setLoading(false);
-      return false;
     }
   }
 }

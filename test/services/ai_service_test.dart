@@ -34,7 +34,6 @@ void main() {
           date: DateTime(2023, 5, 15),
           amount: 50.0,
           currency: 'USD',
-          category: 'Food & Dining',
           item: 'Lunch',
         ),
       ];
@@ -91,7 +90,6 @@ void main() {
           date: DateTime(2023, 5, 15),
           amount: 50.0,
           currency: 'USD',
-          category: 'Food & Dining',
           item: 'Lunch',
         ),
       ];

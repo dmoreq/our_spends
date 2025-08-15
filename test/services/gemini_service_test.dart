@@ -1,8 +1,9 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:our_spends/services/gemini_service.dart';
 import 'package:our_spends/models/expense.dart';
+import 'package:our_spends/services/gemini_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
@@ -135,7 +136,6 @@ void main() {
             date: DateTime(2023, 5, 15),
             amount: 50.0,
             currency: 'USD',
-            category: 'Food & Dining',
             item: 'Lunch',
           ),
           Expense(
@@ -144,7 +144,6 @@ void main() {
             date: DateTime(2023, 5, 16),
             amount: 30.0,
             currency: 'USD',
-            category: 'Transportation',
             item: 'Taxi',
           ),
         ];
@@ -201,7 +200,6 @@ void main() {
             date: DateTime(2023, 5, 15),
             amount: 20.0,
             currency: 'USD',
-            category: 'Food & Dining',
             item: 'Lunch',
           ),
           Expense(
@@ -210,7 +208,6 @@ void main() {
             date: DateTime(2023, 5, 16),
             amount: 30.0,
             currency: 'USD',
-            category: 'Food & Dining',
             item: 'Dinner',
           ),
           Expense(
@@ -219,7 +216,6 @@ void main() {
             date: DateTime(2023, 5, 17),
             amount: 10.0,
             currency: 'USD',
-            category: 'Transportation',
             item: 'Bus',
           ),
         ];
@@ -276,7 +272,6 @@ void main() {
             date: DateTime(2023, 5, 15),
             amount: 25.0,
             currency: 'USD',
-            category: 'Food & Dining',
             item: 'lunch',
           ),
           Expense(
@@ -285,7 +280,6 @@ void main() {
             date: DateTime(2023, 5, 16),
             amount: 30.0,
             currency: 'USD',
-            category: 'Food & Dining',
             item: 'lunch',
           ),
         ];
@@ -303,12 +297,12 @@ void main() {
             retryCount++;
             if (retryCount >= maxRetries) {
               // If we've exhausted retries, rethrow the exception
-              print('Failed after $maxRetries retries: $e');
+              addTearDown(() => debugPrint('Failed after $maxRetries retries: $e'));
               rethrow;
             }
             // Wait before retrying (exponential backoff)
             await Future.delayed(Duration(seconds: 2 * retryCount));
-            print('Retrying API call, attempt $retryCount');
+            addTearDown(() => debugPrint('Retrying API call, attempt $retryCount'));
           }
         }
         

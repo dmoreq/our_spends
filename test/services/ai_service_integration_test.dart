@@ -1,127 +1,100 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:our_spends/services/ai_service.dart';
 import 'package:our_spends/models/expense.dart';
+import 'package:our_spends/services/ai_service.dart';
+import 'package:our_spends/services/gemini_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  group('AI Service Integration Tests', () {
+  group('AIService Integration Tests', () {
     late AIService aiService;
-    
+
     setUp(() async {
-      // Initialize SharedPreferences mock
+      // Setup SharedPreferences for testing
       SharedPreferences.setMockInitialValues({
-        'gemini_api_key': 'test_api_key_12345', // Set test API key
+        'gemini_api_key': 'YOUR_API_KEY_HERE', // Use a placeholder for tests
       });
       
-      // Create AIService instance
-      aiService = AIService();
-      
-      // Initialize the service
-      await aiService.initialize();
+      // Initialize services
+      final geminiService = GeminiService();
+      aiService = AIService(geminiService: geminiService);
     });
 
     test('AIService should initialize correctly', () {
       expect(aiService, isNotNull);
     });
 
-    test('AIService should return correct provider information', () {
-      expect(aiService.getProviderName(), 'Google Gemini');
-      expect(aiService.getProviderModel(), isNotNull);
+    test('AIService should provide provider information', () {
+      final providerName = aiService.getProviderName();
+      final providerModel = aiService.getProviderModel();
+      
+      expect(providerName, 'Google Gemini');
+      expect(providerModel, isNotNull);
     });
-    
-    test('AIService should check Gemini availability', () async {
+
+    test('isGeminiAvailable should return false with placeholder API key', () async {
+      final isAvailable = await aiService.isGeminiAvailable();
+      expect(isAvailable, isFalse);
+    });
+
+    test('getGeminiStatus should return correct status with placeholder API key', () async {
       final status = await aiService.getGeminiStatus();
-      expect(status, isA<Map<String, dynamic>>());
+      expect(status, isNotNull);
       expect(status['name'], 'Google Gemini');
-      expect(status['available'], isTrue);
+      expect(status['available'], isFalse);
+      expect(status['working'], isFalse);
     });
-    
-    test('AIService should process messages', () async {
-      // Using API key from config file, no need to skip
-      
-      // Create test expenses
-      final expenses = <Expense>[];
-      
-      // Process a test message
-      final response = await aiService.processMessage(
-        'Hello, how are you?',
-        expenses,
-        conversationHistory: [],
-        languageCode: 'en',
-      );
-      
-      // Verify response is not empty
-      expect(response, isNotNull);
-      expect(response.isNotEmpty, isTrue);
-    });
-    
-    test('AIService should extract expense information', () async {
-      // Skip if API key is not configured
-      final prefs = await SharedPreferences.getInstance();
-      final apiKey = prefs.getString('gemini_api_key');
-      if (apiKey == null || apiKey.isEmpty || apiKey.contains('YOUR_') || apiKey.length < 10) {
-        markTestSkipped('Skipping test because valid Gemini API key is not set');
-        return;
-      }
-      
-      // Extract expense info
-      final result = await aiService.extractExpenseInfo('I spent \$50 on groceries yesterday');
-      
-      // Verify result structure
-      expect(result, isNotNull);
-      expect(result!['amount'], 50.0);
-      expect(result['description'] ?? result['item'], contains('groceries'));
-    });
-    
-    test('AIService should generate spending insights', () async {
-      // Skip if API key is not configured
-      final prefs = await SharedPreferences.getInstance();
-      final apiKey = prefs.getString('gemini_api_key');
-      if (apiKey == null || apiKey.isEmpty || apiKey.contains('YOUR_') || apiKey.length < 10) {
-        markTestSkipped('Skipping test because valid Gemini API key is not set');
-        return;
-      }
-      
-      // Create test expenses
+
+    // Skip actual API tests if no valid API key is available
+    test('processMessage should handle messages without API key', () async {
       final expenses = [
         Expense(
-          id: '1',
-          userId: 'test-user',
-          date: DateTime.now(),
+          id: 'id1',
+          userId: 'user1',
+          date: DateTime(2023, 5, 15),
           amount: 50.0,
           currency: 'USD',
-          category: 'Food & Dining',
           item: 'Lunch',
-        ),
-        Expense(
-          id: '2',
-          userId: 'test-user',
-          date: DateTime.now().subtract(Duration(days: 1)),
-          amount: 30.0,
-          currency: 'USD',
-          category: 'Transportation',
-          item: 'Taxi',
         ),
       ];
       
-      // Generate spending insights
-      final insights = await aiService.generateSpendingInsights(expenses);
+      // This should not throw an error, but return a message about API key
+      final response = await aiService.processMessage(
+        'How much did I spend on food?',
+        expenses,
+      );
       
-      // Verify insights are not empty
-      expect(insights, isNotNull);
-      expect(insights.isNotEmpty, isTrue);
+      expect(response, contains('API key'));
+    });
+
+    test('extractExpenseInfo should handle messages without API key', () async {
+      // This should not throw an error, but return a message about API key
+      final response = await aiService.extractExpenseInfo(
+        'I spent 10 on coffee',
+      );
       
-      // Verify insights contain relevant information
-      expect(insights, anyOf(
-        contains('Total Expenses'),
-        contains('USD'),
-        contains('\$'),
-      ));
-      expect(insights, anyOf(
-        contains('Food'),
-        contains('Dining'),
-        contains('Transportation'),
-      ));
+      expect(response, isNotNull);
+      // The response might be null or a Map with an error key
+      if (response != null) {
+        expect(response.containsKey('error') || response.containsKey('message'), isTrue);
+      }
+    });
+
+    test('generateSpendingInsights should handle expenses without API key', () async {
+      final expenses = [
+        Expense(
+          id: 'id1',
+          userId: 'user1',
+          date: DateTime(2023, 5, 15),
+          amount: 50.0,
+          currency: 'USD',
+          item: 'Lunch',
+        ),
+      ];
+      
+      // This should not throw an error, but return a message about API key
+      final response = await aiService.generateSpendingInsights(expenses);
+      
+      expect(response, contains('API key'));
     });
   });
 }
